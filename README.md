@@ -41,4 +41,6 @@ Example call
 api.php?lat=41.85755162802421&lng=-87.64665126800537&north=41.86975344657134&south=41.84533324486843&east=-87.62577295303345&west=-87.66748666763306&distance=150
 ````
 
+In the webpage, the bounds are obtained via Leaflet. 
+
 The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois StatePlane West feet) to be able to search distance in feet (this may not be the best method). This is the data's original projection although the records' WGS84 coordinates (provided by the data author) are the actual fields used.
