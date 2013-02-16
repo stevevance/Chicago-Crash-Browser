@@ -210,11 +210,13 @@ function getUrl() {
 				// pedestrian
 				//marker.setIcon(new icon_pedestrian());
 				counterPedestrian++;
+				// count the year here
 			}
 			if(feature[12] == "2"){
 				// bicyclist
 				//marker.setIcon(new icon_bicycle());
 				counterBicyclist++;
+				// count the year here
 			}
 		});
 		map.addLayer(markerGroup);
