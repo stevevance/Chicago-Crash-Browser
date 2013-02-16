@@ -104,7 +104,7 @@ var center = [lat,lng];
 var map = L.map('map').setView(center, 16);
 //var boundsString = map.getBounds().toBBoxString();
 var bounds = map.getBounds();
-var boundsPadded = bounds.pad(0.5);
+var boundsPadded = bounds.pad(10);
 
 var southwest = boundsPadded.getSouthWest();
 var south = southwest.lat;
@@ -163,7 +163,14 @@ function onMapClick(e) {
 	lng = e.latlng.lng;
 	console.log(lat+", "+lng);
 	
+	getUrl();
+}
+
+function getUrl() {
+	$("#status").html("Looking through the database...");
+	
 	bounds = map.getBounds();
+	console.log(bounds);
 	boundsPadded = bounds.pad(10);
 	southwest = boundsPadded.getSouthWest();
 	south = southwest.lat;
@@ -172,11 +179,6 @@ function onMapClick(e) {
 	north = northeast.lat;
 	east = northeast.lng;
 	
-	getUrl();
-}
-
-function getUrl() {
-	$("#status").html("Looking through the database...");
 	var url = "api.php?lat="+lat+"&lng="+lng+"&north="+north+"&south="+south+"&east="+east+"&west="+west+"&distance="+distance;
 	console.log(url);
 	counterBicyclist = 0;
