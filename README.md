@@ -48,3 +48,15 @@ api.php?lat=41.85755162802421&lng=-87.64665126800537&north=41.86975344657134&sou
 In the webpage, the bounds are obtained via Leaflet. 
 
 The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois StatePlane West feet) to be able to search distance in feet (this may not be the best method). This is the data's original projection although the records' WGS84 coordinates (provided by the data author) are the actual fields used.
+
+##Credits##
+* Lori M. at IDOT (for providing the data)
+* Amanda Woodall at Active Transportation Alliance (for helping me understand the data)
+* Derek Eder (for continued tech support and brainstorming)
+* Cory Mollett (for PostgreSQL and Amazon Web Services help)
+* Ryan Lakes (for motivating me to resurrect this)
+* Nabil Nazha (for assistance in developing a method relating intersections to bike crashes in GIS and determining the ideal distance)
+* Everyone who appreciates this work.
+
+##Cities outside Illinois##
+As much as I would love to provide this for outside Illinois, the fact is that the more cities (and their crashes) in the database, the slower this web application works. 
