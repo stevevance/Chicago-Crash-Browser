@@ -19,10 +19,13 @@ The Chicago Crash Browser will, in addition to simple browsing, have a storytell
 ##Enhancements
 Desired enhancements include:
 * Speeding up the PostGIS tables
-* Joining the "CrashExtract" table with the "PersonExtract" table so the full number of bicyclists and pedestrians are counted in the figures returned to the user for their point search.
+* Joining the "CrashExtract" table with the "PersonExtract" table so the full number of bicyclists and pedestrians are counted in the figures returned to the user for their point search. Alternative: After the crash "casenumbers" (unique ID) are returned, send a query to the "PersonExtract" table once per casenumber to get the person information (this might be faster than joining)
 * Usability enhancements that tell the user the database is running their search; show how much time a search has taken; reverse geocodes the searched coordinates
 * Style changes
 * Update the API to return details like the number of rows returned and the time it took for the PostgreSQL server to run the query
+* Close the popup when the search results are returned (for some reason I cannot figure this out, and I thought it was pretty simple)
+* Make it tablet-friendly
+* Count the number of crashes per year and give the bike/pedestrian numbers in a year by year breakdown
 
 ##Data Structure
 One table is currently used, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided to me, I stripped out all cities except Chicago ("City Code" != 1051).
@@ -30,7 +33,7 @@ One table is currently used, called "CrashExtract". It's called this because the
 [CrashExtract data dictionary](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
 
 ##API
-The API returns JSON and has the following parameters:
+The API returns JSON and has the following GET parameters:
 * distance (in feet). This is capped at 1,000 feet. 
 * north, south, east, west (to create a bounding box inserted as a WHERE statement to reduce the dataset search time)
 * lat (latitude)
