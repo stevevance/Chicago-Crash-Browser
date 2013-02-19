@@ -56,7 +56,7 @@
 		<h1>Chicago Crash Browser</h1>
 		<p>Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
 		<p>Search radius is 150 feet. Very beta right now; <a href='https://github.com/stevevance/Chicago-Crash-Browser'>fork it on GitHub</a>. -<a href="mailto:steve@stevevance.net">Steven Vance</a></p>
-		<div id="status">Right-click on a point
+		<div id="status">Click on a point
 		</div>
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
