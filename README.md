@@ -3,7 +3,7 @@ Chicago Crash Browser
 
 [Demo](http://gridchicago.com/crashes/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
 
-Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.
+The Chicago Crash Browser is an interface for the automobile crash data from the Illinois Department of Transportation (IDOT). Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by IDOT.
 
 ##History
 * First Chicago bike crash map created in February 2011
@@ -11,8 +11,12 @@ Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the firs
 * Lots of press for the Chicago bike crash map
 * Attempted to create a public browser later in 2011, to get more details about the crashes, especially after I obtained additional years of data
 
-##Goal
-Provide an easy to use alternative for citizens and elected representatives to discover the number of bicycle and pedestrian crashes for any point in the city. Provide an open alternative to the State of Illinois's own Safety Data Mart.  
+##Purpose
+The purpose of the Crash Browser is two fold:
+
+1. Give planners, politicians, and policy makers the tools and information they need to make good decisions and prioritization about where to make investments about transportation safety. 
+
+2. Give activists and advocates the information they need to demand change in the transportation system in the most effective way. 
 
 The Chicago Crash Browser will, in addition to simple browsing, have a storytelling component to go beyond pure figures of crash frequencies at an intersection. 
 
@@ -50,13 +54,17 @@ In the webpage, the bounds are obtained via Leaflet.
 The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois StatePlane West feet) to be able to search distance in feet (this may not be the best method). This is the data's original projection although the records' WGS84 coordinates (provided by the data author) are the actual fields used.
 
 ##Credits##
+* Michael Carney and Sebastian Lew (who got me interested in automobile crash data in the first place after they asked if I had it)
 * Lori M. at IDOT (for providing the data)
+* Jerad Weiner
 * Amanda Woodall at Active Transportation Alliance (for helping me understand the data)
-* Derek Eder (for continued tech support and brainstorming)
+* Derek Eder and Nick Rougeux (for continued tech support and brainstorming)
 * Cory Mollett (for PostgreSQL and Amazon Web Services help)
 * Ryan Lakes (for motivating me to resurrect this)
 * Nabil Nazha (for assistance in developing a method relating intersections to bike crashes in GIS and determining the ideal distance)
+* Bill Vassilakis
+* Trina Chiasson
 * Everyone who appreciates this work.
 
 ##Cities outside Illinois##
-As much as I would love to provide this for outside Illinois, the fact is that the more cities (and their crashes) in the database, the slower this web application works. 
+As much as I would love to provide this for outside Illinois, the fact is that the more cities (and their crashes) in the database, the slower this web application works.
