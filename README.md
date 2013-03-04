@@ -1,7 +1,7 @@
 Chicago Crash Browser
 =====================
 
-[Demo](http://gridchicago.com/crashes/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
+[Demo](http://chicagocrashes.org/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
 
 The Chicago Crash Browser is an interface for the automobile crash data from the Illinois Department of Transportation (IDOT). Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by IDOT.
 
