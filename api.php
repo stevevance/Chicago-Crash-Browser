@@ -1,5 +1,7 @@
 <?php
 //echo "test";
+header("Access-Control-Allow-Origin: *");
+
 require_once("pg.php");
 error_reporting(0);
 
