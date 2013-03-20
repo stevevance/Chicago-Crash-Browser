@@ -246,6 +246,8 @@ function getUrl() {
 		$("#counterTotals").slideDown();
 		$("#counterBicyclist").html(counterBicyclist);
 		$("#counterPedestrian").html(counterPedestrian);
+		$("#counterBicyclistByYear").html('');
+		$("#counterPedestrianByYear").html('');
 		
 		//counterBicyclistByYear.sort();
 		$.each(counterBicyclistByYear, function(key, value){
