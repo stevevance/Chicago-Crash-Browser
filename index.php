@@ -155,17 +155,6 @@ function openPopup(e) {
     .openOn(map);
 }
 
-function onMapClick(e) {
-	//var latlngStr = '(' + e.latlng.lat.toFixed(9) + ', ' + e.latlng.lng.toFixed(9) + ')';
-	popup.closePopup();
-	
-	lat = e.latlng.lat;
-	lng = e.latlng.lng;
-	console.log(lat+", "+lng);
-	
-	getUrl();
-}
-
 function getUrl() {
 	$("#status").html("Looking through the database...");
 	
