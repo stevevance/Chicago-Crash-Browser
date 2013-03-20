@@ -64,6 +64,7 @@ The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois 
 * Nabil Nazha (for assistance in developing a method relating intersections to bike crashes in GIS and determining the ideal distance)
 * Bill Vassilakis
 * Trina Chiasson
+* Richard Lee who made the first edits via GitHub. 
 * Everyone who appreciates this work.
 
 ##Cities outside Illinois##
