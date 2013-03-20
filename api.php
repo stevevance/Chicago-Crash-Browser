@@ -98,7 +98,8 @@ echo '{"data":[';
 
 $first = true;
 $r = pg_fetch_assoc($result);
-while($r=pg_fetch_row($result)){
+//print_r($r);
+while($r=pg_fetch_assoc($result)){
     //  cast results to specific data types
 
     if($first) {
@@ -106,7 +107,7 @@ while($r=pg_fetch_row($result)){
     } else {
         echo ',';
     }
-    echo json_encode($r);
+    echo json_encode($r)."\n";
 }
 echo ']}';
 	

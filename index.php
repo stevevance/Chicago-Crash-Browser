@@ -61,7 +61,9 @@
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
 			<p>Bike Crashes: <span id="counterBicyclist"></span></p>
+			<div>By Year: <div id="counterBicyclistByYear"></div></div>
 			<p>Pedestrian Crashes: <span id="counterPedestrian"></span></p>
+			 <div>By Year: <div id="counterPedestrianByYear"></div></div>
 			<p>These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
 		</div>
 		<div id="metadata" style="display:none;">
@@ -117,6 +119,8 @@ var circle;
 
 var counterPedestrian = 0;
 var counterBicyclist = 0;
+var counterPedestrianByYear = {};
+var counterBicyclistByYear = {};
 		
 /*
 L.tileLayer('http://{s}.tile.cloudmade.com/851cc32e47324bb6bdf28181975a7218/997/256/{z}/{x}/{y}.png', {
@@ -183,6 +187,8 @@ function getUrl() {
 	console.log(url);
 	counterBicyclist = 0;
 	counterPedestrian = 0;
+	counterPedestrianByYear = {};
+	counterBicyclistByYear = {};
 	
 	$.getJSON(url, function(data) {
 		// remove some layers first
@@ -198,27 +204,39 @@ function getUrl() {
 		console.log("JSON: Getting the URL");
 		
 		var counter = 0;
+		var year;
 		$.each(data.data, function(i, feature) {
 			console.log("JSON: Iterating...");
 			//console.log(counter);
-			console.log(feature[12]);
+			console.log(feature["casenumber"]);
 			
 			//var marker = new L.Marker([feature[11],feature[12]]);
-			var marker = new L.Marker([feature[46],feature[47]]);
+			var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]]);
 			markerGroup.addLayer(marker);
 			counter++;
+			year = feature["year"];
 			
-			if(feature[12] == "1") {
+			if(feature["collType"] == "1") {
 				// pedestrian
 				//marker.setIcon(new icon_pedestrian());
 				counterPedestrian++;
 				// count the year here
+				if(counterPedestrianByYear[year]) {
+					counterPedestrianByYear[year]++;
+				} else {
+					counterPedestrianByYear[year] = 1;
+				};
 			}
-			if(feature[12] == "2"){
+			if(feature["collType"] == "2"){
 				// bicyclist
 				//marker.setIcon(new icon_bicycle());
 				counterBicyclist++;
 				// count the year here
+				if(counterBicyclistByYear[year]) {
+					counterBicyclistByYear[year]++;
+				} else {
+					counterBicyclistByYear[year] = 1;
+				};
 			}
 		});
 		map.addLayer(markerGroup);
@@ -239,6 +257,15 @@ function getUrl() {
 		$("#counterTotals").slideDown();
 		$("#counterBicyclist").html(counterBicyclist);
 		$("#counterPedestrian").html(counterPedestrian);
+		
+		//counterBicyclistByYear.sort();
+		$.each(counterBicyclistByYear, function(key, value){
+			$("#counterBicyclistByYear").append("<div>" + key + ": " + value + "</div>")
+		})
+		//counterPedestrianByYear.sort();
+		$.each(counterPedestrianByYear, function(key, value){
+			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + "</div>")
+		})
 		
 		$("#metadata").slideDown();
 		$("#coords").html(lat+", "+lng);
