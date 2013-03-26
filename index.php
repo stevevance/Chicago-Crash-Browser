@@ -203,7 +203,7 @@ function getUrl() {
 			var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]]);
 			markerGroup.addLayer(marker);
 			counter++;
-			year = feature["year"];
+			year = feature["year"]*1+2000;
 			
 			if(feature["collType"] == "1") {
 				// pedestrian
