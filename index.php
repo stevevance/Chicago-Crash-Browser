@@ -99,8 +99,8 @@ if(hashObject.lon != undefined) {
 } else {
 	lng = -87.654921;
 }
-console.log(hashObject);
-console.log(lat+","+lng);
+//console.log(hashObject);
+//console.log(lat+","+lng);
 
 var center = [lat,lng]; 
 var map = L.map('map').setView(center, 16);
@@ -121,6 +121,10 @@ var counterPedestrian = 0;
 var counterBicyclist = 0;
 var counterPedestrianByYear = {};
 var counterBicyclistByYear = {};
+
+var popup;
+var year;
+
 		
 /*
 L.tileLayer('http://{s}.tile.cloudmade.com/851cc32e47324bb6bdf28181975a7218/997/256/{z}/{x}/{y}.png', {
@@ -140,17 +144,41 @@ map.addControl(new L.control.locate({debug:false}));
 if(get == "yes") {
 	getUrl();
 }
-var popup;
 
 map.on('click', openPopup);
 //map.on('load',init);
 //var popup = new L.Popup();
 //getUrl();
 
+
+/**
+ * Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+ */
+function sortObjectByKey(obj){
+    var keys = [];
+    var sorted_obj = {};
+
+    for(var key in obj){
+        if(obj.hasOwnProperty(key)){
+            keys.push(key);
+        }
+    }
+
+    // sort keys
+    keys.sort();
+
+    // create new array based on Sorted Keys
+    jQuery.each(keys, function(i, key){
+        sorted_obj[key] = obj[key];
+    });
+
+    return sorted_obj;
+};
+
 function openPopup(e) {
 	lat = e.latlng.lat;
 	lng = e.latlng.lng;
-	console.log(lat+", "+lng);
+	//console.log(lat+", "+lng);
 	
 	popup = L.popup()
     .setLatLng([lat, lng])
@@ -163,7 +191,7 @@ function getUrl() {
 	$("#status").html("Looking through the database...");
 	
 	bounds = map.getBounds();
-	console.log(bounds);
+	//console.log(bounds);
 	boundsPadded = bounds.pad(10);
 	southwest = boundsPadded.getSouthWest();
 	south = southwest.lat;
@@ -190,14 +218,13 @@ function getUrl() {
 		var markers = [];
 		map.setView([lat,lng], 18);
 		console.log(data);
-		console.log("JSON: Getting the URL");
+		//console.log("JSON: Getting the URL");
 		
 		var counter = 0;
-		var year;
 		$.each(data.data, function(i, feature) {
 			console.log("JSON: Iterating...");
 			//console.log(counter);
-			console.log(feature["casenumber"]);
+			//console.log(feature["casenumber"]);
 			
 			//var marker = new L.Marker([feature[11],feature[12]]);
 			var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]]);
@@ -249,11 +276,11 @@ function getUrl() {
 		$("#counterBicyclistByYear").html('');
 		$("#counterPedestrianByYear").html('');
 		
-		//counterBicyclistByYear.sort();
+		counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
 		$.each(counterBicyclistByYear, function(key, value){
 			$("#counterBicyclistByYear").append("<div>" + key + ": " + value + "</div>")
 		})
-		//counterPedestrianByYear.sort();
+		counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
 		$.each(counterPedestrianByYear, function(key, value){
 			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + "</div>")
 		})
