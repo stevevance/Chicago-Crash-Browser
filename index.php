@@ -125,6 +125,16 @@ var counterBicyclistByYear = {};
 var popup;
 var year;
 
+var bikeIcon = L.icon({
+  iconUrl: 'images/icon_bike.png',
+  shadowUrl: 'icon_shadow.png'
+});
+
+var pedestrianIcon = L.icon({
+  iconUrl: 'images/icon_pedestrian.png',
+  shadowUrl: 'icon_shadow.png'
+});
+
 		
 /*
 L.tileLayer('http://{s}.tile.cloudmade.com/851cc32e47324bb6bdf28181975a7218/997/256/{z}/{x}/{y}.png', {
@@ -227,14 +237,14 @@ function getUrl() {
 			//console.log(feature["casenumber"]);
 			
 			//var marker = new L.Marker([feature[11],feature[12]]);
-			var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]]);
-			markerGroup.addLayer(marker);
 			counter++;
 			year = feature["year"]*1+2000;
 			
 			if(feature["collType"] == "1") {
 				// pedestrian
 				//marker.setIcon(new icon_pedestrian());
+        var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]], {icon: pedestrianIcon});
+        markerGroup.addLayer(marker);
 				counterPedestrian++;
 				// count the year here
 				if(counterPedestrianByYear[year]) {
@@ -246,6 +256,8 @@ function getUrl() {
 			if(feature["collType"] == "2"){
 				// bicyclist
 				//marker.setIcon(new icon_bicycle());
+        var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]], {icon: bikeIcon});
+        markerGroup.addLayer(marker);
 				counterBicyclist++;
 				// count the year here
 				if(counterBicyclistByYear[year]) {
