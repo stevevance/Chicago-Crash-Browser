@@ -293,7 +293,10 @@ function getUrl() {
 		$("#status").html("");
     map.closePopup();
 	
-	});
+  }).fail(function(){
+		$("#status").html("Something went wrong while retrieving data. Please try again later.");
+    map.closePopup();
+  });
 	
 }
 </script>
