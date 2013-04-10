@@ -127,12 +127,12 @@ var year;
 
 var bikeIcon = L.icon({
   iconUrl: 'images/icon_bike.png',
-  shadowUrl: 'icon_shadow.png'
+  shadowUrl: 'images/icon_shadow.png'
 });
 
 var pedestrianIcon = L.icon({
   iconUrl: 'images/icon_pedestrian.png',
-  shadowUrl: 'icon_shadow.png'
+  shadowUrl: 'images/icon_shadow.png'
 });
 
 		
