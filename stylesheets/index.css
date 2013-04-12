@@ -1,0 +1,30 @@
+#map, body, html { 
+	height: 100%;
+	width:100%;
+	margin:0;
+	padding:0;
+}
+#map { 
+	height:100%;
+	width:70%;
+	margin:0;
+	padding:0;
+	float:left;
+}
+#listContainer {
+	height:100%;
+	width:30%;
+	float: left;
+}
+#list {
+	padding-left: 10px;
+}
+#instructions {
+	height:4%;
+	padding:0 1em;
+	font-size:90%;
+	display: none;
+}
+#status {
+	font-size: 130%;
+}

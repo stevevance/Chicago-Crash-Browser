@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="leaflet/MarkerCluster.css" />
 <link rel="stylesheet" href="leaflet/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="leaflet/L.Control.Locate.css" />
+<link rel="stylesheet" href="stylesheets/index.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" ></script>
 <script src="leaflet/leaflet-src.js"></script>
 <script src="leaflet/leaflet.markercluster-src.js"></script>
@@ -15,38 +16,6 @@
 <script src="leaflet/leaflet.permalink.js"></script>
 <script src="js/jquery.ba-bbq.min.js"></script>
 
-<style>
-#map, body, html { 
-	height: 100%;
-	width:100%;
-	margin:0;
-	padding:0;
-}
-#map { 
-	height:100%;
-	width:70%;
-	margin:0;
-	padding:0;
-	float:left;
-}
-#listContainer {
-	height:100%;
-	width:30%;
-	float: left;
-}
-#list {
-	padding-left: 10px;
-}
-#instructions {
-	height:4%;
-	padding:0 1em;
-	font-size:90%;
-	display: none;
-}
-#status {
-	font-size: 130%;
-}
-</style>
 </head>
 <body>
 <div id="instructions"></div>
@@ -104,36 +73,9 @@ if(hashObject.lon != undefined) {
 
 var center = [lat,lng]; 
 var map = L.map('map').setView(center, 16);
-//var boundsString = map.getBounds().toBBoxString();
-var bounds = map.getBounds();
-var boundsPadded = bounds.pad(10);
-
-var southwest = boundsPadded.getSouthWest();
-var south = southwest.lat;
-var west = southwest.lng;
-var northeast = boundsPadded.getNorthEast();
-var north = northeast.lat;
-var east = northeast.lng;
-
 var circle;
 
-var counterPedestrian = 0;
-var counterBicyclist = 0;
-var counterPedestrianByYear = {};
-var counterBicyclistByYear = {};
-
-var popup;
 var year;
-
-var bikeIcon = L.icon({
-  iconUrl: 'images/icon_bike.png',
-  shadowUrl: 'images/icon_shadow.png'
-});
-
-var pedestrianIcon = L.icon({
-  iconUrl: 'images/icon_pedestrian.png',
-  shadowUrl: 'images/icon_shadow.png'
-});
 
 		
 /*
@@ -190,7 +132,7 @@ function openPopup(e) {
 	lng = e.latlng.lng;
 	//console.log(lat+", "+lng);
 	
-	popup = L.popup()
+	var popup = L.popup()
     .setLatLng([lat, lng])
     //.setContent("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Search here</a>")
     .setContent("<a href='javascript:getUrl();'>Search here</a>")
@@ -198,6 +140,34 @@ function openPopup(e) {
 }
 
 function getUrl() {
+  var counterPedestrian = 0;
+  var counterBicyclist = 0;
+  var counterPedestrianByYear = {};
+  var counterBicyclistByYear = {};
+
+  //var boundsString = map.getBounds().toBBoxString();
+  var bounds = map.getBounds();
+  var boundsPadded = bounds.pad(10);
+
+
+  var southwest = boundsPadded.getSouthWest();
+  var south = southwest.lat;
+  var west = southwest.lng;
+  var northeast = boundsPadded.getNorthEast();
+  var north = northeast.lat;
+  var east = northeast.lng;
+
+  var bikeIcon = L.icon({
+    iconUrl: 'images/icon_bike.png',
+    shadowUrl: 'images/icon_shadow.png'
+  });
+
+  var pedestrianIcon = L.icon({
+    iconUrl: 'images/icon_pedestrian.png',
+    shadowUrl: 'images/icon_shadow.png'
+  });
+
+
 	$("#status").html("Looking through the database...");
 	
 	bounds = map.getBounds();
