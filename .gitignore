@@ -2,3 +2,6 @@ old/
 .DS_Store
 pg.php
 *dontcopy*
+*.sql
+
+*.qgs
