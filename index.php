@@ -276,7 +276,7 @@ function getUrl() {
     map.closePopup();
 	
   }).fail(function(){
-		$("#status").html("Something went wrong while retrieving data. Please try again later.");
+		$("#status").html("Something went wrong while retrieving data. Please try again later and alert Steven.");
     map.closePopup();
   });
 	
