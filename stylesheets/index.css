@@ -28,3 +28,9 @@
 #status {
 	font-size: 130%;
 }
+body {
+	font-family: sans-serif;
+}
+.smaller {
+	font-size: 90%;
+}
