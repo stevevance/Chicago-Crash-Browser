@@ -39,6 +39,7 @@
 		<div id="metadata" style="display:none;">
 			<h2>Metadata</h2>
 			<p>For your selected location.</p>
+			<p id="staticimage"></p>
 			<ul>
 			<li>Geographic coordinates: <span id="coords"></span></li>
 			<li>Latitude: <span id="latitude"></span></li>
@@ -268,7 +269,10 @@ function getUrl() {
 			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + "</div>")
 		})
 		
+		var zoom = map.getZoom();
+		
 		$("#metadata").slideDown();
+		$("#staticimage").html("<img src='staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom + "&size=200x200' />");
 		$("#coords").html(lat+", "+lng);
 		$("#latitude").html(lat);
 		$("#longitude").html(lng);
