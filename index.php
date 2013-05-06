@@ -79,7 +79,7 @@ var circle;
 var zoom = map.getZoom();
 
 var year;
-$("#staticimage").attr({src: "staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom + "&size=200x200' />"});
+$("#staticimage").attr({src: "staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom+1 + "&size=200x200' />"});
 
 		
 /*
