@@ -26,19 +26,19 @@
 		<p>Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
 		<p>Search radius is 150 feet. Very beta right now; <a href='https://github.com/stevevance/Chicago-Crash-Browser'>fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Hosted by Smart Chicago Collaborative</a>.</p>
 		</div>
-		<div id="status">Click on a point
+		<div id="status">Click on an intersection
 		</div>
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
 			<p>Bike Crashes: <span id="counterBicyclist"></span></p>
-			<div>By Year: <div id="counterBicyclistByYear"></div></div>
+			<div><div id="counterBicyclistByYear"></div></div>
 			<p>Pedestrian Crashes: <span id="counterPedestrian"></span></p>
-			 <div>By Year: <div id="counterPedestrianByYear"></div></div>
+			 <div><div id="counterPedestrianByYear"></div></div>
 			<p>These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
 		</div>
 		<div id="metadata" style="display:none;">
 			<h2>Metadata</h2>
-			<p>For the specified center.</p>
+			<p>For your selected location.</p>
 			<ul>
 			<li>Geographic coordinates: <span id="coords"></span></li>
 			<li>Latitude: <span id="latitude"></span></li>
