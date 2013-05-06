@@ -70,13 +70,13 @@ Class staticMapLite {
 		if($this->zoom>18)$this->zoom = 18;
 		
 		// get lat and lon from GET paramter
-		list($this->lat,$this->lon) = split(',',$_GET['center']);
+		list($this->lat,$this->lon) = explode(',',$_GET['center']);
 		$this->lat = floatval($this->lat);
 		$this->lon = floatval($this->lon);
 		
 		// get zoom from GET paramter
 		if($_GET['size']){
-			list($this->width, $this->height) = split('x',$_GET['size']);
+			list($this->width, $this->height) = explode('x',$_GET['size']);
 			$this->width = intval($this->width);
 			$this->height = intval($this->height);
 		}
