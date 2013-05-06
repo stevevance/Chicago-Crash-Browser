@@ -5,3 +5,4 @@ pg.php
 *.sql
 
 *.qgs
+cache/
