@@ -23,8 +23,8 @@
 	<div id="list">
 		<h1>Chicago Crash Browser</h1>
 		<div class='smaller'>
-		<p>Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
-		<p>Search radius is 150 feet. Very beta right now; <a href='https://github.com/stevevance/Chicago-Crash-Browser'>fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Hosted by Smart Chicago Collaborative</a>.</p>
+		<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation (the number represents the number of crashes that occurred, not the number of people that were involved).</p>
+		<p>Search radius is 150 feet.<a href='https://github.com/stevevance/Chicago-Crash-Browser'>fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Hosted by Smart Chicago Collaborative</a>.</p>
 		</div>
 		<div id="status">Click on an intersection
 		</div>
