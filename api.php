@@ -1,6 +1,7 @@
 <?php
 //echo "test";
 header("Access-Control-Allow-Origin: *");
+header('Content-Type: application/json');
 
 require_once("pg.php");
 error_reporting(0);
@@ -8,7 +9,7 @@ error_reporting(0);
 if(!empty($_GET)) {
 	$lat = trim($_GET['lat']);
 	$lng = trim($_GET['lng']);
-	$distance = $_GET['distance'];
+	$distance = intval($_GET['distance']);
 	
 	$north = trim($_GET["north"]);
 	$south = trim($_GET["south"]);
@@ -28,12 +29,10 @@ if(!is_numeric($north)) { // protect
 	$north  = 42.0820;
 	$south = 41.6300;
 }
-// TileMill -87.93,41.6300,-87.515,42.0820
-
-if(!is_numeric($distance)) { // protect
-	$distance = $_GET['distance'];
+if($distance > 500) { // in feet
 	$distance = 150;
 }
+
 $distanceMiles = distanceCheck($distance);
 
 $carsToo = false;
@@ -83,24 +82,49 @@ AND "Crash longitude"::decimal != 0
 AND	c."Crash latitude"::decimal < '.$north.' AND c."Crash latitude"::decimal > '.$south.'
 AND c."Crash longitude"::decimal > '.$west.' AND c."Crash longitude"::decimal < '.$east.' 
 ORDER BY c.month ASC, c.day ASC';
+
+$sql5 = 'SELECT * FROM "'.$table.'" c
+WHERE
+ST_DWithin((SELECT ST_GeomFromText(\'POINT('.$lng.' '.$lat.')\',4326)), c.wgs84), '.$distance.')
+AND latitude::decimal != 0 
+AND longitude::decimal != 0
+AND	latitude::decimal < '.$north.' AND latitude::decimal > '.$south.'
+AND longitude::decimal > '.$west.' AND longitude::decimal < '.$east.' 
+ORDER BY c.month ASC, c.day ASC';
+
+$sql6 = 'SELECT * FROM "'.$table.'" c
+WHERE
+ST_DWithin((SELECT ST_Transform(ST_GeomFromText(\'POINT('.$lng.' '.$lat.')\',4326),3435)), ST_Transform(c.wgs84, 3435), '.$distance.')
+AND	latitude < '.$north.' AND latitude > '.$south.'
+AND longitude > '.$west.' AND longitude < '.$east.' 
+ORDER BY c.month ASC, c.day ASC';
+
+$sql7 = 'SELECT "collType", casenumber, year, "totalInjuries", "Total killed" as "totalKilled", "No injuries" as "noInjuries", latitude, longitude FROM "'.$table.'" c
+WHERE
+ST_DWithin((SELECT ST_Transform(ST_GeomFromText(\'POINT('.$lng.' '.$lat.')\',4326),3435)), ST_Transform(c.wgs84, 3435), '.$distance.')
+AND latitude < '.$north.' AND latitude > '.$south.'
+AND longitude > '.$west.' AND longitude < '.$east.' 
+ORDER BY month ASC, day ASC';
+
 // ERROR:  transform: couldn't project point (0 0 0): latitude or longitude exceeded limits (-14)
 
 //echo $choice;
 if(!empty($lat) && !empty($lng)) {
-	$result = pg_query($pg, $sql4);
+	$result = pg_query($pg, $sql7);
 	$total = pg_num_rows($result);
 }
 //echo "<p>".$sql4."</p>";
 
 
 // output JSON
-echo '{"data":[';
+echo '{"response":{"sql":"' . str_replace('"','\"',"put the SQL query here - it's hard to get it to validate as JSON because of all the quotes") . '"},"crashes":[';
+
+echo pg_last_error($pg);
 
 $first = true;
 $r = pg_fetch_assoc($result);
 //print_r($r);
 while($r=pg_fetch_assoc($result)){
-    //  cast results to specific data types
 
     if($first) {
         $first = false;

@@ -23,18 +23,20 @@
 	<div id="list">
 		<h1>Chicago Crash Browser</h1>
 		<div class='smaller'>
-		<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation (the number represents the number of crashes that occurred, not the number of people that were involved).</p>
-		<p>Search radius is 150 feet.<a href='https://github.com/stevevance/Chicago-Crash-Browser'>fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Hosted by Smart Chicago Collaborative</a>.</p>
+			<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation (number represents crashes that occurred, not how many people were involved).</p>
+			<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
 		</div>
 		<div id="status">Click on an intersection
 		</div>
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
-			<p>Bike Crashes: <span id="counterBicyclist"></span></p>
-			<div><div id="counterBicyclistByYear"></div></div>
-			<p>Pedestrian Crashes: <span id="counterPedestrian"></span></p>
-			 <div><div id="counterPedestrianByYear"></div></div>
-			<p>These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
+			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
+			<div id="counterBicyclistByYear"></div>
+			<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
+			<div id="counterPedestrianByYear"></div>
+			<h3>Radius: <span id="radius"></span> feet</h3>
+			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
+			<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
 		</div>
 		<div id="metadata" style="display:none;">
 			<h2>Metadata</h2>
@@ -58,7 +60,6 @@ var markerGroup = new L.MarkerClusterGroup({
 				maxClusterRadius:30,
 				spiderfyDistanceMultiplier:1.3
 				});
-var distance = 150;
 var lat,lng;
 if(hashObject.lat != undefined) {
 	lat = hashObject.lat;
@@ -90,7 +91,8 @@ L.tileLayer('http://{s}.tile.cloudmade.com/851cc32e47324bb6bdf28181975a7218/997/
 */
 // add an OpenStreetMap tile layer
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
 }).addTo(map);
 map.addControl(new L.Control.Permalink({useLocation:true}));
 map.addControl(new L.control.locate({debug:false}));
@@ -139,15 +141,18 @@ function openPopup(e) {
 	var popup = L.popup()
     .setLatLng([lat, lng])
     //.setContent("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Search here</a>")
-    .setContent("<a href='javascript:getUrl();'>Search here</a>")
+    .setContent("Search within <a href='javascript:getUrl(50);'>50 ft</a>, <a href='javascript:getUrl(100);'>100 ft</a>, <b><a href='javascript:getUrl(150);'>150 ft</a></b>, <a href='javascript:getUrl(200);'>200 ft</a>")
     .openOn(map);
 }
 
-function getUrl() {
+function getUrl(distance) {
   var counterPedestrian = 0;
   var counterBicyclist = 0;
   var counterPedestrianByYear = {};
   var counterBicyclistByYear = {};
+  if(distance == undefined || distance == null) {
+	  var distance = 150;
+  }
 
   //var boundsString = map.getBounds().toBBoxString();
   var bounds = map.getBounds();
@@ -184,12 +189,20 @@ function getUrl() {
 	north = northeast.lat;
 	east = northeast.lng;
 	
-	var url = "api.php?lat="+lat+"&lng="+lng+"&north="+north+"&south="+south+"&east="+east+"&west="+west+"&distance="+distance;
+	var url = "http://chicagocrashes.org/api.php?lat="+lat+"&lng="+lng+"&north="+north+"&south="+south+"&east="+east+"&west="+west+"&distance="+distance;
 	console.log(url);
-	counterBicyclist = 0;
+	
 	counterPedestrian = 0;
 	counterPedestrianByYear = {};
+	counterPedInjuriesByYear = {};
+	counterPedFatalByYear = {};
+	counterPedNoInjByYear = {};
+	
+	counterBicyclist = 0;
 	counterBicyclistByYear = {};
+	counterBikeInjuriesByYear = {};
+	counterBikeFatalByYear = {};
+	counterBikeNoInjByYear = {};
 	
 	$.getJSON(url, function(data) {
 		// remove some layers first
@@ -205,19 +218,20 @@ function getUrl() {
 		//console.log("JSON: Getting the URL");
 		
 		var counter = 0;
-		$.each(data.data, function(i, feature) {
-			console.log("JSON: Iterating...");
+		$.each(data.crashes, function(i, feature) {
+			console.log("JSON: Iterating through the crashes...");
 			//console.log(counter);
 			//console.log(feature["casenumber"]);
+			//console.log("Latitude should be " + feature.latitude);
 			
 			//var marker = new L.Marker([feature[11],feature[12]]);
 			counter++;
-			year = feature["year"]*1+2000;
+			year = feature.year*1+2000;
 			
-			if(feature["collType"] == "1") {
+			if(feature.collType == "1") {
 				// pedestrian
 				//marker.setIcon(new icon_pedestrian());
-        var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]], {icon: pedestrianIcon});
+        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: pedestrianIcon});
         markerGroup.addLayer(marker);
 				counterPedestrian++;
 				// count the year here
@@ -226,11 +240,24 @@ function getUrl() {
 				} else {
 					counterPedestrianByYear[year] = 1;
 				};
+				
+				if(counterPedInjuriesByYear[year]) {
+					counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterPedInjuriesByYear[year]);
+				} else {
+					counterPedInjuriesByYear[year] = 1;
+				};
+				
+				if(counterPedNoInjByYear[year]) {
+					counterPedNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterPedNoInjByYear[year]);
+				} else {
+					counterPedNoInjByYear[year] = 1;
+				};
+
 			}
-			if(feature["collType"] == "2"){
+			if(feature.collType == "2"){
 				// bicyclist
 				//marker.setIcon(new icon_bicycle());
-        var marker = new L.Marker([feature["Crash latitude"],feature["Crash longitude"]], {icon: bikeIcon});
+        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: bikeIcon});
         markerGroup.addLayer(marker);
 				counterBicyclist++;
 				// count the year here
@@ -238,6 +265,18 @@ function getUrl() {
 					counterBicyclistByYear[year]++;
 				} else {
 					counterBicyclistByYear[year] = 1;
+				};
+				
+				if(counterBikeInjuriesByYear[year]) {
+					counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterBikeInjuriesByYear[year]);
+				} else {
+					counterBikeInjuriesByYear[year] = 1;
+				};
+				
+				if(counterBikeNoInjByYear[year]) {
+					counterBikeNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterBikeNoInjByYear[year]);
+				} else {
+					counterBikeNoInjByYear[year] = 1;
 				};
 			}
 		});
@@ -249,12 +288,15 @@ function getUrl() {
 			color: 'red', 
 			fillColor: '#f03', 
 			fillOpacity: 0.3,
-			stroke: false
+			stroke: false,
+			clickable:false
 		};
 		
 		var meters = distance/3.2808399;
 		circle = new L.Circle([lat,lng], meters, circleOptions);
 		map.addLayer(circle);
+		
+		map.fitBounds(markerGroup.getBounds());
 		
 		$("#counterTotals").slideDown();
 		$("#counterBicyclist").html(counterBicyclist);
@@ -262,13 +304,15 @@ function getUrl() {
 		$("#counterBicyclistByYear").html('');
 		$("#counterPedestrianByYear").html('');
 		
+		$("#radius").html(distance);
+		
 		counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
 		$.each(counterBicyclistByYear, function(key, value){
-			$("#counterBicyclistByYear").append("<div>" + key + ": " + value + "</div>")
+			$("#counterBicyclistByYear").append("<div>" + key + ": " + value + " (" + counterBikeInjuriesByYear[key] + " people injured, " + counterBikeNoInjByYear[key] + " people uninjured)</div>")
 		})
 		counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
 		$.each(counterPedestrianByYear, function(key, value){
-			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + "</div>")
+			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + " (" + counterPedInjuriesByYear[key] + " people injured, " + counterPedNoInjByYear[key] + " people uninjured)</div>")
 		})
 		
 		$("#metadata").slideDown();
