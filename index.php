@@ -38,15 +38,15 @@
 			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
 			<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
 		</div>
-		<div id="metadata" style="display:none;">
+		<div id="metadata" class="hidden">
 			<h2>Metadata</h2>
 			<p>For your selected location.</p>
-			<p><img id="staticimage" src=""></p>
+			<p class="hidden"><img id="staticimage" src=""></p>
 			<ul>
-			<li>Geographic coordinates: <span id="coords"></span></li>
-			<li>Latitude: <span id="latitude"></span></li>
-			<li>Longitude: <span id="longitude"></span></li>
-			<li><span id="permalink"></span></li>
+				<li><span id="permalink"></span></li>
+				<li>Geographic coordinates: <span id="coords"></span></li>
+				<li>Latitude: <span id="latitude"></span></li>
+				<li>Longitude: <span id="longitude"></span></li>
 			</ul>
 		</div>
 		
@@ -57,7 +57,7 @@
 var hashObject = $.deparam.fragment();
 var get = hashObject.get;
 var markerGroup = new L.MarkerClusterGroup({
-				maxClusterRadius:30,
+				maxClusterRadius:20,
 				spiderfyDistanceMultiplier:1.3
 				});
 var lat,lng;
@@ -80,7 +80,7 @@ var circle;
 var zoom = map.getZoom();
 
 var year;
-$("#staticimage").attr({src: "staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom+1 + "&size=200x200' />"});
+//$("#staticimage").attr({src: "staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom+1 + "&size=200x200' />"});
 
 		
 /*
@@ -218,111 +218,115 @@ function getUrl(distance) {
 		//console.log("JSON: Getting the URL");
 		
 		var counter = 0;
-		$.each(data.crashes, function(i, feature) {
-			console.log("JSON: Iterating through the crashes...");
-			//console.log(counter);
-			//console.log(feature["casenumber"]);
-			//console.log("Latitude should be " + feature.latitude);
-			
-			//var marker = new L.Marker([feature[11],feature[12]]);
-			counter++;
-			year = feature.year*1+2000;
-			
-			if(feature.collType == "1") {
-				// pedestrian
-				//marker.setIcon(new icon_pedestrian());
-        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: pedestrianIcon});
-        markerGroup.addLayer(marker);
-				counterPedestrian++;
-				// count the year here
-				if(counterPedestrianByYear[year]) {
-					counterPedestrianByYear[year]++;
-				} else {
-					counterPedestrianByYear[year] = 1;
-				};
+		if(data.crashes.length > 0) {
+			$.each(data.crashes, function(i, feature) {
+				map.closePopup();
+				//console.log("JSON: Iterating through the crashes...");
+				//console.log(counter);
+				//console.log(feature["casenumber"]);
+				//console.log("Latitude should be " + feature.latitude);
 				
-				if(counterPedInjuriesByYear[year]) {
-					counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterPedInjuriesByYear[year]);
-				} else {
-					counterPedInjuriesByYear[year] = 1;
-				};
+				//var marker = new L.Marker([feature[11],feature[12]]);
+				counter++;
+				year = feature.year*1+2000;
 				
-				if(counterPedNoInjByYear[year]) {
-					counterPedNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterPedNoInjByYear[year]);
-				} else {
-					counterPedNoInjByYear[year] = 1;
-				};
-
-			}
-			if(feature.collType == "2"){
-				// bicyclist
-				//marker.setIcon(new icon_bicycle());
-        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: bikeIcon});
-        markerGroup.addLayer(marker);
-				counterBicyclist++;
-				// count the year here
-				if(counterBicyclistByYear[year]) {
-					counterBicyclistByYear[year]++;
-				} else {
-					counterBicyclistByYear[year] = 1;
-				};
-				
-				if(counterBikeInjuriesByYear[year]) {
-					counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterBikeInjuriesByYear[year]);
-				} else {
-					counterBikeInjuriesByYear[year] = 1;
-				};
-				
-				if(counterBikeNoInjByYear[year]) {
-					counterBikeNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterBikeNoInjByYear[year]);
-				} else {
-					counterBikeNoInjByYear[year] = 1;
-				};
-			}
-		});
-		map.addLayer(markerGroup);
-		
-		// add circle
-		// this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
-		circleOptions = {
-			color: 'red', 
-			fillColor: '#f03', 
-			fillOpacity: 0.3,
-			stroke: false,
-			clickable:false
-		};
-		
-		var meters = distance/3.2808399;
-		circle = new L.Circle([lat,lng], meters, circleOptions);
-		map.addLayer(circle);
-		
-		map.fitBounds(markerGroup.getBounds());
-		
-		$("#counterTotals").slideDown();
-		$("#counterBicyclist").html(counterBicyclist);
-		$("#counterPedestrian").html(counterPedestrian);
-		$("#counterBicyclistByYear").html('');
-		$("#counterPedestrianByYear").html('');
-		
-		$("#radius").html(distance);
-		
-		counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
-		$.each(counterBicyclistByYear, function(key, value){
-			$("#counterBicyclistByYear").append("<div>" + key + ": " + value + " (" + counterBikeInjuriesByYear[key] + " people injured, " + counterBikeNoInjByYear[key] + " people uninjured)</div>")
-		})
-		counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
-		$.each(counterPedestrianByYear, function(key, value){
-			$("#counterPedestrianByYear").append("<div>" + key + ": " + value + " (" + counterPedInjuriesByYear[key] + " people injured, " + counterPedNoInjByYear[key] + " people uninjured)</div>")
-		})
-		
-		$("#metadata").slideDown();
-		$("#coords").html(lat+", "+lng);
-		$("#latitude").html(lat);
-		$("#longitude").html(lng);
-		$("#permalink").html("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Permalink</a>");
-		$("#status").html("");
-    map.closePopup();
+				if(feature.collType == "1") {
+					// pedestrian
+					//marker.setIcon(new icon_pedestrian());
+			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: pedestrianIcon});
+			        markerGroup.addLayer(marker);
+					counterPedestrian++;
+					// count the year here
+					if(counterPedestrianByYear[year]) {
+						counterPedestrianByYear[year]++;
+					} else {
+						counterPedestrianByYear[year] = 1;
+					};
+					
+					if(counterPedInjuriesByYear[year]) {
+						counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterPedInjuriesByYear[year]);
+					} else {
+						counterPedInjuriesByYear[year] = 1;
+					};
+					
+					if(counterPedNoInjByYear[year]) {
+						counterPedNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterPedNoInjByYear[year]);
+					} else {
+						counterPedNoInjByYear[year] = 1;
+					};
 	
+				}
+				if(feature.collType == "2"){
+					// bicyclist
+					//marker.setIcon(new icon_bicycle());
+			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: bikeIcon});
+			        markerGroup.addLayer(marker);
+					counterBicyclist++;
+					// count the year here
+					if(counterBicyclistByYear[year]) {
+						counterBicyclistByYear[year]++;
+					} else {
+						counterBicyclistByYear[year] = 1;
+					};
+					
+					if(counterBikeInjuriesByYear[year]) {
+						counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterBikeInjuriesByYear[year]);
+					} else {
+						counterBikeInjuriesByYear[year] = 1;
+					};
+					
+					if(counterBikeNoInjByYear[year]) {
+						counterBikeNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterBikeNoInjByYear[year]);
+					} else {
+						counterBikeNoInjByYear[year] = 1;
+					};
+				}
+			});
+			map.addLayer(markerGroup);
+			
+			// add circle
+			// this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
+			circleOptions = {
+				color: 'red', 
+				fillColor: '#f03', 
+				fillOpacity: 0.3,
+				stroke: false,
+				clickable:false
+			};
+			
+			var meters = distance/3.2808399;
+			circle = new L.Circle([lat,lng], meters, circleOptions);
+			map.addLayer(circle);
+			
+			map.fitBounds(markerGroup.getBounds());
+			
+			$("#counterTotals").slideDown();
+			$("#counterBicyclist").html(counterBicyclist);
+			$("#counterPedestrian").html(counterPedestrian);
+			$("#counterBicyclistByYear").html('');
+			$("#counterPedestrianByYear").html('');
+			
+			$("#radius").html(distance);
+			
+			counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
+			$.each(counterBicyclistByYear, function(key, value){
+				$("#counterBicyclistByYear").append("<div>" + key + ": " + value + " (" + counterBikeInjuriesByYear[key] + " people injured, " + counterBikeNoInjByYear[key] + " people uninjured)</div>")
+			})
+			counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
+			$.each(counterPedestrianByYear, function(key, value){
+				$("#counterPedestrianByYear").append("<div>" + key + ": " + value + " (" + counterPedInjuriesByYear[key] + " people injured, " + counterPedNoInjByYear[key] + " people uninjured)</div>")
+			}) // end each 
+			
+					
+			$("#metadata").slideDown();
+			$("#coords").html(lat+", "+lng);
+			$("#latitude").html(lat);
+			$("#longitude").html(lng);
+			$("#permalink").html("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Permalink</a>");
+			$("#status").html("");
+		} else {
+			$("#status").html("No crashes found within " + distance + " feet of this location");
+		}	
   }).fail(function(){
 		$("#status").html("Something went wrong while retrieving data. Please try again later and alert Steven.");
     map.closePopup();

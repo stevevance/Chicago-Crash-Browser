@@ -99,12 +99,12 @@ AND	latitude < '.$north.' AND latitude > '.$south.'
 AND longitude > '.$west.' AND longitude < '.$east.' 
 ORDER BY c.month ASC, c.day ASC';
 
-$sql7 = 'SELECT "collType", casenumber, year, "totalInjuries", "Total killed" as "totalKilled", "No injuries" as "noInjuries", latitude, longitude FROM "'.$table.'" c
+$sql7 = 'SELECT "collType", casenumber, "totalInjuries", "Total killed" as "totalKilled", "No injuries" as "noInjuries", month, day, year, latitude, longitude FROM "'.$table.'" c
 WHERE
 ST_DWithin((SELECT ST_Transform(ST_GeomFromText(\'POINT('.$lng.' '.$lat.')\',4326),3435)), ST_Transform(c.wgs84, 3435), '.$distance.')
 AND latitude < '.$north.' AND latitude > '.$south.'
 AND longitude > '.$west.' AND longitude < '.$east.' 
-ORDER BY month ASC, day ASC';
+ORDER BY year ASC, month ASC, day ASC';
 
 // ERROR:  transform: couldn't project point (0 0 0): latitude or longitude exceeded limits (-14)
 
@@ -117,7 +117,7 @@ if(!empty($lat) && !empty($lng)) {
 
 
 // output JSON
-echo '{"response":{"sql":"' . str_replace('"','\"',"put the SQL query here - it's hard to get it to validate as JSON because of all the quotes") . '"},"crashes":[';
+echo '{"response":{"sql":' . json_encode($sql7) . '},"crashes":[';
 
 echo pg_last_error($pg);
 
