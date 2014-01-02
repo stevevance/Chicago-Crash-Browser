@@ -23,7 +23,7 @@
 	<div id="list">
 		<h1>Chicago Crash Browser</h1>
 		<div class='smaller'>
-			<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation (number represents crashes that occurred, not how many people were involved).</p>
+			<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
 			<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
 		</div>
 		<div id="status">Click on an intersection
@@ -310,11 +310,11 @@ function getUrl(distance) {
 			
 			counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
 			$.each(counterBicyclistByYear, function(key, value){
-				$("#counterBicyclistByYear").append("<div>" + key + ": " + value + " (" + counterBikeInjuriesByYear[key] + " people injured, " + counterBikeNoInjByYear[key] + " people uninjured)</div>")
+				$("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + personOrPeople(counterBikeInjuriesByYear[key]) + " injured & " + personOrPeople(counterBikeNoInjByYear[key]) + " uninjured</div>")
 			})
 			counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
 			$.each(counterPedestrianByYear, function(key, value){
-				$("#counterPedestrianByYear").append("<div>" + key + ": " + value + " (" + counterPedInjuriesByYear[key] + " people injured, " + counterPedNoInjByYear[key] + " people uninjured)</div>")
+				$("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + personOrPeople(counterPedInjuriesByYear[key]) + " injured & " + personOrPeople(counterPedNoInjByYear[key]) + " uninjured</div>")
 			}) // end each 
 			
 					
@@ -332,6 +332,26 @@ function getUrl(distance) {
     map.closePopup();
   });
 	
+}
+
+function personOrPeople(quantity) {
+	var s;
+	if(quantity == 1) {
+		s = quantity + " person";
+	} else if(quantity > 1) {
+		s = quantity + " people";
+	}
+	return s;
+}
+
+function crashOrCrashes(quantity) {
+	var s;
+	if(quantity == 1) {
+		s = quantity + " crash";
+	} else if(quantity > 1) {
+		s = quantity + " crashes";
+	}
+	return s;
 }
 </script>
 <script type="text/javascript">
