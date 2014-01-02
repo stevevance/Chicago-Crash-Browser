@@ -35,3 +35,6 @@ body {
 .smaller {
 	font-size: 90%;
 }
+.hidden {
+	display:none;
+}
