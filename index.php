@@ -31,8 +31,10 @@
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
 			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
+			<h4>Bike Injuries: <span id="totalBicyclistInjuries"></span></h4>
 			<div id="counterBicyclistByYear"></div>
 			<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
+			<h4>Pedestrian Injuries: <span id="totalPedestrianInjuries"></span></h4>
 			<div id="counterPedestrianByYear"></div>
 			<h3>Radius: <span id="radius"></span> feet</h3>
 			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
@@ -145,6 +147,14 @@ function openPopup(e) {
     .openOn(map);
 }
 
+// given a JSON crashes row, return pop 
+function getCrashDetails(feature) {
+	return "Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
+	"Injuries: " + feature.totalInjuries + "<br/>" +
+	"Uninjured: " + feature.noInjuries;
+
+}
+
 function getUrl(distance) {
   var counterPedestrian = 0;
   var counterBicyclist = 0;
@@ -219,6 +229,10 @@ function getUrl(distance) {
 		
 		var counter = 0;
 		if(data.crashes.length > 0) {
+			totalInjuries = 0;
+			totalBicyclistInjuries = 0;
+			totalPedestrianInjuries = 0;
+
 			$.each(data.crashes, function(i, feature) {
 				map.closePopup();
 				//console.log("JSON: Iterating through the crashes...");
@@ -233,7 +247,15 @@ function getUrl(distance) {
 				if(feature.collType == "1") {
 					// pedestrian
 					//marker.setIcon(new icon_pedestrian());
-			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: pedestrianIcon});
+
+			        var marker = new L.Marker(
+			        	[feature.latitude,feature.longitude], 
+			        	{icon: pedestrianIcon}
+		        	);
+					
+					var details = getCrashDetails(feature);
+			        marker.bindPopup(details).openPopup();
+
 			        markerGroup.addLayer(marker);
 					counterPedestrian++;
 					// count the year here
@@ -243,23 +265,31 @@ function getUrl(distance) {
 						counterPedestrianByYear[year] = 1;
 					};
 					
+					totalPedestrianInjuries += parseInt(feature.totalInjuries);
 					if(counterPedInjuriesByYear[year]) {
-						counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterPedInjuriesByYear[year]);
+						counterPedInjuriesByYear[year] += parseInt(feature.totalInjuries);
 					} else {
-						counterPedInjuriesByYear[year] = 1;
+						counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries);
 					};
 					
 					if(counterPedNoInjByYear[year]) {
-						counterPedNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterPedNoInjByYear[year]);
+						counterPedNoInjByYear[year] += parseInt(feature.noInjuries);
 					} else {
-						counterPedNoInjByYear[year] = 1;
+						counterPedNoInjByYear[year] = parseInt(feature.noInjuries);
 					};
 	
 				}
 				if(feature.collType == "2"){
 					// bicyclist
 					//marker.setIcon(new icon_bicycle());
-			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: bikeIcon});
+			        var marker = new L.Marker(
+			        	[feature.latitude,feature.longitude], 
+			        	{icon: bikeIcon}
+		        	);
+
+					var details = getCrashDetails(feature);
+			        marker.bindPopup(details).openPopup();
+
 			        markerGroup.addLayer(marker);
 					counterBicyclist++;
 					// count the year here
@@ -269,16 +299,17 @@ function getUrl(distance) {
 						counterBicyclistByYear[year] = 1;
 					};
 					
+					totalBicyclistInjuries += parseInt(feature.totalInjuries);
 					if(counterBikeInjuriesByYear[year]) {
-						counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries) + parseInt(counterBikeInjuriesByYear[year]);
+						counterBikeInjuriesByYear[year] += parseInt(feature.totalInjuries);
 					} else {
-						counterBikeInjuriesByYear[year] = 1;
+						counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries);
 					};
 					
 					if(counterBikeNoInjByYear[year]) {
-						counterBikeNoInjByYear[year] = parseInt(feature.noInjuries) + parseInt(counterBikeNoInjByYear[year]);
+						counterBikeNoInjByYear[year] += parseInt(feature.noInjuries);
 					} else {
-						counterBikeNoInjByYear[year] = 1;
+						counterBikeNoInjByYear[year] = parseInt(feature.noInjuries);
 					};
 				}
 			});
@@ -305,6 +336,8 @@ function getUrl(distance) {
 			$("#counterPedestrian").html(counterPedestrian);
 			$("#counterBicyclistByYear").html('');
 			$("#counterPedestrianByYear").html('');
+			$("#totalBicyclistInjuries").html(totalBicyclistInjuries);
+			$("#totalPedestrianInjuries").html(totalPedestrianInjuries);
 			
 			$("#radius").html(distance);
 			
