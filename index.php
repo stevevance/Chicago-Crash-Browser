@@ -31,10 +31,10 @@
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
 			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
-			<h4>Bike Injuries: <span id="totalBicyclistInjuries"></span></h4>
+			<h4>Total Injuries: <span id="totalBicyclistInjuries"></span></h4>
 			<div id="counterBicyclistByYear"></div>
 			<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
-			<h4>Pedestrian Injuries: <span id="totalPedestrianInjuries"></span></h4>
+			<h4>Total Injuries: <span id="totalPedestrianInjuries"></span></h4>
 			<div id="counterPedestrianByYear"></div>
 			<h3>Radius: <span id="radius"></span> feet</h3>
 			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
@@ -147,12 +147,17 @@ function openPopup(e) {
     .openOn(map);
 }
 
-// given a JSON crashes row, return pop 
+// given a JSON crashes row, return popup
 function getCrashDetails(feature) {
-	return "Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
-	"Injuries: " + feature.totalInjuries + "<br/>" +
-	"Uninjured: " + feature.noInjuries;
+	if(feature.collType == 1) {
+		var type = "Pedestrian Crash";
+	} else if(feature.collType == 2) {
+		var type = "Bicycle Crash";
+	}
 
+	return "<p>" + type + "</p><p>Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
+	"Injuries: " + feature.totalInjuries + "<br/>" +
+	"Uninjured: " + feature.noInjuries + "</p>";
 }
 
 function getUrl(distance) {
@@ -178,12 +183,22 @@ function getUrl(distance) {
 
   var bikeIcon = L.icon({
     iconUrl: 'images/icon_bike.png',
-    shadowUrl: 'images/icon_shadow.png'
+    shadowUrl: 'images/icon_shadow.png',
+    iconSize: [32, 37],
+    iconAnchor: [16, 38],
+    shadowSize: [51, 37],
+    shadowAnchor: [25, 38],
+    popupAnchor: [0, -38],
   });
 
   var pedestrianIcon = L.icon({
     iconUrl: 'images/icon_pedestrian.png',
-    shadowUrl: 'images/icon_shadow.png'
+    shadowUrl: 'images/icon_shadow.png',
+    iconSize: [32, 37],
+    iconAnchor: [16, 38],
+    shadowSize: [51, 37],
+    shadowAnchor: [25, 38],
+    popupAnchor: [0, -38],
   });
 
 
