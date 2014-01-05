@@ -147,6 +147,14 @@ function openPopup(e) {
     .openOn(map);
 }
 
+// given a JSON crashes row, return pop 
+function getCrashDetails(feature) {
+	return "Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
+	"Injuries: " + feature.totalInjuries + "<br/>" +
+	"Uninjured: " + feature.noInjuries;
+
+}
+
 function getUrl(distance) {
   var counterPedestrian = 0;
   var counterBicyclist = 0;
@@ -239,7 +247,15 @@ function getUrl(distance) {
 				if(feature.collType == "1") {
 					// pedestrian
 					//marker.setIcon(new icon_pedestrian());
-			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: pedestrianIcon});
+
+			        var marker = new L.Marker(
+			        	[feature.latitude,feature.longitude], 
+			        	{icon: pedestrianIcon}
+		        	);
+					
+					var details = getCrashDetails(feature);
+			        marker.bindPopup(details).openPopup();
+
 			        markerGroup.addLayer(marker);
 					counterPedestrian++;
 					// count the year here
@@ -266,7 +282,14 @@ function getUrl(distance) {
 				if(feature.collType == "2"){
 					// bicyclist
 					//marker.setIcon(new icon_bicycle());
-			        var marker = new L.Marker([feature.latitude,feature.longitude], {icon: bikeIcon});
+			        var marker = new L.Marker(
+			        	[feature.latitude,feature.longitude], 
+			        	{icon: bikeIcon}
+		        	);
+
+					var details = getCrashDetails(feature);
+			        marker.bindPopup(details).openPopup();
+
 			        markerGroup.addLayer(marker);
 					counterBicyclist++;
 					// count the year here
