@@ -1,0 +1,23 @@
+{
+  "name": "Chicago-Crash-Browser",
+  "version": "0.0.0",
+  "homepage": "https://github.com/stevevance/Chicago-Crash-Browser",
+  "authors": [
+    "Robert Guico <rguico@gmail.com>",
+    "Steve Vance <svance@streetsblog.org>"
+  ],
+  "description": "Interactive map of pedestrian and bicycle-related crashes.",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "leaflet-dist": "0.7.1",
+    "leaflet.markerclusterer": "*",
+    "leaflet-locatecontrol": "0.20.0"
+  }
+}
