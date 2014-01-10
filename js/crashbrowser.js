@@ -1,22 +1,10 @@
-var hashObject = $.deparam.fragment();
-var get = hashObject.get;
 var markerGroup = new L.MarkerClusterGroup({
 				maxClusterRadius:20,
 				spiderfyDistanceMultiplier:1.3
 				});
-var lat,lng;
-if(hashObject.lat != undefined) {
-	lat = hashObject.lat;
-} else {
-	lat = 41.895924;
-}
-if(hashObject.lon != undefined) {
-	lng = hashObject.lon;
-} else {
-	lng = -87.654921;
-}
-//console.log(hashObject);
-//console.log(lat+","+lng);
+
+var lat = $.url().param('lat') || 41.895924;
+var lng = $.url().param('lon') || -87.654921;
 
 var center = [lat,lng]; 
 var map = L.map('map').setView(center, 16);
@@ -41,8 +29,7 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 map.addControl(new L.Control.Permalink({useLocation:true}));
 map.addControl(new L.control.locate({debug:false}));
 
-
-
+var get = $.url().param('get');
 if(get == "yes") {
 	getUrl();
 }
