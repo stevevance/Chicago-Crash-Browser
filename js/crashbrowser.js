@@ -76,12 +76,17 @@ function openPopup(e) {
     .openOn(map);
 }
 
-// given a JSON crashes row, return pop 
+// given a JSON crashes row, return popup
 function getCrashDetails(feature) {
-	return "Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
-	"Injuries: " + feature.totalInjuries + "<br/>" +
-	"Uninjured: " + feature.noInjuries;
+	if(feature.collType == 1) {
+		var type = "Pedestrian Crash";
+	} else if(feature.collType == 2) {
+		var type = "Bicycle Crash";
+	}
 
+	return "<p>" + type + "</p><p>Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
+	"Injuries: " + feature.totalInjuries + "<br/>" +
+	"Uninjured: " + feature.noInjuries + "</p>";
 }
 
 function getUrl(distance) {
@@ -107,12 +112,22 @@ function getUrl(distance) {
 
   var bikeIcon = L.icon({
     iconUrl: 'images/icon_bike.png',
-    shadowUrl: 'images/icon_shadow.png'
+    shadowUrl: 'images/icon_shadow.png',
+    iconSize: [32, 37],
+    iconAnchor: [16, 38],
+    shadowSize: [51, 37],
+    shadowAnchor: [25, 38],
+    popupAnchor: [0, -38],
   });
 
   var pedestrianIcon = L.icon({
     iconUrl: 'images/icon_pedestrian.png',
-    shadowUrl: 'images/icon_shadow.png'
+    shadowUrl: 'images/icon_shadow.png',
+    iconSize: [32, 37],
+    iconAnchor: [16, 38],
+    shadowSize: [51, 37],
+    shadowAnchor: [25, 38],
+    popupAnchor: [0, -38],
   });
 
 
