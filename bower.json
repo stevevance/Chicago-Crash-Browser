@@ -18,6 +18,9 @@
   "dependencies": {
     "leaflet-dist": "0.7.1",
     "leaflet.markerclusterer": "*",
-    "leaflet-locatecontrol": "0.20.0"
+    "leaflet-locatecontrol": "0.20.0",
+    "leaflet-plugins": "1.0.1",
+    "jquery": "2.0.3",
+    "purl": "2.3.1"
   }
 }

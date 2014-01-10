@@ -1,24 +1,10 @@
-var ccb = ccb || {};
-
-var hashObject = $.deparam.fragment();
-var get = hashObject.get;
 var markerGroup = new L.MarkerClusterGroup({
 				maxClusterRadius:20,
 				spiderfyDistanceMultiplier:1.3
 				});
-var lat,lng;
-if(hashObject.lat != undefined) {
-	lat = hashObject.lat;
-} else {
-	lat = 41.895924;
-}
-if(hashObject.lon != undefined) {
-	lng = hashObject.lon;
-} else {
-	lng = -87.654921;
-}
-//console.log(hashObject);
-//console.log(lat+","+lng);
+
+var lat = $.url().param('lat') || 41.895924;
+var lng = $.url().param('lon') || -87.654921;
 
 var center = [lat,lng]; 
 var map = L.map('map').setView(center, 16);
@@ -43,8 +29,7 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 map.addControl(new L.Control.Permalink({useLocation:true}));
 map.addControl(new L.control.locate({debug:false}));
 
-
-
+var get = $.url().param('get');
 if(get == "yes") {
 	getUrl();
 }
@@ -53,12 +38,6 @@ map.on('click', openPopup);
 //map.on('load',init);
 //var popup = new L.Popup();
 //getUrl();
-
-function init() {
-	$( document ).ready() {
-		doSomething();
-	}
-}
 
 
 /**
@@ -97,20 +76,15 @@ function openPopup(e) {
     .openOn(map);
 }
 
-// given a JSON crashes row, return popup
+// given a JSON crashes row, return pop 
 function getCrashDetails(feature) {
-	if(feature.collType == 1) {
-		var type = "Pedestrian Crash";
-	} else if(feature.collType == 2) {
-		var type = "Bicycle Crash";
-	}
-
-	return "<p>" + type + "</p><p>Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
+	return "Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
 	"Injuries: " + feature.totalInjuries + "<br/>" +
-	"Uninjured: " + feature.noInjuries + "</p>";
+	"Uninjured: " + feature.noInjuries;
+
 }
 
-function   (distance) {
+function getUrl(distance) {
   var counterPedestrian = 0;
   var counterBicyclist = 0;
   var counterPedestrianByYear = {};
@@ -133,22 +107,12 @@ function   (distance) {
 
   var bikeIcon = L.icon({
     iconUrl: 'images/icon_bike.png',
-    shadowUrl: 'images/icon_shadow.png',
-    iconSize: [32, 37],
-    iconAnchor: [16, 38],
-    shadowSize: [51, 37],
-    shadowAnchor: [25, 38],
-    popupAnchor: [0, -38],
+    shadowUrl: 'images/icon_shadow.png'
   });
 
   var pedestrianIcon = L.icon({
     iconUrl: 'images/icon_pedestrian.png',
-    shadowUrl: 'images/icon_shadow.png',
-    iconSize: [32, 37],
-    iconAnchor: [16, 38],
-    shadowSize: [51, 37],
-    shadowAnchor: [25, 38],
-    popupAnchor: [0, -38],
+    shadowUrl: 'images/icon_shadow.png'
   });
 
 
