@@ -5,15 +5,15 @@
  <!--[if lte IE 8]>
      <link rel="stylesheet" href="leaflet/leaflet.ie.css" />
  <![endif]-->
-<link rel="stylesheet" href="bower-components/leaflet.markerclusterer/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="bower-components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
-<link rel="stylesheet" href="bower-components/leaflet-locatecontrol/src/images/leaflet/L.Control.Locate.css" />
+<link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/images/leaflet/L.Control.Locate.css" />
 <link rel="stylesheet" href="stylesheets/index.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" ></script>
-<script src="bower-components/leaflet-dist/leaflet-src.js"></script>
-<script src="bower-components/leaflet-dist/leaflet.markercluster-src.js"></script>
-<script src="bower-components/leaflet-locatecontrol/L.Control.Locate.js"></script>
-<script src="bower-components/leaflet/leaflet.permalink.js"></script>
+<script src="bower_components/leaflet-dist/leaflet-src.js"></script>
+<script src="bower_components/leaflet.markerclusterer/dist/leaflet.markercluster.js"></script>
+<script src="bower_components/leaflet-locatecontrol/src/L.Control.Locate.js"></script>
+<script src="bower_components/leaflet-dist/leaflet.permalink.js"></script>
 <script src="js/jquery.ba-bbq.min.js"></script>
 </head>
 <body>
