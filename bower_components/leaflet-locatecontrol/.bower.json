@@ -1,0 +1,14 @@
+{
+  "name": "leaflet-locatecontrol",
+  "homepage": "https://github.com/domoritz/leaflet-locatecontrol",
+  "version": "0.20.0",
+  "_release": "0.20.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.20.0",
+    "commit": "0b210a73085b73c094e11767ec7f459bf7a73014"
+  },
+  "_source": "git://github.com/domoritz/leaflet-locatecontrol.git",
+  "_target": "0.20.0",
+  "_originalSource": "leaflet-locatecontrol"
+}
