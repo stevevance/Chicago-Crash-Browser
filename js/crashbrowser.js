@@ -312,31 +312,8 @@ function getUrl(distance) {
 }
 
 function outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj) {
-	// $("#counterTotals").slideDown();
-	// $("#counterBicyclist").html(bikeOutputObj.crashes);
-	// $("#counterPedestrian").html(pedOutputObj.crashes);
-	// $("#counterBicyclistByYear").html('');
-	// $("#counterPedestrianByYear").html('');
-	// $("#totalBicyclistInjuries").html(bikeOutputObj.totalInjuries);
-	// $("#totalPedestrianInjuries").html(pedOutputObj.totalInjuries);
-	
-	// $("#radius").html(metaDataObj.distance);
-	
-	// counterBicyclistByYear = sortObjectByKey(bikeOutputObj.crashYearArr);
-	// $.each(counterBicyclistByYear, function(key, value){
-	// 	$("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
-	// 		personOrPeople(bikeOutputObj.injuryYearArr[key]) + " injured & " + 
-	// 		personOrPeople(bikeOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
-	// })
-	
-	// counterPedestrianByYear = sortObjectByKey(pedOutputObj.crashYearArr);
-	// $.each(counterPedestrianByYear, function(key, value){
-	// 	$("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
-	// 		personOrPeople(pedOutputObj.injuryYearArr[key]) + " injured & " + 
-	// 		personOrPeople(pedOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
-	// }) // end each 
-	
-			
+	$("#counterTotals").slideDown();	
+		
 	$("#metadata").slideDown();
 	$("#coords").html(metaDataObj.lat+", "+metaDataObj.lng);
 	$("#latitude").html(metaDataObj.lat);
@@ -357,7 +334,7 @@ function outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj) {
 			type: 'bar'
 		},
 		title: {
-			text: 'Injury summary'
+			text: 'Injury summary (2005-2012)'
 		},
 		xAxis: {
 			categories: ['Injuries']
@@ -398,15 +375,110 @@ function outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj) {
 			[
 				{
 					name: 'Pedestrian',
+					color: '#fdae68',
 					data: [pedOutputObj.totalInjuries]
 				},
 				{
 					name: 'Bicycle',
+					color: '#36a095',
 					data: [bikeOutputObj.totalInjuries]
 				}
-			]
-		
+			]	
 	});
+
+	//
+	// Output the yearly breakdown. Preferably as an array of objects.
+	//
+
+	var annualBreakdownObj = new Object();
+
+	$.each(pedOutputObj.injuryYearArr, function(year, injuries) {
+		annualBreakdownDetailObj = {bikeInjuries: 0, pedInjuries: injuries};
+		annualBreakdownObj[year] = annualBreakdownDetailObj;
+	});
+
+	$.each(bikeOutputObj.injuryYearArr, function(year, injuries) {
+		if (annualBreakdownObj[year] instanceof Object) {
+			annualBreakdownDetailObj = annualBreakdownObj[year];
+			annualBreakdownDetailObj.bikeInjuries = injuries;
+			annualBreakdownObj[year] = annualBreakdownDetailObj;
+		} else {
+		annualBreakdownDetailObj = {bikeInjuries: injuries, pedInjuries: 0};
+		annualBreakdownObj[year] = annualBreakdownDetailObj;			
+		}
+	});
+
+	console.log(annualBreakdownObj);
+
+	pedInjuryArr = new Array();
+	bikeInjuryArr = new Array();
+	$.each(annualBreakdownObj, function(index, injuryObject) {
+	 	pedInjuryArr.push(injuryObject.pedInjuries);
+	 	bikeInjuryArr.push(injuryObject.bikeInjuries);
+	});
+
+	$('#breakdownGraph').highcharts({
+		chart: {
+			type: 'bar'
+		},
+		title: {
+			text: 'Annual Breakdown'
+		},
+		xAxis: {
+			categories: Object.keys(annualBreakdownObj)
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Number of Injuries'
+			},
+			stackLabels: {
+				enabled: true,
+				style: {
+					fontWeight: 'bold'
+				}
+			}
+		},
+		legend: {
+			reversed: true
+		},
+		plotOptions: {
+			series: {
+				stacking: 'normal',
+				dataLabels: {
+					formatter: function() {
+						if (this.y == 0) {
+							return "";
+						} else {
+							return this.y;
+						}
+					},
+					enabled: true,
+					color: 'white',
+					fontWeight: 'bold'
+				}
+			}
+		},
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br/>'+
+                    this.series.name +': '+ this.y +'<br/>'+
+                    'Total: '+ this.point.stackTotal;
+            }
+        },
+		 series: 
+		 	[{
+	 			name: 'Pedestrian',
+	 			color: '#fdae68',
+	 			data: pedInjuryArr
+	 		},
+	 		{
+	 			name: 'Bicycle',
+	 			color: '#36a095',
+	 			data: bikeInjuryArr
+	 		}]
+	});
+
 }
 
 function personOrPeople(quantity) {

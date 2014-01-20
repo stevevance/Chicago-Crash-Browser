@@ -26,14 +26,8 @@
 		<div id="status">Click on an intersection
 		</div>
 		<div id="summaryGraph" style="height: 200px;"></div>
+		<div id="breakdownGraph"></div>
 		<div id="counterTotals" style="display:none;">
-			<h2>Totals</h2>
-			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
-			<h4>Total Injuries: <span id="totalBicyclistInjuries"></span></h4>
-			<div id="counterBicyclistByYear"></div>
-			<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
-			<h4>Total Injuries: <span id="totalPedestrianInjuries"></span></h4>
-			<div id="counterPedestrianByYear"></div>
 			<h3>Radius: <span id="radius"></span> feet</h3>
 			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
 			<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
