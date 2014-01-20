@@ -1,3 +1,5 @@
+var ccb = ccb || {};
+
 var markerGroup = new L.MarkerClusterGroup({
 				maxClusterRadius:20,
 				spiderfyDistanceMultiplier:1.3
@@ -275,32 +277,30 @@ function getUrl(distance) {
 			
 			map.fitBounds(markerGroup.getBounds());
 			
-			$("#counterTotals").slideDown();
-			$("#counterBicyclist").html(counterBicyclist);
-			$("#counterPedestrian").html(counterPedestrian);
-			$("#counterBicyclistByYear").html('');
-			$("#counterPedestrianByYear").html('');
-			$("#totalBicyclistInjuries").html(totalBicyclistInjuries);
-			$("#totalPedestrianInjuries").html(totalPedestrianInjuries);
-			
-			$("#radius").html(distance);
-			
-			counterBicyclistByYear = sortObjectByKey(counterBicyclistByYear);
-			$.each(counterBicyclistByYear, function(key, value){
-				$("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + personOrPeople(counterBikeInjuriesByYear[key]) + " injured & " + personOrPeople(counterBikeNoInjByYear[key]) + " uninjured</div>")
-			})
-			counterPedestrianByYear = sortObjectByKey(counterPedestrianByYear);
-			$.each(counterPedestrianByYear, function(key, value){
-				$("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + personOrPeople(counterPedInjuriesByYear[key]) + " injured & " + personOrPeople(counterPedNoInjByYear[key]) + " uninjured</div>")
-			}) // end each 
-			
-					
-			$("#metadata").slideDown();
-			$("#coords").html(lat+", "+lng);
-			$("#latitude").html(lat);
-			$("#longitude").html(lng);
-			$("#permalink").html("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Permalink</a>");
-			$("#status").html("");
+			bikeOutputObj = {type: 'bicycle', 
+							 crashes: counterBicyclist,
+							 totalInjuries: totalBicyclistInjuries,
+							 crashYearArr: counterBicyclistByYear,
+							 injuryYearArr: counterBikeInjuriesByYear,
+							 noinjuryYearArr: counterBikeNoInjByYear
+							};
+
+			pedOutputObj = { type: 'pedestrian', 
+							 crashes: counterPedestrian,
+							 totalInjuries: totalPedestrianInjuries,
+							 crashYearArr: counterPedestrianByYear,
+							 injuryYearArr: counterPedInjuriesByYear,
+							 noinjuryYearArr: counterPedNoInjByYear
+							};
+
+			metaDataObj = {lat: lat,
+						   lng: lng,
+						   distance: distance
+						    };
+
+			outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj);
+			outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj);
+
 		} else {
 			$("#status").html("No crashes found within " + distance + " feet of this location");
 		}	
@@ -309,6 +309,104 @@ function getUrl(distance) {
     map.closePopup();
   });
 	
+}
+
+function outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj) {
+	// $("#counterTotals").slideDown();
+	// $("#counterBicyclist").html(bikeOutputObj.crashes);
+	// $("#counterPedestrian").html(pedOutputObj.crashes);
+	// $("#counterBicyclistByYear").html('');
+	// $("#counterPedestrianByYear").html('');
+	// $("#totalBicyclistInjuries").html(bikeOutputObj.totalInjuries);
+	// $("#totalPedestrianInjuries").html(pedOutputObj.totalInjuries);
+	
+	// $("#radius").html(metaDataObj.distance);
+	
+	// counterBicyclistByYear = sortObjectByKey(bikeOutputObj.crashYearArr);
+	// $.each(counterBicyclistByYear, function(key, value){
+	// 	$("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
+	// 		personOrPeople(bikeOutputObj.injuryYearArr[key]) + " injured & " + 
+	// 		personOrPeople(bikeOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
+	// })
+	
+	// counterPedestrianByYear = sortObjectByKey(pedOutputObj.crashYearArr);
+	// $.each(counterPedestrianByYear, function(key, value){
+	// 	$("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
+	// 		personOrPeople(pedOutputObj.injuryYearArr[key]) + " injured & " + 
+	// 		personOrPeople(pedOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
+	// }) // end each 
+	
+			
+	$("#metadata").slideDown();
+	$("#coords").html(metaDataObj.lat+", "+metaDataObj.lng);
+	$("#latitude").html(metaDataObj.lat);
+	$("#longitude").html(metaDataObj.lng);
+	$("#permalink").html("<a href='#lat="+metaDataObj.lat+"&lon="+metaDataObj.lng+"&get=yes'>Permalink</a>");
+	$("#status").html("");
+}
+
+/*
+	Output our crash data in two separate graphs
+*/
+function outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj) {
+	// 
+	// Output the summary graph (# of total pedestrian injuries, # of total bicycle injuries, total as encap if possible)
+	//
+	$('#summaryGraph').highcharts({
+		chart: {
+			type: 'bar'
+		},
+		title: {
+			text: 'Injury summary'
+		},
+		xAxis: {
+			categories: ['Injuries']
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Number of Injuries'
+			},
+			stackLabels: {
+				enabled: true,
+				style: {
+					fontWeight: 'bold'
+				}
+			}
+		},
+		legend: {
+			reversed: true
+		},
+		plotOptions: {
+			series: {
+				stacking: 'normal',
+				dataLabels: {
+					enabled: true,
+					color: 'white',
+					fontWeight: 'bold'
+				}
+			}
+		},
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br/>'+
+                    this.series.name +': '+ this.y +'<br/>'+
+                    'Total: '+ this.point.stackTotal;
+            }
+        },
+		series: 
+			[
+				{
+					name: 'Pedestrian',
+					data: [pedOutputObj.totalInjuries]
+				},
+				{
+					name: 'Bicycle',
+					data: [bikeOutputObj.totalInjuries]
+				}
+			]
+		
+	});
 }
 
 function personOrPeople(quantity) {

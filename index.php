@@ -9,6 +9,9 @@
 <link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/L.Control.Locate.css" />
 <link rel="stylesheet" href="stylesheets/index.css" />
+<script src="bower_components/jquery/jquery.min.js"></script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 </head>
 <body>
 <div id="instructions"></div>
@@ -22,6 +25,7 @@
 		</div>
 		<div id="status">Click on an intersection
 		</div>
+		<div id="summaryGraph" style="height: 200px;"></div>
 		<div id="counterTotals" style="display:none;">
 			<h2>Totals</h2>
 			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
@@ -49,7 +53,6 @@
 	</div>
 </div>
 
-<script src="bower_components/jquery/jquery.min.js"></script>
 <script src="bower_components/leaflet-dist/leaflet-src.js"></script>
 <script src="bower_components/leaflet.markerclusterer/dist/leaflet.markercluster.js"></script>
 <script src="bower_components/leaflet-locatecontrol/src/L.Control.Locate.js"></script>
