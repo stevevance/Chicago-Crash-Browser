@@ -147,7 +147,7 @@ function getUrl(distance) {
     east = northeast.lng;
     
     var url = "http://chicagocrashes.org/api.php?lat="+lat+"&lng="+lng+"&north="+north+"&south="+south+"&east="+east+"&west="+west+"&distance="+distance;
-    console.log(url);
+    // console.log(url);
     
     counterPedestrian = 0;
     counterPedestrianByYear = {};
@@ -163,6 +163,7 @@ function getUrl(distance) {
     
     $.getJSON(url, function(data) {
         // remove some layers first
+        $("#results").hide();
         if(typeof circle !='undefined') {
             map.removeLayer(circle);
             markerGroup.clearLayers();
@@ -171,7 +172,7 @@ function getUrl(distance) {
         }
         var markers = [];
         map.setView([lat,lng], 18);
-        console.log(data);
+        // console.log(data);
         //console.log("JSON: Getting the URL");
         
         var counter = 0;
@@ -315,8 +316,30 @@ function getUrl(distance) {
 }
 
 function outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj) {
-    $("#counterTotals").slideDown();    
-        
+    $("#results").show();
+    $("#counterBicyclist").html(bikeOutputObj.crashes);
+    $("#counterPedestrian").html(pedOutputObj.crashes);
+    $("#counterBicyclistByYear").html('');
+    $("#counterPedestrianByYear").html('');
+    $("#totalBicyclistInjuries").html(bikeOutputObj.totalInjuries);
+    $("#totalPedestrianInjuries").html(pedOutputObj.totalInjuries);
+    
+    $("#radius").html(metaDataObj.distance);
+    
+    counterBicyclistByYear = sortObjectByKey(bikeOutputObj.crashYearArr);
+    $.each(counterBicyclistByYear, function(key, value){
+     $("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
+         personOrPeople(bikeOutputObj.injuryYearArr[key]) + " injured & " + 
+         personOrPeople(bikeOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
+    })
+    
+    counterPedestrianByYear = sortObjectByKey(pedOutputObj.crashYearArr);
+    $.each(counterPedestrianByYear, function(key, value){
+     $("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
+         personOrPeople(pedOutputObj.injuryYearArr[key]) + " injured & " + 
+         personOrPeople(pedOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
+    }) // end each 
+
     $("#metadata").slideDown();
     $("#coords").html(metaDataObj.lat+", "+metaDataObj.lng);
     $("#latitude").html(metaDataObj.lat);
@@ -411,7 +434,7 @@ function outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj) {
         }
     });
 
-    console.log(annualBreakdownObj);
+    // console.log(annualBreakdownObj);
 
     pedInjuryArr = [];
     bikeInjuryArr = [];
@@ -503,3 +526,44 @@ function crashOrCrashes(quantity) {
     }
     return s;
 }
+
+function resizeGraphs() {
+    $("#summaryGraph").width($("#list").width());
+    $("#breakdownGraph").width($("#list").width());
+}
+
+function showGraph() {
+    $('#graphButton').addClass('active');
+    $('#textButton').removeClass('active');
+    $('#counterTotals').hide();
+    $('#graphs').show();
+    resizeGraphs();
+}
+
+function showText() {
+    $('#graphButton').removeClass('active');
+    $('#textButton').addClass('active');
+    $('#counterTotals').show();
+    $('#graphs').hide();
+    resizeGraphs();
+}
+
+$(document).ready(function() {
+    $('#graphButton').click(function() {
+        showGraph();
+        $.cookie('display', 'graph');
+    });
+    
+    $('#textButton').click(function() {
+        showText();
+        $.cookie('display', 'text');
+    });
+
+    if ($.cookie('display') == 'graph') {
+        showGraph();
+    }
+
+    if ($.cookie('display') == 'text') {
+        showText();
+    }
+});

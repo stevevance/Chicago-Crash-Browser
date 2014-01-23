@@ -51,3 +51,27 @@ h4 {
 .hidden {
 	display:none;
 }
+
+.buttons {
+	margin-top: 1em;
+}
+
+.buttons div {
+	width: 190px;
+	padding: 5px;
+	border: 1px solid black;
+	display: inline-block;
+	text-align: center;
+	cursor: pointer;
+}
+
+.buttons div:first-child {
+	float: left;
+	border-right: none;
+}
+
+.buttons div.active {
+	background-color: #36a095;
+	color: white;
+	font-weight: bold;
+}
