@@ -528,8 +528,8 @@ function crashOrCrashes(quantity) {
 }
 
 function resizeGraphs() {
-    $("#summaryGraph").width($("#list").width());
-    $("#breakdownGraph").width($("#list").width());
+    $("#summaryGraph").width($("#list").width()-5);
+    $("#breakdownGraph").width($("#list").width()-5);
 }
 
 function showGraph() {
