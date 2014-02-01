@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/L.Control.Locate.css" />
 <link rel="stylesheet" href="stylesheets/index.css" />
+<script src="bower_components/jquery/jquery.min.js"></script>
+<script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 </head>
 <body>
 <div id="instructions"></div>
@@ -22,34 +26,42 @@
 		</div>
 		<div id="status">Click on an intersection
 		</div>
-		<div id="counterTotals" style="display:none;">
-			<h2>Totals</h2>
-			<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
-			<h4>Total Injuries: <span id="totalBicyclistInjuries"></span></h4>
-			<div id="counterBicyclistByYear"></div>
-			<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
-			<h4>Total Injuries: <span id="totalPedestrianInjuries"></span></h4>
-			<div id="counterPedestrianByYear"></div>
-			<h3>Radius: <span id="radius"></span> feet</h3>
+		<div id="results" style="display: none;">
+			<div class="buttons" id="displaySelection">
+				<div id="graphButton" class="active">Graphs</div>
+				<div id="textButton">Text</div>
+			</div>
 			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
-			<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
+			<div id="graphs">
+				<div id="summaryGraph" style="height: 200px;"></div>
+				<div id="breakdownGraph"></div>
+			</div>
+			<div id="counterTotals" style="display:none;">
+				<h2>Totals</h2>
+				<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
+				<h4>Total Injuries: <span id="totalBicyclistInjuries"></span></h4>
+				<div id="counterBicyclistByYear"></div>
+				<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
+				<h4>Total Injuries: <span id="totalPedestrianInjuries"></span></h4>
+				<div id="counterPedestrianByYear"></div>		
+				<h3>Radius: <span id="radius"></span> feet</h3>
+				<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
+			</div>
+			<div id="metadata" class="hidden">
+				<h2>Metadata</h2>
+				<p>For your selected location.</p>
+				<p class="hidden"><img id="staticimage" src=""></p>
+				<ul>
+					<li><span id="permalink"></span></li>
+					<li>Geographic coordinates: <span id="coords"></span></li>
+					<li>Latitude: <span id="latitude"></span></li>
+					<li>Longitude: <span id="longitude"></span></li>
+				</ul>
+			</div>
 		</div>
-		<div id="metadata" class="hidden">
-			<h2>Metadata</h2>
-			<p>For your selected location.</p>
-			<p class="hidden"><img id="staticimage" src=""></p>
-			<ul>
-				<li><span id="permalink"></span></li>
-				<li>Geographic coordinates: <span id="coords"></span></li>
-				<li>Latitude: <span id="latitude"></span></li>
-				<li>Longitude: <span id="longitude"></span></li>
-			</ul>
-		</div>
-		
 	</div>
 </div>
 
-<script src="bower_components/jquery/jquery.min.js"></script>
 <script src="bower_components/leaflet-dist/leaflet-src.js"></script>
 <script src="bower_components/leaflet.markerclusterer/dist/leaflet.markercluster.js"></script>
 <script src="bower_components/leaflet-locatecontrol/src/L.Control.Locate.js"></script>
