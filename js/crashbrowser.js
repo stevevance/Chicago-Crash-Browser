@@ -3,6 +3,9 @@
 
 'use strict';
 
+/*
+  Utility functions that can be used anywhere in the code.
+*/
 var Utility = (function() {
     /**
      * Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
@@ -52,7 +55,7 @@ var Utility = (function() {
         sortObjectByKey: sortObjectByKey,
         personOrPeople: personOrPeople,
         crashOrCrashes: crashOrCrashes
-    }
+    };
 }());
 
 // Group CrashBrowser functionality in a convenient object.
@@ -67,6 +70,32 @@ var CrashBrowser = (function() {
     var circle;
 
     var year;
+
+    var init = function() {
+        markerGroup = new L.MarkerClusterGroup({
+                maxClusterRadius:20,
+                spiderfyDistanceMultiplier:1.3
+                });
+        lat = $.url().param('lat') || 41.895924;
+        lng = $.url().param('lon') || -87.654921;
+        center = [lat, lng];
+        map = L.map('map').setView(center, 16);
+        map.addControl(new L.Control.Permalink({useLocation:true}));
+        map.addControl(new L.control.locate({debug:false}));
+
+        // add an OpenStreetMap tile layer
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        map.on('click', openPopup);
+
+        var get = $.url().param('get');
+        if(get == 'yes') {
+            getUrl();
+        }
+    };
 
     var openPopup = function(e) {
             lat = e.latlng.lat;
@@ -512,7 +541,7 @@ var CrashBrowser = (function() {
         $('#textButton').removeClass('active');
         $('#counterTotals').hide();
         $('#graphs').show();
-        this.resizeGraphs();
+        resizeGraphs();
     };
 
     var showText = function() {
@@ -520,44 +549,13 @@ var CrashBrowser = (function() {
         $('#textButton').addClass('active');
         $('#counterTotals').show();
         $('#graphs').hide();
-        this.resizeGraphs();
-    };
-
-    var init = function() {
-        markerGroup = new L.MarkerClusterGroup({
-                maxClusterRadius:20,
-                spiderfyDistanceMultiplier:1.3
-                });
-        lat = $.url().param('lat') || 41.895924;
-        lng = $.url().param('lon') || -87.654921;
-        center = [lat, lng];
-        map = L.map('map').setView(center, 16);
-        map.addControl(new L.Control.Permalink({useLocation:true}));
-        map.addControl(new L.control.locate({debug:false}));
-
-        // add an OpenStreetMap tile layer
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
-        }).addTo(map);
-
-        map.on('click', openPopup);
-
-        var get = $.url().param('get');
-        if(get == 'yes') {
-            getUrl();
-        }
+        resizeGraphs();
     };
 
     init();
 
     return {
-        openPopup: openPopup,
-        getCrashDetails: getCrashDetails,
         getUrl: getUrl,
-        outputCrashDataText: outputCrashDataText,
-        outputCrashDataGraph: outputCrashDataGraph,
-        resizeGraphs: resizeGraphs,
         showGraph: showGraph,
         showText: showText
     };
