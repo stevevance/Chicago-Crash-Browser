@@ -4,11 +4,20 @@
 'use strict';
 
 /*
-  Utility functions that can be used anywhere in the code.
+*   Collision type enumerations. The variable type matters, because
+*   switch statements use === for comparisons.
+*/
+var CollisionEnum = Object.freeze({
+    PEDESTRIAN: '1',
+    BICYCLIST: '2'
+});
+
+/*
+*   Utility functions that can be used anywhere in the code.
 */
 var Utility = (function() {
     /**
-     * Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+     *  Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
      */
     var sortObjectByKey = function(obj){
         var keys = [];
@@ -31,6 +40,9 @@ var Utility = (function() {
         return sorted_obj;
     };
 
+    /*
+    *   Returns plural forms of common words.
+    */
     var personOrPeople = function(quantity) {
         var s;
         if(quantity == 1) {
@@ -59,7 +71,7 @@ var Utility = (function() {
 }());
 
 /*
-  Functions that are more for displaying results are here.
+*   Methods that interact with the map layers
 */
 var mapDisplay = (function() {
     var lat;
@@ -84,7 +96,12 @@ var mapDisplay = (function() {
             maxZoom: 19
         }).addTo(map);
 
-        map.on('click', setCoords);
+        map.on('click', function(e) {
+            lat = e.latlng.lat;
+            lng = e.latlng.lng;
+
+            showCrashes();
+        });
 
         markerGroup = new L.MarkerClusterGroup({
             maxClusterRadius:20,
@@ -93,24 +110,24 @@ var mapDisplay = (function() {
 
     };
 
-    var setCoords = function(e) {
-        lat = e.latlng.lat;
-        lng = e.latlng.lng;
-
-        showCrashes();
-    };
-
+    /*
+    *   Notifies the crashBrowser module to fetch updated crash data for
+    *   the current latitude and longitude in the map.
+    */
     var showCrashes = function() {
         dist = $('input:radio[name="searchRadius"]:checked').val();
         crashBrowser.fetchCrashData();
     };
 
-    // given a JSON crashes row, return popup
+    /*
+    *   Takes a feature row from the API and outputs basic information
+    *   for the crash.
+    */
     var getCrashDetails = function(feature) {
         var type = null;
-        if(feature.collType == 1) {
+        if(feature.collType == CollisionEnum.PEDESTRIAN) {
             type = 'Pedestrian Crash';
-        } else if(feature.collType == 2) {
+        } else if(feature.collType == CollisionEnum.BICYCLIST) {
             type = 'Bicycle Crash';
         }
 
@@ -119,6 +136,9 @@ var mapDisplay = (function() {
         'Uninjured: ' + feature.noInjuries + '</p>';
     };
 
+    /*
+    *   Removes marker group and circle from the map.
+    */
     var clearCircle = function() {
         $('#results').hide();
         if(typeof circle !='undefined') {
@@ -129,6 +149,9 @@ var mapDisplay = (function() {
         map.closePopup();
     };
 
+    /**
+    *   Adds circle to the map and fits the amp boundaries to the marker group, if applicable
+    */
     var addCircle = function() {
         // this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
         var circleOptions = {
@@ -148,8 +171,10 @@ var mapDisplay = (function() {
         }
     };
 
+    /**
+    *   Returns the API url for the current map view.
+    */
     var getAPIUrl = function() {
-        //var boundsString = map.getBounds().toBBoxString();
         var bounds = map.getBounds();
         var boundsPadded = bounds.pad(10);
 
@@ -175,12 +200,16 @@ var mapDisplay = (function() {
         return 'http://chicagocrashes.org/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+dist;
     };
 
+    /**
+    *   Based on the individual crash data passed in, creates a map marker,
+    *   with details bound to it in a popup.
+    */
    var createFeatureMarker = function(feature) {
         var marker = null;
         var details = null;
         var iconValue = null;
 
-        if (feature.collType == 1) {
+        if (feature.collType == CollisionEnum.PEDESTRIAN) {
             iconValue = mapDisplay.pedestrianIcon;
         } else {
             iconValue = mapDisplay.bikeIcon;
@@ -198,14 +227,17 @@ var mapDisplay = (function() {
         return marker;
     };
 
-    var closePopup = function() {
-        map.closePopup();
-    };
-
+    /**
+    *   Helper function that wraps the feature creation and adds it to the map.
+    */
     var addFeatureToMap = function(feature) {
         markerGroup.addLayer(createFeatureMarker(feature));
     };
 
+    /**
+    *   Called after adding all of the features to the map; actually adds the
+    *   markerGroup to the map.
+    */
     var finalizeMarkerGroup = function() {
         map.addLayer(markerGroup);
     };
@@ -230,6 +262,9 @@ var mapDisplay = (function() {
         popupAnchor: [0, -38],
     });
 
+    /**
+    *   Returns a map metadata object.
+    */
     var getMetaData = function() {
         return {
             lat: lat,
@@ -247,15 +282,21 @@ var mapDisplay = (function() {
         showCrashes: showCrashes,
         clearCircle: clearCircle,
         addCircle: addCircle,
-        closePopup: closePopup,
+        closePopup: map.closePopup,
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData
         };
 }());
 
+/*
+*   Methods used to control the display of CrashBrowser summary information
+*/
+var summaryDisplay = (function() {
 
-var crashBrowserDisplay = (function() {
+    /**
+    *   Outputs the textual representation of crashes located in a given distance.
+    */
     var outputCrashDataText = function(bikeOutputObj, pedOutputObj, metaDataObj) {
         $('#results').show();
 
@@ -295,7 +336,7 @@ var crashBrowserDisplay = (function() {
     };
 
     /*
-        Output our crash data in two separate graphs
+    *   Output our crash data in two separate graphs.
     */
     var outputCrashDataGraph = function(bikeOutputObj, pedOutputObj) {
         //
@@ -348,12 +389,12 @@ var crashBrowserDisplay = (function() {
                     {
                         name: 'Pedestrian',
                         color: '#fdae68',
-                        data: [pedOutputObj === undefined ? "" : pedOutputObj.totalInjuries]
+                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries]
                     },
                     {
                         name: 'Bicycle',
                         color: '#36a095',
-                        data: [bikeOutputObj === undefined ? "" : bikeOutputObj.totalInjuries]
+                        data: [bikeOutputObj === undefined ? '' : bikeOutputObj.totalInjuries]
                     }
                 ]
         });
@@ -452,11 +493,17 @@ var crashBrowserDisplay = (function() {
 
     };
 
+    /*
+    *   After showing graphs in the sidebar, resize to fit within viewport.
+    */
     var resizeGraphs = function() {
         $('#summaryGraph').width($('#list').width()-5);
         $('#breakdownGraph').width($('#list').width()-5);
     };
 
+    /*
+    *   Toggles showing the graph.
+    */
     var showGraph = function() {
         $('#graphButton').addClass('active');
         $('#textButton').removeClass('active');
@@ -465,6 +512,9 @@ var crashBrowserDisplay = (function() {
         resizeGraphs();
     };
 
+    /**
+    *   Toggles showing text.
+    */
     var showText = function() {
         $('#graphButton').removeClass('active');
         $('#textButton').addClass('active');
@@ -483,7 +533,7 @@ var crashBrowserDisplay = (function() {
 })();
 
 /*
-    Main module; delegates most of the functionality to mapDisplay at the moment.
+    Main module; handles the general behavior of the application, delegating as needed.
 */
 var crashBrowser = (function() {
     var init = function() {
@@ -493,6 +543,9 @@ var crashBrowser = (function() {
         }
     };
 
+    /*
+    *   Communicates with the backend API to get crash data for the distance provided.
+    */
     var fetchCrashData = function() {
         var url = mapDisplay.getAPIUrl();
         $.getJSON(url, function(data) {
@@ -507,19 +560,19 @@ var crashBrowser = (function() {
     };
 
     /*
-        Returns an array of summary objects for the data provided, i.e.
-
-        [{
-            type: 'ped',
-            crashes: 2,
-            crashesByYear: [2011 => 1, 2012 => 2],
-            injuriesByYear: [2011 => 2, 2012 => 5],
-            noInjuriesByYear: [2011 => 3, 2012 => 7]
-        },
-        {
-            type: 'bike',
-            ...
-        }]
+    *   Returns an array of summary objects for the data provided, i.e.
+    *
+    *   [{
+    *       type: 'ped',
+    *       crashes: 2,
+    *       crashesByYear: [2011 => 1, 2012 => 2],
+    *       injuriesByYear: [2011 => 2, 2012 => 5],
+    *       noInjuriesByYear: [2011 => 3, 2012 => 7]
+    *   },
+    *   {
+    *       type: 'bike',
+    *       ...
+    *   }]
     */
 
     var summaryObjects = [];
@@ -533,7 +586,7 @@ var crashBrowser = (function() {
     };
 
     /*
-      Helper function that updates a SummaryObject based on the feature read.
+    *   Helper function that updates a SummaryObject based on the feature read.
     */
     var addFeatureToSummary = function(feature, s) {
         s.crashes++;
@@ -560,7 +613,7 @@ var crashBrowser = (function() {
     };
 
     /*
-      Creates summaryObjects.bicycle and summaryObjects.pedestrian based on
+    *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on
     */
     var generateSummaries = function(crashes) {
         summaryObjects = [];
@@ -571,7 +624,7 @@ var crashBrowser = (function() {
                 mapDisplay.addFeatureToMap(feature);
 
                 switch (feature.collType) {
-                    case '1':
+                    case CollisionEnum.PEDESTRIAN:
                         if (summaryObjects.pedestrian === undefined) {
                             s = new SummaryObject();
                         } else {
@@ -580,7 +633,7 @@ var crashBrowser = (function() {
                         addFeatureToSummary(feature, s);
                         summaryObjects.pedestrian = s;
                     break;
-                    case '2':
+                    case CollisionEnum.BICYCLIST:
                         if (summaryObjects.bicycle === undefined) {
                             s = new SummaryObject();
                         } else {
@@ -595,14 +648,17 @@ var crashBrowser = (function() {
 
             var metaDataObj = mapDisplay.getMetaData();
 
-            crashBrowserDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
-            crashBrowserDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
+            summaryDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
+            summaryDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
 
         } else {
             $('#status').html('No crashes found within ' + mapDisplay.getMetaData().dist + ' feet of this location');
         }
     };
 
+    /*
+    *   Helper function to determine easily if the app has any crashes.
+    */
     var hasCrashes = function() {
         return summaryObjects.length > 0;
     };
@@ -616,25 +672,25 @@ var crashBrowser = (function() {
 }());
 
 /*
-  Assign module methods to various events.
+*  Assign module methods to various events.
 */
 $(document).ready(function() {
     $('#graphButton').click(function() {
-        crashBrowserDisplay.showGraph();
+        summaryDisplay.showGraph();
         $.cookie('display', 'graph');
     });
 
     $('#textButton').click(function() {
-        crashBrowserDisplay.showText();
+        summaryDisplay.showText();
         $.cookie('display', 'text');
     });
 
     if ($.cookie('display') == 'graph') {
-        crashBrowserDisplay.showGraph();
+        summaryDisplay.showGraph();
     }
 
     if ($.cookie('display') == 'text') {
-        crashBrowserDisplay.showText();
+        summaryDisplay.showText();
     }
 
     $('input:radio[name="searchRadius"]').click(function() {
