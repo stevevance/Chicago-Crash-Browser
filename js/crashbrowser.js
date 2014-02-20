@@ -102,7 +102,7 @@ var mapDisplay = (function() {
 
     var showCrashes = function() {
         dist = $('input:radio[name="searchRadius"]:checked').val();
-        CrashBrowser.fetchCrashData();
+        crashBrowser.fetchCrashData();
     };
 
     // given a JSON crashes row, return popup
@@ -143,7 +143,7 @@ var mapDisplay = (function() {
         circle = new L.Circle([lat,lng], meters, circleOptions);
         map.addLayer(circle);
 
-        if (CrashBrowser.hasCrashes()) {
+        if (crashBrowser.hasCrashes()) {
             map.fitBounds(markerGroup.getBounds());
         }
     };
@@ -255,7 +255,7 @@ var mapDisplay = (function() {
 }());
 
 
-var CrashBrowserDisplay = (function() {
+var crashBrowserDisplay = (function() {
     var outputCrashDataText = function(bikeOutputObj, pedOutputObj, metaDataObj) {
         $('#results').show();
 
@@ -485,7 +485,7 @@ var CrashBrowserDisplay = (function() {
 /*
     Main module; delegates most of the functionality to mapDisplay at the moment.
 */
-var CrashBrowser = (function() {
+var crashBrowser = (function() {
     var init = function() {
         var get = $.url().param('get');
         if(get == 'yes') {
@@ -595,8 +595,8 @@ var CrashBrowser = (function() {
 
             var metaDataObj = mapDisplay.getMetaData();
 
-            CrashBrowserDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
-            CrashBrowserDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
+            crashBrowserDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
+            crashBrowserDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
 
         } else {
             $('#status').html('No crashes found within ' + mapDisplay.getMetaData().dist + ' feet of this location');
@@ -620,21 +620,21 @@ var CrashBrowser = (function() {
 */
 $(document).ready(function() {
     $('#graphButton').click(function() {
-        CrashBrowserDisplay.showGraph();
+        crashBrowserDisplay.showGraph();
         $.cookie('display', 'graph');
     });
 
     $('#textButton').click(function() {
-        CrashBrowserDisplay.showText();
+        crashBrowserDisplay.showText();
         $.cookie('display', 'text');
     });
 
     if ($.cookie('display') == 'graph') {
-        CrashBrowserDisplay.showGraph();
+        crashBrowserDisplay.showGraph();
     }
 
     if ($.cookie('display') == 'text') {
-        CrashBrowserDisplay.showText();
+        crashBrowserDisplay.showText();
     }
 
     $('input:radio[name="searchRadius"]').click(function() {
