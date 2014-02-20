@@ -24,14 +24,19 @@
 			<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
 			<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
 		</div>
-		<div id="status">Click on an intersection
-		</div>
+		<h2>Change search radius</h2>
+		<form id="searchRadius">
+			<span class="searchValue"><input type="radio" name="searchRadius" value="50">50'</span>
+			<span class="searchValue"><input type="radio" name="searchRadius" value="100">100'</span>
+			<span class="searchValue"><input type="radio" name="searchRadius" value="150" checked="checked">150'</span>
+			<span class="searchValue"><input type="radio" name="searchRadius" value="200">200'</span>
+		</form>
+		<div id="status"></div>
 		<div id="results" style="display: none;">
 			<div class="buttons" id="displaySelection">
 				<div id="graphButton" class="active">Graphs</div>
 				<div id="textButton">Text</div>
 			</div>
-			<p>Try: <a href="javascript:getUrl(50);">50 ft</a>, <a href="javascript:getUrl(100);">100 ft</a>, <a href="javascript:getUrl(150);">150 ft</a>, <a href="javascript:getUrl(200);">200 ft</a></p>
 			<div id="graphs">
 				<div id="summaryGraph" style="height: 200px;"></div>
 				<div id="breakdownGraph"></div>
@@ -43,7 +48,7 @@
 				<div id="counterBicyclistByYear"></div>
 				<h3>Pedestrian Crashes: <span id="counterPedestrian"></span></h3>
 				<h4>Total Injuries: <span id="totalPedestrianInjuries"></span></h4>
-				<div id="counterPedestrianByYear"></div>		
+				<div id="counterPedestrianByYear"></div>
 				<h3>Radius: <span id="radius"></span> feet</h3>
 				<p class="smaller">Important: These are counts of crashes with that collision type, not the count of how many people were involved. The actual number of crashes involving bicyclists or pedestrians may be higher if the bicyclist or pedestrian was the second or third point of impact.</p>
 			</div>
