@@ -293,6 +293,19 @@ var mapDisplay = (function() {
 *   Methods used to control the display of CrashBrowser summary information
 */
 var summaryDisplay = (function() {
+    var counterBicyclistByYearDiv;
+    var counterPedestrianByYearDiv;
+    var summaryGraph;
+    var breakdownGraph;
+
+    $(function() {
+        // Cache the IDs on document ready so that we don't have to constantly reiterate
+        // through the DOM.
+        counterBicyclistByYearDiv = $('#counterBicyclistByYear');
+        counterPedestrianByYearDiv = $('#counterPedestrianByYear');
+        summaryGraph = $('#summaryGraph');
+        breakdownGraph = $('#breakdownGraph');
+    });
 
     /**
     *   Outputs the textual representation of crashes located in a given distance.
@@ -302,12 +315,12 @@ var summaryDisplay = (function() {
 
         if (bikeOutputObj !== undefined) {
             $('#counterBicyclist').html(bikeOutputObj.crashes);
-            $('#counterBicyclistByYear').html('');
+            counterBicyclistByYearDiv.html('');
             $('#totalBicyclistInjuries').html(bikeOutputObj.totalInjuries);
 
             var counterBicyclistByYear = Utility.sortObjectByKey(bikeOutputObj.crashesByYear);
             $.each(counterBicyclistByYear, function(key, value){
-             $('#counterBicyclistByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
+             counterBicyclistByYearDiv.append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
                  Utility.personOrPeople(bikeOutputObj.injuriesByYear[key]) + ' injured & ' +
                  Utility.personOrPeople(bikeOutputObj.noInjuriesByYear[key]) + ' uninjured</div>');
             });
@@ -315,12 +328,12 @@ var summaryDisplay = (function() {
 
         if (pedOutputObj !== undefined) {
             $('#counterPedestrian').html(pedOutputObj.crashes);
-            $('#counterPedestrianByYear').html('');
+            counterPedestrianByYearDiv.html('');
             $('#totalPedestrianInjuries').html(pedOutputObj.totalInjuries);
 
             var counterPedestrianByYear = Utility.sortObjectByKey(pedOutputObj.crashesByYear);
             $.each(counterPedestrianByYear, function(key, value){
-             $('#counterPedestrianByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
+             counterPedestrianByYearDiv.append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
                  Utility.personOrPeople(pedOutputObj.injuriesByYear[key]) + ' injured & ' +
                  Utility.personOrPeople(pedOutputObj.noInjuriesByYear[key]) + ' uninjured</div>');
             }); // end each
@@ -342,7 +355,7 @@ var summaryDisplay = (function() {
         //
         // Output the summary graph (# of total pedestrian injuries, # of total bicycle injuries, total as encap if possible)
         //
-        $('#summaryGraph').highcharts({
+        summaryGraph.highcharts({
             chart: {
                 type: 'bar'
             },
@@ -429,7 +442,7 @@ var summaryDisplay = (function() {
             bikeInjuryArr.push(injuryObject.bikeInjuries);
         });
 
-        $('#breakdownGraph').highcharts({
+        breakdownGraph.highcharts({
             chart: {
                 type: 'bar'
             },
@@ -497,8 +510,8 @@ var summaryDisplay = (function() {
     *   After showing graphs in the sidebar, resize to fit within viewport.
     */
     var resizeGraphs = function() {
-        $('#summaryGraph').width($('#list').width()-5);
-        $('#breakdownGraph').width($('#list').width()-5);
+        summaryGraph.width($('#list').width()-5);
+        breakdownGraph.width($('#list').width()-5);
     };
 
     /*
@@ -674,7 +687,7 @@ var crashBrowser = (function() {
 /*
 *  Assign module methods to various events.
 */
-$(document).ready(function() {
+$(function() {
     $('#graphButton').click(function() {
         summaryDisplay.showGraph();
         $.cookie('display', 'graph');
