@@ -9,10 +9,12 @@
 <link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/L.Control.Locate.css" />
 <link rel="stylesheet" href="stylesheets/index.css" />
-<script src="bower_components/jquery/jquery.min.js"></script>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
 <script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div id="instructions"></div>
@@ -25,12 +27,20 @@
 			<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
 		</div>
 		<h2>Change search radius</h2>
-		<form id="searchRadius">
-			<span class="searchValue"><input type="radio" name="searchRadius" value="50">50'</span>
-			<span class="searchValue"><input type="radio" name="searchRadius" value="100">100'</span>
-			<span class="searchValue"><input type="radio" name="searchRadius" value="150" checked="checked">150'</span>
-			<span class="searchValue"><input type="radio" name="searchRadius" value="200">200'</span>
-		</form>
+		<div class="btn-group" data-toggle="buttons">
+			<label class="btn btn-primary">
+				<input type="radio" name="searchRadius" value="50">50'</input>
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="searchRadius" class="btn btn-primary" value="100">100'</input>
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="searchRadius" class="btn btn-primary" value="150" checked="checked">150'</input>
+			</label>
+			<label class="btn btn-primary">
+				<input type="radio" name="searchRadius" class="btn btn-primary" value="200">200'</input>
+			</label>
+		</div>
 		<div id="status"></div>
 		<div id="results" style="display: none;">
 			<div class="buttons" id="displaySelection">

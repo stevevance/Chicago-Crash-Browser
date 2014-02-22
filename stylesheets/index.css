@@ -1,3 +1,8 @@
+div {
+	margin: 0;
+	padding: 0;
+}
+
 #map, body, html {
 	height: 100%;
 	width:100%;
@@ -76,4 +81,30 @@ h4 {
 	background-color: #36a095;
 	color: white;
 	font-weight: bold;
+}
+
+.searchValue {
+	width: 100px;
+	padding: 10px 0;
+	background-color: #36a095;
+	border-right: 1px solid white;
+	color: white;
+	text-align: center;
+	float: left;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+
+.searchValue.selected {
+	background-color: yellow;
+	color: black;
+}
+
+#status:before {
+	clear: both;
+}
+
+#status {
+	margin-top: 1em;
 }
