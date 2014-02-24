@@ -115,6 +115,8 @@ var mapDisplay = (function() {
     *   the current latitude and longitude in the map.
     */
     var showCrashes = function() {
+        $('#results').hide();
+        $('#metadata-link').hide();
         dist = $('input[name="searchRadius"]:checked').val();
         crashBrowser.fetchCrashData();
     };
@@ -297,7 +299,7 @@ var summaryDisplay = (function() {
     /**
     *   Outputs the textual representation of crashes located in a given distance.
     */
-    var outputCrashDataText = function(bikeOutputObj, pedOutputObj, metaDataObj) {
+    var outputCrashDataText = function(bikeOutputObj, pedOutputObj) {
         $('#results').show();
 
         if (bikeOutputObj !== undefined) {
@@ -326,12 +328,6 @@ var summaryDisplay = (function() {
             }); // end each
         }
 
-        $('#radius').html(metaDataObj.dist);
-        $('#metadata').slideDown();
-        $('#coords').html(metaDataObj.lat+', '+metaDataObj.lng);
-        $('#latitude').html(metaDataObj.lat);
-        $('#longitude').html(metaDataObj.lng);
-        $('#permalink').html('<a href="#lat='+metaDataObj.lat+'&lon='+metaDataObj.lng+'&get=yes">Permalink</a>');
         $('#status').html('');
     };
 
@@ -505,8 +501,6 @@ var summaryDisplay = (function() {
     *   Toggles showing the graph.
     */
     var showGraph = function() {
-        $('#graphButton').addClass('active');
-        $('#textButton').removeClass('active');
         $('#counterTotals').hide();
         $('#graphs').show();
         resizeGraphs();
@@ -516,16 +510,24 @@ var summaryDisplay = (function() {
     *   Toggles showing text.
     */
     var showText = function() {
-        $('#graphButton').removeClass('active');
-        $('#textButton').addClass('active');
         $('#counterTotals').show();
         $('#graphs').hide();
         resizeGraphs();
     };
 
+    var populateMetaData = function(metaDataObj) {
+        $('#radius').html(metaDataObj.dist);
+        $('#coords').html(metaDataObj.lat+', '+metaDataObj.lng);
+        $('#latitude').html(metaDataObj.lat);
+        $('#longitude').html(metaDataObj.lng);
+        $('#permalink').html('<a href="#lat='+metaDataObj.lat+'&lon='+metaDataObj.lng+'&get=yes">Permalink</a>');
+        $('#metadata-link').show();
+    };
+
     return {
         outputCrashDataGraph: outputCrashDataGraph,
         outputCrashDataText: outputCrashDataText,
+        populateMetaData: populateMetaData,
         showGraph: showGraph,
         showText: showText
     };
@@ -648,8 +650,9 @@ var crashBrowser = (function() {
 
             var metaDataObj = mapDisplay.getMetaData();
 
-            summaryDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
-            summaryDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian, mapDisplay.getMetaData);
+            summaryDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian);
+            summaryDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian);
+            summaryDisplay.populateMetaData(metaDataObj);
 
         } else {
             $('#status').html('No crashes found within ' + mapDisplay.getMetaData().dist + ' feet of this location');
