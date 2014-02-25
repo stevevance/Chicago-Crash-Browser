@@ -4,6 +4,14 @@ div {
 	font-size: 13px;
 }
 
+p, h1 {
+	 margin-top: 10px;
+}
+
+h1 {
+	font-size: 32px;
+}
+
 #map, body, html {
 	height: 100%;
 	width:100%;
@@ -22,9 +30,21 @@ div {
 	width:30%;
 	float: left;
 }
+
 #list {
 	padding-left: 10px;
+	top: 0;
+	bottom: 30px;
+	overflow: hidden;
+	position: absolute;
+	overflow-y: auto;
+	width: 30%;
 }
+
+#graphs {
+	width: 95%;
+}
+
 #instructions {
 	height:4%;
 	padding:0 1em;
@@ -45,10 +65,6 @@ div {
    padding-top: 5px;
    background-color: #DDD;
    z-index: 1000;
-}
-
-h2 {
-	font-size: 130%;
 }
 
 body {

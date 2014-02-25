@@ -493,8 +493,8 @@ var summaryDisplay = (function() {
     *   After showing graphs in the sidebar, resize to fit within viewport.
     */
     var resizeGraphs = function() {
-        $('#summaryGraph').width($('#list').width()-5);
-        $('#breakdownGraph').width($('#list').width()-5);
+        $('#summaryGraph').width($('#list').width()-15);
+        $('#breakdownGraph').width($('#list').width()-15);
     };
 
     /*
@@ -675,29 +675,54 @@ var crashBrowser = (function() {
 }());
 
 /*
+*   Set initial conditions
+*/
+var init = function() {
+    // When there isn't a display cookie, default to graph.
+    if ($.cookie('display') === undefined) {
+        $('#outputGraph').prop('checked', true);
+        $.cookie('display', 'graph');
+    } else {
+        if ($.cookie('display') == 'graph') {
+            $('#outputGraph').prop('checked', true);
+            summaryDisplay.showGraph();
+        }
+
+        if ($.cookie('display') == 'text') {
+            $('#outputText').prop('checked', true);
+            summaryDisplay.showText();
+        }
+    }
+
+    // When there isn't a searchRadius cookie, default to 150.
+    if ($.cookie('searchRadius') === undefined) {
+        $('input[name="searchRadius"][value="150"]').prop('checked', true);
+        $.cookie('searchRadius', '150');
+    } else {
+        var searchRadius = $.cookie('searchRadius');
+        $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true);
+    }
+};
+
+/*
 *  Assign module methods to various events.
 */
 $(document).ready(function() {
-    $('#graphButton').click(function() {
-        summaryDisplay.showGraph();
-        $.cookie('display', 'graph');
-    });
+    init();
 
-    $('#textButton').click(function() {
-        summaryDisplay.showText();
-        $.cookie('display', 'text');
-    });
-
-    if ($.cookie('display') == 'graph') {
-        summaryDisplay.showGraph();
-    }
-
-    if ($.cookie('display') == 'text') {
-        summaryDisplay.showText();
-    }
-
-    $('input[name="searchRadius"]').click(function() {
+    $('input[name="searchRadius"]:radio').change(function() {
         mapDisplay.showCrashes();
+    });
+
+    $('input[name="outputType"]:radio').change(function() {
+        var outputTypeCheckedValue = $('input[name="outputType"]:checked').val();
+
+        $.cookie('display', outputTypeCheckedValue);
+        if (outputTypeCheckedValue == 'graph') {
+            summaryDisplay.showGraph();
+        } else if (outputTypeCheckedValue == 'text') {
+            summaryDisplay.showText();
+        }
     });
 
     $('.btn').button();

@@ -23,36 +23,38 @@
 	<div id="listContainer">
 		<div id="list">
 			<h1>Chicago Crash Browser</h1>
-			<div id="searchRadiusSelector">
-				<div class="configSet">
-					<div class="configLabel">Search radius:</div>
-					<div class="btn-group" data-toggle="buttons" id="searchRadiusButtons">
-						<label class="btn btn-primary">
-							<input type="radio" name="searchRadius" value="50">50'</input>
-						</label>
-						<label class="btn btn-primary">
-							<input type="radio" name="searchRadius" class="btn btn-primary" value="100">100'</input>
-						</label>
-						<label class="btn btn-primary active">
-							<input type="radio" name="searchRadius" class="btn btn-primary" value="150" checked="checked">150'</input>
-						</label>
-						<label class="btn btn-primary">
-							<input type="radio" name="searchRadius" class="btn btn-primary" value="200">200'</input>
-						</label>
+			<form name="config" id="configForm">
+				<div id="searchRadiusSelector">
+					<div class="configSet">
+						<div class="configLabel">Search radius:</div>
+						<div class="btn-group" data-toggle="buttons" id="searchRadiusButtons">
+							<label class="btn btn-primary">
+								<input type="radio" name="searchRadius" value="50">50'</input>
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="searchRadius" class="btn btn-primary" value="100">100'</input>
+							</label>
+							<label class="btn btn-primary active">
+								<input type="radio" name="searchRadius" class="btn btn-primary" value="150">150'</input>
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="searchRadius" class="btn btn-primary" value="200">200'</input>
+							</label>
+						</div>
+					</div>
+					<div class="configSet">
+						<div class="configLabel">Output Type:</div>
+						<div class="btn-group" data-toggle="buttons" id="displaySelection">
+							<label class="btn btn-primary active">
+								<input type="radio" name="outputType" class="btn btn-primary" value="graph" id="outputGraph">Graph</input>
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="outputType" class="btn btn-primary" value="text" id="outputText">Text</input>
+							</label>
+						</div>
 					</div>
 				</div>
-				<div class="configSet">
-					<div class="configLabel">Output Type:</div>
-					<div class="btn-group" data-toggle="buttons" id="displaySelection">
-						<label class="btn btn-primary active">
-							<input type="radio" name="outputType" class="btn btn-primary" value="graph" id="outputGraph" checked="checked">Graph</input>
-						</label>
-						<label class="btn btn-primary">
-							<input type="radio" name="outputType" class="btn btn-primary" value="text" id="outputText">Text</input>
-						</label>
-					</div>
-				</div>
-			</div>
+			</form>
 			<div id="status"></div>
 			<div id="results" style="display: none;">
 				<div id="graphs">
@@ -60,7 +62,6 @@
 					<div id="breakdownGraph"></div>
 				</div>
 				<div id="counterTotals" style="display:none;">
-					<h2>Totals</h2>
 					<h3>Bike Crashes: <span id="counterBicyclist"></span></h3>
 					<h4>Total Injuries: <span id="totalBicyclistInjuries"></span></h4>
 					<div id="counterBicyclistByYear"></div>
@@ -122,7 +123,7 @@
 
 <div id="footer">
 	<a href="#" data-toggle="modal" data-target="#about">About</a>
-	<span id="metadata-link" style="display: none;">&#160;&mdash;&#160;<a href="#" data-toggle="modal" data-target="#metadata">Metadata</a></span>
+	<span id="metadata-link" style="display: none;">&mdash;&#160;<a href="#" data-toggle="modal" data-target="#metadata">Metadata</a></span>
 </div>
 </body>
 </html>
