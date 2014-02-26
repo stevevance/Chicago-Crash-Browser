@@ -133,7 +133,7 @@ var mapDisplay = (function() {
             type = 'Bicycle Crash';
         }
 
-        return '<p><strong>' + type + '</strong></p><p>Case Number:< ' + feature.casenumber + '<br/>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
+        return '<p><strong>' + type + '</strong></p><p>Case Number: ' + feature.casenumber + '<br/>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
         'Injuries: ' + feature.totalInjuries + '<br/>' +
         'Uninjured: ' + feature.noInjuries + '</p>';
     };
@@ -296,6 +296,14 @@ var mapDisplay = (function() {
 */
 var summaryDisplay = (function() {
 
+    var injuryFigure = function(injuries) {
+        if (injuries === undefined) {
+            return 0;
+        } else {
+            return injuries;
+        }
+    }
+
     /**
     *   Outputs the textual representation of crashes located in a given distance.
     */
@@ -310,8 +318,8 @@ var summaryDisplay = (function() {
             var counterBicyclistByYear = Utility.sortObjectByKey(bikeOutputObj.crashesByYear);
             $.each(counterBicyclistByYear, function(key, value){
              $('#counterBicyclistByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
-                 Utility.personOrPeople(bikeOutputObj.injuriesByYear[key]) + ' injured & ' +
-                 Utility.personOrPeople(bikeOutputObj.noInjuriesByYear[key]) + ' uninjured</div>');
+                 injuryFigure(Utility.personOrPeople(bikeOutputObj.injuriesByYear[key])) + ' injured & ' +
+                 injuryFigure(Utility.personOrPeople(bikeOutputObj.noInjuriesByYear[key])) + ' uninjured</div>');
             });
         }
 
@@ -323,8 +331,8 @@ var summaryDisplay = (function() {
             var counterPedestrianByYear = Utility.sortObjectByKey(pedOutputObj.crashesByYear);
             $.each(counterPedestrianByYear, function(key, value){
              $('#counterPedestrianByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
-                 Utility.personOrPeople(pedOutputObj.injuriesByYear[key]) + ' injured & ' +
-                 Utility.personOrPeople(pedOutputObj.noInjuriesByYear[key]) + ' uninjured</div>');
+                 injuryFigure(Utility.personOrPeople(pedOutputObj.injuriesByYear[key])) + ' injured & ' +
+                 injuryFigure(Utility.personOrPeople(pedOutputObj.noInjuriesByYear[key])) + ' uninjured</div>');
             }); // end each
         }
 
