@@ -133,7 +133,7 @@ var mapDisplay = (function() {
             type = 'Bicycle Crash';
         }
 
-        return '<p>' + type + '</p><p>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
+        return '<p><strong>' + type + '</strong></p><p>Case Number:< ' + feature.casenumber + '<br/>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
         'Injuries: ' + feature.totalInjuries + '<br/>' +
         'Uninjured: ' + feature.noInjuries + '</p>';
     };
