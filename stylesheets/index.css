@@ -157,11 +157,15 @@ h4 {
 	margin-top: 10px;
 }
 
-.modal-content {
-	padding: 10px;
-}
-
 .configSet {
 	overflow: hidden;
 	margin-top: 10px;
+}
+
+.moda-body p {
+	margin-top: 10px;
+}
+
+.modal-body p:first-child {
+	margin-top: 0;
 }

@@ -32,24 +32,24 @@
 								<input type="radio" name="searchRadius" value="50">50'</input>
 							</label>
 							<label class="btn btn-primary">
-								<input type="radio" name="searchRadius" class="btn btn-primary" value="100">100'</input>
-							</label>
-							<label class="btn btn-primary active">
-								<input type="radio" name="searchRadius" class="btn btn-primary" value="150">150'</input>
+								<input type="radio" name="searchRadius" value="100">100'</input>
 							</label>
 							<label class="btn btn-primary">
-								<input type="radio" name="searchRadius" class="btn btn-primary" value="200">200'</input>
+								<input type="radio" name="searchRadius" value="150">150'</input>
+							</label>
+							<label class="btn btn-primary">
+								<input type="radio" name="searchRadius" value="200">200'</input>
 							</label>
 						</div>
 					</div>
 					<div class="configSet">
 						<div class="configLabel">Output Type:</div>
 						<div class="btn-group" data-toggle="buttons" id="displaySelection">
-							<label class="btn btn-primary active">
-								<input type="radio" name="outputType" class="btn btn-primary" value="graph" id="outputGraph">Graph</input>
+							<label class="btn btn-primary">
+								<input type="radio" name="outputType" value="graph" id="outputGraph">Graph</input>
 							</label>
 							<label class="btn btn-primary">
-								<input type="radio" name="outputType" class="btn btn-primary" value="text" id="outputText">Text</input>
+								<input type="radio" name="outputType" value="text" id="outputText">Text</input>
 							</label>
 						</div>
 					</div>
@@ -98,8 +98,14 @@
 <div id="about" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content" id="about-modal">
-			<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
-			<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<strong>About</strong>
+			</div>
+			<div class="modal-body">
+				<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
+				<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
+			</div>
 		</div>
 	</div>
 </div>
@@ -107,15 +113,20 @@
 <div id="metadata" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content" id="metadata-modal">
-			<h2>Metadata</h2>
-			<p>For your selected location.</p>
-			<p class="hidden"><img id="staticimage" src=""></p>
-			<ul>
-				<li><span id="permalink"></span></li>
-				<li>Geographic coordinates: <span id="coords"></span></li>
-				<li>Latitude: <span id="latitude"></span></li>
-				<li>Longitude: <span id="longitude"></span></li>
-			</ul>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<strong>Metadata</strong>
+			</div>
+			<div class="modal-body">
+				<p>For your selected location.</p>
+				<p class="hidden"><img id="staticimage" src=""></p>
+				<ul>
+					<li><span id="permalink"></span></li>
+					<li>Geographic coordinates: <span id="coords"></span></li>
+					<li>Latitude: <span id="latitude"></span></li>
+					<li>Longitude: <span id="longitude"></span></li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </div>

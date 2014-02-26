@@ -83,8 +83,8 @@ var mapDisplay = (function() {
     var markerGroup;
 
     var init = function() {
-        lat = $.url().param('lat') || 41.895924;
-        lng = $.url().param('lon') || -87.654921;
+        lat = $.url().fparam('lat') || 41.895924;
+        lng = $.url().fparam('lon') || -87.654921;
         center = [lat, lng];
 
         map = L.map('map').setView(center, 16);
@@ -538,12 +538,7 @@ var summaryDisplay = (function() {
     Main module; handles the general behavior of the application, delegating as needed.
 */
 var crashBrowser = (function() {
-    var init = function() {
-        var get = $.url().param('get');
-        if(get == 'yes') {
-            fetchCrashData();
-        }
-    };
+    var init = function() {};
 
     /*
     *   Communicates with the backend API to get crash data for the distance provided.
@@ -680,27 +675,28 @@ var crashBrowser = (function() {
 var init = function() {
     // When there isn't a display cookie, default to graph.
     if ($.cookie('display') === undefined) {
-        $('#outputGraph').prop('checked', true);
+        $('#outputGraph').prop('checked', true).parent().addClass('active');
         $.cookie('display', 'graph');
     } else {
+
         if ($.cookie('display') == 'graph') {
-            $('#outputGraph').prop('checked', true);
+            $('#outputGraph').prop('checked', true).parent().addClass('active');
             summaryDisplay.showGraph();
         }
 
         if ($.cookie('display') == 'text') {
-            $('#outputText').prop('checked', true);
+            $('#outputText').prop('checked', true).parent().addClass('active');
             summaryDisplay.showText();
         }
     }
 
     // When there isn't a searchRadius cookie, default to 150.
     if ($.cookie('searchRadius') === undefined) {
-        $('input[name="searchRadius"][value="150"]').prop('checked', true);
+        $('input[name="searchRadius"][value="150"]').prop('checked', true).parent().addClass('active');
         $.cookie('searchRadius', '150');
     } else {
         var searchRadius = $.cookie('searchRadius');
-        $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true);
+        $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true).parent().addClass('active');
     }
 };
 
@@ -711,12 +707,16 @@ $(document).ready(function() {
     init();
 
     $('input[name="searchRadius"]:radio').change(function() {
+        var searchRadiusValue = $('input[name="searchRadius"]:checked').val();
+        $('#searchRadiusButtons label input').removeClass('active');
+        $.cookie('searchRadius', searchRadiusValue);
         mapDisplay.showCrashes();
     });
 
     $('input[name="outputType"]:radio').change(function() {
         var outputTypeCheckedValue = $('input[name="outputType"]:checked').val();
-
+        $('#displaySelection label input').removeClass('active');
+        $('input[name="outputType"]:checked').addClass('active');
         $.cookie('display', outputTypeCheckedValue);
         if (outputTypeCheckedValue == 'graph') {
             summaryDisplay.showGraph();
@@ -724,6 +724,12 @@ $(document).ready(function() {
             summaryDisplay.showText();
         }
     });
+
+    var get = $.url().fparam('get');
+    if(get == 'yes') {
+        mapDisplay.showCrashes();
+    }
+
 
     $('.btn').button();
 });
