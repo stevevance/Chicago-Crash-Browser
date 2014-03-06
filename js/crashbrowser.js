@@ -306,7 +306,7 @@ var summaryDisplay = (function() {
         } else {
             return injuries;
         }
-    }
+    };
 
     /**
     *   Outputs the textual representation of crashes located in a given distance.
@@ -622,10 +622,11 @@ var crashBrowser = (function() {
     };
 
     /*
-    *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on
+    *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on features
+    *   loaded from the API.
     */
     var generateSummaries = function(crashes) {
-        summaryObjects = [];
+        var summaryObjects = {};
 
         if(crashes.length > 0) {
             $.each(crashes, function(i, feature) {
@@ -634,19 +635,19 @@ var crashBrowser = (function() {
 
                 switch (feature.collType) {
                     case CollisionEnum.PEDESTRIAN:
-                        if (summaryObjects.pedestrian === undefined) {
-                            s = new SummaryObject();
-                        } else {
+                        if ('pedestrian' in summaryObjects) {
                             s = summaryObjects.pedestrian;
+                        } else {
+                            s = new SummaryObject();
                         }
                         addFeatureToSummary(feature, s);
                         summaryObjects.pedestrian = s;
                     break;
                     case CollisionEnum.BICYCLIST:
-                        if (summaryObjects.bicycle === undefined) {
-                            s = new SummaryObject();
-                        } else {
+                        if ('bicycle' in summaryObjects) {
                             s = summaryObjects.bicycle;
+                        } else {
+                            s = new SummaryObject();
                         }
                         addFeatureToSummary(feature, s);
                         summaryObjects.bicycle = s;
