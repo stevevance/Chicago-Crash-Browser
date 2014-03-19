@@ -1,569 +1,748 @@
-var ccb = ccb || {};
+/* jshint undef: true, unused: false */
+/* global L,Q,$,$$ */
 
-var markerGroup = new L.MarkerClusterGroup({
-                maxClusterRadius:20,
-                spiderfyDistanceMultiplier:1.3
-                });
+'use strict';
 
-var lat = $.url().param('lat') || 41.895924;
-var lng = $.url().param('lon') || -87.654921;
-
-var center = [lat,lng]; 
-var map = L.map('map').setView(center, 16);
-var circle;
-var zoom = map.getZoom();
-
-var year;
-//$("#staticimage").attr({src: "staticmap.php?center=" + lat + "," + lng + "&zoom=" + zoom+1 + "&size=200x200' />"});
-
-        
 /*
-L.tileLayer('http://{s}.tile.cloudmade.com/851cc32e47324bb6bdf28181975a7218/997/256/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>',
-    maxZoom: 18
-}).addTo(map);
+*   Collision type enumerations. The variable type matters, because
+*   switch statements use === for comparisons.
 */
-// add an OpenStreetMap tile layer
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
-}).addTo(map);
-map.addControl(new L.Control.Permalink({useLocation:true}));
-map.addControl(new L.control.locate({debug:false}));
+var CollisionEnum = Object.freeze({
+    PEDESTRIAN: '1',
+    BICYCLIST: '2'
+});
 
-var get = $.url().param('get');
-if(get == "yes") {
-    getUrl();
-}
+/*
+*   Utility functions that can be used anywhere in the code.
+*/
+var Utility = (function() {
+    /**
+     *  Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
+     */
+    var sortObjectByKey = function(obj){
+        var keys = [];
+        var sorted_obj = {};
 
-map.on('click', openPopup);
-//map.on('load',init);
-//var popup = new L.Popup();
-//getUrl();
-
-
-/**
- * Return an Object sorted by it's Key; http://stackoverflow.com/questions/5467129/sort-javascript-object-by-key
- */
-function sortObjectByKey(obj){
-    var keys = [];
-    var sorted_obj = {};
-
-    for(var key in obj){
-        if(obj.hasOwnProperty(key)){
-            keys.push(key);
+        for(var key in obj){
+            if(obj.hasOwnProperty(key)){
+                keys.push(key);
+            }
         }
-    }
 
-    // sort keys
-    keys.sort();
+        // sort keys
+        keys.sort();
 
-    // create new array based on Sorted Keys
-    jQuery.each(keys, function(i, key){
-        sorted_obj[key] = obj[key];
-    });
+        // create new array based on Sorted Keys
+        $.each(keys, function(i, key){
+            sorted_obj[key] = obj[key];
+        });
 
-    return sorted_obj;
-}
+        return sorted_obj;
+    };
 
-function openPopup(e) {
-    lat = e.latlng.lat;
-    lng = e.latlng.lng;
-    //console.log(lat+", "+lng);
-    
-    var popup = L.popup()
-    .setLatLng([lat, lng])
-    //.setContent("<a href='#lat="+lat+"&lon="+lng+"&get=yes'>Search here</a>")
-    .setContent("Search within <a href='javascript:getUrl(50);'>50 ft</a>, <a href='javascript:getUrl(100);'>100 ft</a>, <b><a href='javascript:getUrl(150);'>150 ft</a></b>, <a href='javascript:getUrl(200);'>200 ft</a>")
-    .openOn(map);
-}
+    /*
+    *   Returns plural forms of common words.
+    */
+    var personOrPeople = function(quantity) {
+        var s;
+        if(quantity == 1) {
+            s = quantity + ' person';
+        } else if(quantity > 1) {
+            s = quantity + ' people';
+        }
+        return s;
+    };
 
-// given a JSON crashes row, return popup
-function getCrashDetails(feature) {
-    var type = null;
-    if(feature.collType == 1) {
-        type = "Pedestrian Crash";
-    } else if(feature.collType == 2) {
-        type = "Bicycle Crash";
-    }
+    var crashOrCrashes = function(quantity) {
+        var s;
+        if(quantity == 1) {
+            s = quantity + ' crash';
+        } else if(quantity > 1) {
+            s = quantity + ' crashes';
+        }
+        return s;
+    };
 
-    return "<p>" + type + "</p><p>Date: " + feature.month + "/" + feature.day + "/" + (parseInt(feature.year) + 2000) + "<br/>" +
-    "Injuries: " + feature.totalInjuries + "<br/>" +
-    "Uninjured: " + feature.noInjuries + "</p>";
-}
+    return {
+        sortObjectByKey: sortObjectByKey,
+        personOrPeople: personOrPeople,
+        crashOrCrashes: crashOrCrashes
+    };
+}());
 
-function getUrl(distance) {
-  var counterPedestrian = 0;
-  var counterBicyclist = 0;
-  var counterPedestrianByYear = {};
-  var counterBicyclistByYear = {};
-  if(distance === undefined || distance === null) {
-        distance = 150;
-  }
+/*
+*   Methods that interact with the map layers
+*/
+var mapDisplay = (function() {
+    var lat;
+    var lng;
+    var map;
+    var center;
+    var circle;
+    var dist;
+    var markerGroup;
 
-  //var boundsString = map.getBounds().toBBoxString();
-  var bounds = map.getBounds();
-  var boundsPadded = bounds.pad(10);
+    var init = function() {
+        lat = $.url().fparam('lat') || 41.895924;
+        lng = $.url().fparam('lon') || -87.654921;
+        center = [lat, lng];
 
+        map = L.map('map').setView(center, 16);
+        map.addControl(new L.Control.Permalink({useLocation:true}));
+        map.addControl(new L.control.locate({debug:false}));
+        // add an OpenStreetMap tile layer
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
 
-  var southwest = boundsPadded.getSouthWest();
-  var south = southwest.lat;
-  var west = southwest.lng;
-  var northeast = boundsPadded.getNorthEast();
-  var north = northeast.lat;
-  var east = northeast.lng;
+        map.on('click', function(e) {
+            lat = e.latlng.lat;
+            lng = e.latlng.lng;
 
-  var bikeIcon = L.icon({
-    iconUrl: 'images/icon_bike.png',
-    shadowUrl: 'images/icon_shadow.png',
-    iconSize: [32, 37],
-    iconAnchor: [16, 38],
-    shadowSize: [51, 37],
-    shadowAnchor: [25, 38],
-    popupAnchor: [0, -38],
-  });
+            showCrashes();
+        });
 
-  var pedestrianIcon = L.icon({
-    iconUrl: 'images/icon_pedestrian.png',
-    shadowUrl: 'images/icon_shadow.png',
-    iconSize: [32, 37],
-    iconAnchor: [16, 38],
-    shadowSize: [51, 37],
-    shadowAnchor: [25, 38],
-    popupAnchor: [0, -38],
-  });
+        markerGroup = new L.MarkerClusterGroup({
+            maxClusterRadius:20,
+            spiderfyDistanceMultiplier:1.3
+        });
 
+    };
 
-    $("#status").html("Looking through the database...");
-    
-    bounds = map.getBounds();
-    //console.log(bounds);
-    boundsPadded = bounds.pad(10);
-    southwest = boundsPadded.getSouthWest();
-    south = southwest.lat;
-    west = southwest.lng;
-    northeast = boundsPadded.getNorthEast();
-    north = northeast.lat;
-    east = northeast.lng;
-    
-    var url = "http://chicagocrashes.org/api.php?lat="+lat+"&lng="+lng+"&north="+north+"&south="+south+"&east="+east+"&west="+west+"&distance="+distance;
-    // console.log(url);
-    
-    counterPedestrian = 0;
-    counterPedestrianByYear = {};
-    counterPedInjuriesByYear = {};
-    counterPedFatalByYear = {};
-    counterPedNoInjByYear = {};
-    
-    counterBicyclist = 0;
-    counterBicyclistByYear = {};
-    counterBikeInjuriesByYear = {};
-    counterBikeFatalByYear = {};
-    counterBikeNoInjByYear = {};
-    
-    $.getJSON(url, function(data) {
-        // remove some layers first
-        $("#results").hide();
+    /*
+    *   Notifies the crashBrowser module to fetch updated crash data for
+    *   the current latitude and longitude in the map.
+    */
+    var showCrashes = function() {
+        $('#results').hide();
+        $('#metadata-link').hide();
+        dist = $('input[name="searchRadius"]:checked').val();
+        crashBrowser.fetchCrashData();
+    };
+
+    /*
+    *   Takes a feature row from the API and outputs basic information
+    *   for the crash.
+    */
+    var getCrashDetails = function(feature) {
+        var type = null;
+        if(feature.collType == CollisionEnum.PEDESTRIAN) {
+            type = 'Pedestrian Crash';
+        } else if(feature.collType == CollisionEnum.BICYCLIST) {
+            type = 'Bicycle Crash';
+        }
+
+        return '<p><strong>' + type + '</strong></p><p>Case Number: ' + feature.casenumber + '<br/>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
+        'Injuries: ' + feature.totalInjuries + '<br/>' +
+        'Uninjured: ' + feature.noInjuries + '</p>';
+    };
+
+    /*
+    *   Removes marker group and circle from the map.
+    */
+    var clearCircle = function() {
+        $('#results').hide();
         if(typeof circle !='undefined') {
             map.removeLayer(circle);
             markerGroup.clearLayers();
-            //map.removeLayer(markerGroup);
-            
         }
-        var markers = [];
         map.setView([lat,lng], 18);
-        // console.log(data);
-        //console.log("JSON: Getting the URL");
-        
-        var counter = 0;
-        if(data.crashes.length > 0) {
-            totalInjuries = 0;
-            totalBicyclistInjuries = 0;
-            totalPedestrianInjuries = 0;
+        map.closePopup();
+    };
 
-            $.each(data.crashes, function(i, feature) {
-                map.closePopup();
-                //console.log("JSON: Iterating through the crashes...");
-                //console.log(counter);
-                //console.log(feature["casenumber"]);
-                //console.log("Latitude should be " + feature.latitude);
-                
-                //var marker = new L.Marker([feature[11],feature[12]]);
-                counter++;
-                year = feature.year*1+2000;
-                var marker = null;
-                var details = null;
+    /**
+    *   Adds circle to the map and fits the amp boundaries to the marker group, if applicable
+    */
+    var addCircle = function() {
+        // this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
+        var circleOptions = {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.3,
+            stroke: false,
+            clickable:false
+        };
 
-                if(feature.collType == "1") {
-                    // pedestrian
-                    //marker.setIcon(new icon_pedestrian());
+        var meters = dist/3.2808399;
+        circle = new L.Circle([lat,lng], meters, circleOptions);
+        map.addLayer(circle);
 
-                    marker = new L.Marker(
-                        [feature.latitude,feature.longitude], 
-                        {icon: pedestrianIcon}
-                    );
-                    
-                    details = getCrashDetails(feature);
-                    marker.bindPopup(details).openPopup();
-
-                    markerGroup.addLayer(marker);
-                    counterPedestrian++;
-                    // count the year here
-                    if(counterPedestrianByYear[year]) {
-                        counterPedestrianByYear[year]++;
-                    } else {
-                        counterPedestrianByYear[year] = 1;
-                    }
-                    
-                    totalPedestrianInjuries += parseInt(feature.totalInjuries);
-                    if(counterPedInjuriesByYear[year]) {
-                        counterPedInjuriesByYear[year] += parseInt(feature.totalInjuries);
-                    } else {
-                        counterPedInjuriesByYear[year] = parseInt(feature.totalInjuries);
-                    }
-                    
-                    if(counterPedNoInjByYear[year]) {
-                        counterPedNoInjByYear[year] += parseInt(feature.noInjuries);
-                    } else {
-                        counterPedNoInjByYear[year] = parseInt(feature.noInjuries);
-                    }
-    
-                }
-                if(feature.collType == "2"){
-                    // bicyclist
-                    //marker.setIcon(new icon_bicycle());
-                    marker = new L.Marker(
-                        [feature.latitude,feature.longitude], 
-                        {icon: bikeIcon}
-                    );
-
-                    details = getCrashDetails(feature);
-                    marker.bindPopup(details).openPopup();
-
-                    markerGroup.addLayer(marker);
-                    counterBicyclist++;
-                    // count the year here
-                    if(counterBicyclistByYear[year]) {
-                        counterBicyclistByYear[year]++;
-                    } else {
-                        counterBicyclistByYear[year] = 1;
-                    }
-                    
-                    totalBicyclistInjuries += parseInt(feature.totalInjuries);
-                    if(counterBikeInjuriesByYear[year]) {
-                        counterBikeInjuriesByYear[year] += parseInt(feature.totalInjuries);
-                    } else {
-                        counterBikeInjuriesByYear[year] = parseInt(feature.totalInjuries);
-                    }
-                    
-                    if(counterBikeNoInjByYear[year]) {
-                        counterBikeNoInjByYear[year] += parseInt(feature.noInjuries);
-                    } else {
-                        counterBikeNoInjByYear[year] = parseInt(feature.noInjuries);
-                    }
-                }
-            });
-            map.addLayer(markerGroup);
-            
-            // add circle
-            // this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
-            circleOptions = {
-                color: 'red', 
-                fillColor: '#f03', 
-                fillOpacity: 0.3,
-                stroke: false,
-                clickable:false
-            };
-            
-            var meters = distance/3.2808399;
-            circle = new L.Circle([lat,lng], meters, circleOptions);
-            map.addLayer(circle);
-            
+        if (crashBrowser.hasCrashes()) {
             map.fitBounds(markerGroup.getBounds());
-            
-            bikeOutputObj = {type: 'bicycle', 
-                             crashes: counterBicyclist,
-                             totalInjuries: totalBicyclistInjuries,
-                             crashYearArr: counterBicyclistByYear,
-                             injuryYearArr: counterBikeInjuriesByYear,
-                             noinjuryYearArr: counterBikeNoInjByYear
-                            };
+        }
+    };
 
-            pedOutputObj = { type: 'pedestrian', 
-                             crashes: counterPedestrian,
-                             totalInjuries: totalPedestrianInjuries,
-                             crashYearArr: counterPedestrianByYear,
-                             injuryYearArr: counterPedInjuriesByYear,
-                             noinjuryYearArr: counterPedNoInjByYear
-                            };
+    /**
+    *   Returns the API url for the current map view.
+    */
+    var getAPIUrl = function() {
+        var bounds = map.getBounds();
+        var boundsPadded = bounds.pad(10);
 
-            metaDataObj = {lat: lat,
-                           lng: lng,
-                           distance: distance
-                            };
+        var southwest = boundsPadded.getSouthWest();
+        var south = southwest.lat;
+        var west = southwest.lng;
+        var northeast = boundsPadded.getNorthEast();
+        var north = northeast.lat;
+        var east = northeast.lng;
 
-            outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj);
-            outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj);
+        $('#status').html('Looking through the database...');
 
+        bounds = map.getBounds();
+        //console.log(bounds);
+        boundsPadded = bounds.pad(10);
+        southwest = boundsPadded.getSouthWest();
+        south = southwest.lat;
+        west = southwest.lng;
+        northeast = boundsPadded.getNorthEast();
+        north = northeast.lat;
+        east = northeast.lng;
+
+        return 'http://chicagocrashes.org/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+dist;
+    };
+
+    /**
+    *   Based on the individual crash data passed in, creates a map marker,
+    *   with details bound to it in a popup.
+    */
+   var createFeatureMarker = function(feature) {
+        var marker = null;
+        var details = null;
+        var iconValue = null;
+
+        if (feature.collType == CollisionEnum.PEDESTRIAN) {
+            iconValue = mapDisplay.pedestrianIcon;
         } else {
-            $("#status").html("No crashes found within " + distance + " feet of this location");
-        }   
-  }).fail(function(){
-        $("#status").html("Something went wrong while retrieving data. Please try again later and alert Steven.");
-    map.closePopup();
-  });
-    
-}
+            iconValue = mapDisplay.bikeIcon;
+        }
 
-function outputCrashDataText(bikeOutputObj, pedOutputObj, metaDataObj) {
-    $("#results").show();
-    $("#counterBicyclist").html(bikeOutputObj.crashes);
-    $("#counterPedestrian").html(pedOutputObj.crashes);
-    $("#counterBicyclistByYear").html('');
-    $("#counterPedestrianByYear").html('');
-    $("#totalBicyclistInjuries").html(bikeOutputObj.totalInjuries);
-    $("#totalPedestrianInjuries").html(pedOutputObj.totalInjuries);
-    
-    $("#radius").html(metaDataObj.distance);
-    
-    counterBicyclistByYear = sortObjectByKey(bikeOutputObj.crashYearArr);
-    $.each(counterBicyclistByYear, function(key, value){
-     $("#counterBicyclistByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
-         personOrPeople(bikeOutputObj.injuryYearArr[key]) + " injured & " + 
-         personOrPeople(bikeOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
-    })
-    
-    counterPedestrianByYear = sortObjectByKey(pedOutputObj.crashYearArr);
-    $.each(counterPedestrianByYear, function(key, value){
-     $("#counterPedestrianByYear").append("<div>" + key + ": " + crashOrCrashes(value) + " with " + 
-         personOrPeople(pedOutputObj.injuryYearArr[key]) + " injured & " + 
-         personOrPeople(pedOutputObj.noinjuryYearArr[key]) + " uninjured</div>")
-    }) // end each 
+        marker = new L.Marker(
+            [feature.latitude,feature.longitude],
+            {icon: iconValue}
+        );
 
-    $("#metadata").slideDown();
-    $("#coords").html(metaDataObj.lat+", "+metaDataObj.lng);
-    $("#latitude").html(metaDataObj.lat);
-    $("#longitude").html(metaDataObj.lng);
-    $("#permalink").html("<a href='#lat="+metaDataObj.lat+"&lon="+metaDataObj.lng+"&get=yes'>Permalink</a>");
-    $("#status").html("");
-}
+        details = getCrashDetails(feature);
+
+        marker.bindPopup(details);
+
+        return marker;
+    };
+
+    /**
+    *   Helper function that wraps the feature creation and adds it to the map.
+    */
+    var addFeatureToMap = function(feature) {
+        markerGroup.addLayer(createFeatureMarker(feature));
+    };
+
+    /**
+    *   Called after adding all of the features to the map; actually adds the
+    *   markerGroup to the map.
+    */
+    var finalizeMarkerGroup = function() {
+        map.addLayer(markerGroup);
+    };
+
+    var bikeIcon = L.icon({
+        iconUrl: 'images/icon_bike.png',
+        shadowUrl: 'images/icon_shadow.png',
+        iconSize: [32, 37],
+        iconAnchor: [16, 38],
+        shadowSize: [51, 37],
+        shadowAnchor: [25, 38],
+        popupAnchor: [0, -38],
+    });
+
+    var pedestrianIcon = L.icon({
+        iconUrl: 'images/icon_pedestrian.png',
+        shadowUrl: 'images/icon_shadow.png',
+        iconSize: [32, 37],
+        iconAnchor: [16, 38],
+        shadowSize: [51, 37],
+        shadowAnchor: [25, 38],
+        popupAnchor: [0, -38],
+    });
+
+    /**
+    *   Returns a map metadata object.
+    */
+    var getMetaData = function() {
+        return {
+            lat: lat,
+            lng: lng,
+            dist: dist
+        };
+    };
+
+    init();
+
+    return {
+        bikeIcon: bikeIcon,
+        pedestrianIcon: pedestrianIcon,
+        getAPIUrl: getAPIUrl,
+        showCrashes: showCrashes,
+        clearCircle: clearCircle,
+        addCircle: addCircle,
+        closePopup: map.closePopup,
+        finalizeMarkerGroup: finalizeMarkerGroup,
+        addFeatureToMap: addFeatureToMap,
+        getMetaData: getMetaData
+        };
+}());
 
 /*
-    Output our crash data in two separate graphs
+*   Methods used to control the display of CrashBrowser summary information
 */
-function outputCrashDataGraph(bikeOutputObj, pedOutputObj, metaDataObj) {
-    // 
-    // Output the summary graph (# of total pedestrian injuries, # of total bicycle injuries, total as encap if possible)
-    //
-    $('#summaryGraph').highcharts({
-        chart: {
-            type: 'bar'
-        },
-        title: {
-            text: 'Injury summary (2005-2012)'
-        },
-        xAxis: {
-            categories: ['Injuries']
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Number of Injuries'
+var summaryDisplay = (function() {
+
+    /**
+    *   Issue #28: Since some crashes may not have any injuries, we need a helper function
+    *   that catches this condition and returns 0 instead.
+    */
+    var injuryFigure = function(injuries) {
+        if (injuries === undefined) {
+            return 0;
+        } else {
+            return injuries;
+        }
+    };
+
+    /**
+    *   Outputs the textual representation of crashes located in a given distance.
+    */
+    var outputCrashDataText = function(bikeOutputObj, pedOutputObj) {
+        $('#results').show();
+
+        if (bikeOutputObj !== undefined) {
+            $('#counterBicyclist').html(bikeOutputObj.crashes);
+            $('#counterBicyclistByYear').html('');
+            $('#totalBicyclistInjuries').html(bikeOutputObj.totalInjuries);
+
+            var counterBicyclistByYear = Utility.sortObjectByKey(bikeOutputObj.crashesByYear);
+            $.each(counterBicyclistByYear, function(key, value){
+             $('#counterBicyclistByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
+                 injuryFigure(Utility.personOrPeople(bikeOutputObj.injuriesByYear[key])) + ' injured & ' +
+                 injuryFigure(Utility.personOrPeople(bikeOutputObj.noInjuriesByYear[key])) + ' uninjured</div>');
+            });
+        }
+
+        if (pedOutputObj !== undefined) {
+            $('#counterPedestrian').html(pedOutputObj.crashes);
+            $('#counterPedestrianByYear').html('');
+            $('#totalPedestrianInjuries').html(pedOutputObj.totalInjuries);
+
+            var counterPedestrianByYear = Utility.sortObjectByKey(pedOutputObj.crashesByYear);
+            $.each(counterPedestrianByYear, function(key, value){
+             $('#counterPedestrianByYear').append('<div>' + key + ': ' + Utility.crashOrCrashes(value) + ' with ' +
+                 injuryFigure(Utility.personOrPeople(pedOutputObj.injuriesByYear[key])) + ' injured & ' +
+                 injuryFigure(Utility.personOrPeople(pedOutputObj.noInjuriesByYear[key])) + ' uninjured</div>');
+            }); // end each
+        }
+
+        $('#status').html('');
+    };
+
+    /*
+    *   Output our crash data in two separate graphs.
+    */
+    var outputCrashDataGraph = function(bikeOutputObj, pedOutputObj) {
+        //
+        // Output the summary graph (# of total pedestrian injuries, # of total bicycle injuries, total as encap if possible)
+        //
+        $('#summaryGraph').highcharts({
+            chart: {
+                type: 'bar'
             },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold'
-                }
-            }
-        },
-        legend: {
-            reversed: true
-        },
-        plotOptions: {
-            series: {
-                stacking: 'normal',
-                dataLabels: {
+            title: {
+                text: 'Injury summary (2005-2012)'
+            },
+            xAxis: {
+                categories: ['Injuries']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Injuries'
+                },
+                stackLabels: {
                     enabled: true,
-                    color: 'white',
-                    fontWeight: 'bold'
+                    style: {
+                        fontWeight: 'bold'
+                    }
                 }
-            }
-        },
-        tooltip: {
-            formatter: function() {
-                return '<b>'+ this.x +'</b><br/>'+
-                    this.series.name +': '+ this.y +'<br/>'+
-                    'Total: '+ this.point.stackTotal;
-            }
-        },
-        series: 
-            [
-                {
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: 'white',
+                        fontWeight: 'bold'
+                    }
+                }
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+            series:
+                [
+                    {
+                        name: 'Pedestrian',
+                        color: '#fdae68',
+                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries]
+                    },
+                    {
+                        name: 'Bicycle',
+                        color: '#36a095',
+                        data: [bikeOutputObj === undefined ? '' : bikeOutputObj.totalInjuries]
+                    }
+                ]
+        });
+
+        var annualBreakdownObj = {};
+
+        if (pedOutputObj !== undefined) {
+            pedOutputObj.injuriesByYear.forEach(function(injuries, year) {
+                var annualBreakdownDetailObj = {bikeInjuries: 0, pedInjuries: injuries};
+                annualBreakdownObj[year] = annualBreakdownDetailObj;
+            });
+        }
+
+        if (bikeOutputObj !== undefined) {
+            bikeOutputObj.injuriesByYear.forEach(function(injuries, year) {
+                var annualBreakdownDetailObj;
+                if (annualBreakdownObj[year] instanceof Object) {
+                    annualBreakdownDetailObj = annualBreakdownObj[year];
+                    annualBreakdownDetailObj.bikeInjuries = injuries;
+                    annualBreakdownObj[year] = annualBreakdownDetailObj;
+                } else {
+                annualBreakdownDetailObj = {bikeInjuries: injuries, pedInjuries: 0};
+                annualBreakdownObj[year] = annualBreakdownDetailObj;
+                }
+            });
+        }
+
+        var pedInjuryArr = [];
+        var bikeInjuryArr = [];
+        $.each(annualBreakdownObj, function(index, injuryObject) {
+            pedInjuryArr.push(injuryObject.pedInjuries);
+            bikeInjuryArr.push(injuryObject.bikeInjuries);
+        });
+
+        $('#breakdownGraph').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Annual Breakdown'
+            },
+            xAxis: {
+                categories: Object.keys(annualBreakdownObj)
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Injuries'
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold'
+                    }
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        formatter: function() {
+                            if (this.y === 0) {
+                                return '';
+                            } else {
+                                return this.y;
+                            }
+                        },
+                        enabled: true,
+                        color: 'white',
+                        fontWeight: 'bold'
+                    }
+                }
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+             series:
+                [{
                     name: 'Pedestrian',
                     color: '#fdae68',
-                    data: [pedOutputObj.totalInjuries]
+                    data: pedInjuryArr
                 },
                 {
                     name: 'Bicycle',
                     color: '#36a095',
-                    data: [bikeOutputObj.totalInjuries]
-                }
-            ]   
-    });
+                    data: bikeInjuryArr
+                }]
+        });
 
-    //
-    // Output the yearly breakdown. Preferably as an array of objects.
-    //
+    };
 
-    var annualBreakdownObj = {};
+    /*
+    *   After showing graphs in the sidebar, resize to fit within viewport.
+    */
+    var resizeGraphs = function() {
+        $('#summaryGraph').width($('#list').width()-15);
+        $('#breakdownGraph').width($('#list').width()-15);
+    };
 
-    $.each(pedOutputObj.injuryYearArr, function(year, injuries) {
-        annualBreakdownDetailObj = {bikeInjuries: 0, pedInjuries: injuries};
-        annualBreakdownObj[year] = annualBreakdownDetailObj;
-    });
+    /*
+    *   Toggles showing the graph.
+    */
+    var showGraph = function() {
+        $('#counterTotals').hide();
+        $('#graphs').show();
+        resizeGraphs();
+    };
 
-    $.each(bikeOutputObj.injuryYearArr, function(year, injuries) {
-        if (annualBreakdownObj[year] instanceof Object) {
-            annualBreakdownDetailObj = annualBreakdownObj[year];
-            annualBreakdownDetailObj.bikeInjuries = injuries;
-            annualBreakdownObj[year] = annualBreakdownDetailObj;
+    /**
+    *   Toggles showing text.
+    */
+    var showText = function() {
+        $('#counterTotals').show();
+        $('#graphs').hide();
+        resizeGraphs();
+    };
+
+    var populateMetaData = function(metaDataObj) {
+        $('#radius').html(metaDataObj.dist);
+        $('#coords').html(metaDataObj.lat+', '+metaDataObj.lng);
+        $('#latitude').html(metaDataObj.lat);
+        $('#longitude').html(metaDataObj.lng);
+        $('#permalink').html('<a href="#lat='+metaDataObj.lat+'&lon='+metaDataObj.lng+'&get=yes">Permalink</a>');
+        $('#metadata-link').show();
+    };
+
+    return {
+        outputCrashDataGraph: outputCrashDataGraph,
+        outputCrashDataText: outputCrashDataText,
+        populateMetaData: populateMetaData,
+        showGraph: showGraph,
+        showText: showText
+    };
+
+})();
+
+/*
+    Main module; handles the general behavior of the application, delegating as needed.
+*/
+var crashBrowser = (function() {
+    var init = function() {};
+
+    /*
+    *   Communicates with the backend API to get crash data for the distance provided.
+    */
+    var fetchCrashData = function() {
+        var url = mapDisplay.getAPIUrl();
+        $.getJSON(url, function(data) {
+            mapDisplay.clearCircle();
+            generateSummaries(data.crashes);
+            mapDisplay.addCircle();
+        }).fail(function(){
+            $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
+            mapDisplay.closePopup();
+        });
+
+    };
+
+    /*
+    *   Returns an array of summary objects for the data provided, i.e.
+    *
+    *   [{
+    *       type: 'ped',
+    *       crashes: 2,
+    *       crashesByYear: [2011 => 1, 2012 => 2],
+    *       injuriesByYear: [2011 => 2, 2012 => 5],
+    *       noInjuriesByYear: [2011 => 3, 2012 => 7]
+    *   },
+    *   {
+    *       type: 'bike',
+    *       ...
+    *   }]
+    */
+
+    var summaryObjects = [];
+
+    var SummaryObject = function() {
+        this.crashes = 0;
+        this.totalInjuries = 0;
+        this.crashesByYear = [];
+        this.injuriesByYear = [];
+        this.noInjuriesByYear = [];
+    };
+
+    /*
+    *   Helper function that updates a SummaryObject based on the feature read.
+    */
+    var addFeatureToSummary = function(feature, s) {
+        s.crashes++;
+        var year = feature.year*1+2000;
+
+        if(s.crashesByYear[year] === undefined) {
+            s.crashesByYear[year] = 1;
         } else {
-        annualBreakdownDetailObj = {bikeInjuries: injuries, pedInjuries: 0};
-        annualBreakdownObj[year] = annualBreakdownDetailObj;            
+            s.crashesByYear[year]++;
+        }
+
+        s.totalInjuries += parseInt(feature.totalInjuries);
+        if(s.injuriesByYear[year]) {
+            s.injuriesByYear[year] += parseInt(feature.totalInjuries);
+        } else {
+            s.injuriesByYear[year] = parseInt(feature.totalInjuries);
+        }
+
+        if(s.noInjuriesByYear[year]) {
+            s.noInjuriesByYear[year] += parseInt(feature.noInjuries);
+        } else {
+            s.noInjuriesByYear[year] = parseInt(feature.noInjuries);
+        }
+    };
+
+    /*
+    *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on features
+    *   loaded from the API.
+    */
+    var generateSummaries = function(crashes) {
+        var summaryObjects = {};
+
+        if(crashes.length > 0) {
+            $.each(crashes, function(i, feature) {
+                var s;
+                mapDisplay.addFeatureToMap(feature);
+
+                switch (feature.collType) {
+                    case CollisionEnum.PEDESTRIAN:
+                        if ('pedestrian' in summaryObjects) {
+                            s = summaryObjects.pedestrian;
+                        } else {
+                            s = new SummaryObject();
+                        }
+                        addFeatureToSummary(feature, s);
+                        summaryObjects.pedestrian = s;
+                    break;
+                    case CollisionEnum.BICYCLIST:
+                        if ('bicycle' in summaryObjects) {
+                            s = summaryObjects.bicycle;
+                        } else {
+                            s = new SummaryObject();
+                        }
+                        addFeatureToSummary(feature, s);
+                        summaryObjects.bicycle = s;
+                    break;
+                }
+            });
+            mapDisplay.finalizeMarkerGroup();
+
+            var metaDataObj = mapDisplay.getMetaData();
+
+            summaryDisplay.outputCrashDataText(summaryObjects.bicycle, summaryObjects.pedestrian);
+            summaryDisplay.outputCrashDataGraph(summaryObjects.bicycle, summaryObjects.pedestrian);
+            summaryDisplay.populateMetaData(metaDataObj);
+
+        } else {
+            $('#status').html('No crashes found within ' + mapDisplay.getMetaData().dist + ' feet of this location');
+        }
+    };
+
+    /*
+    *   Helper function to determine easily if the app has any crashes.
+    */
+    var hasCrashes = function() {
+        return summaryObjects.length > 0;
+    };
+
+    init();
+
+    return {
+        fetchCrashData: fetchCrashData,
+        hasCrashes: hasCrashes
+    };
+}());
+
+/*
+*   Set initial conditions
+*/
+var init = function() {
+    // When there isn't a display cookie, default to graph.
+    if ($.cookie('display') === undefined) {
+        $('#outputGraph').prop('checked', true).parent().addClass('active');
+        $.cookie('display', 'graph');
+    } else {
+
+        if ($.cookie('display') == 'graph') {
+            $('#outputGraph').prop('checked', true).parent().addClass('active');
+            summaryDisplay.showGraph();
+        }
+
+        if ($.cookie('display') == 'text') {
+            $('#outputText').prop('checked', true).parent().addClass('active');
+            summaryDisplay.showText();
+        }
+    }
+
+    // When there isn't a searchRadius cookie, default to 150.
+    if ($.cookie('searchRadius') === undefined) {
+        $('input[name="searchRadius"][value="150"]').prop('checked', true).parent().addClass('active');
+        $.cookie('searchRadius', '150');
+    } else {
+        var searchRadius = $.cookie('searchRadius');
+        $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true).parent().addClass('active');
+    }
+};
+
+/*
+*  Assign module methods to various events.
+*/
+$(document).ready(function() {
+    init();
+
+    $('input[name="searchRadius"]:radio').change(function() {
+        var searchRadiusValue = $('input[name="searchRadius"]:checked').val();
+        $('#searchRadiusButtons label input').removeClass('active');
+        $.cookie('searchRadius', searchRadiusValue);
+        mapDisplay.showCrashes();
+    });
+
+    $('input[name="outputType"]:radio').change(function() {
+        var outputTypeCheckedValue = $('input[name="outputType"]:checked').val();
+        $('#displaySelection label input').removeClass('active');
+        $('input[name="outputType"]:checked').addClass('active');
+        $.cookie('display', outputTypeCheckedValue);
+        if (outputTypeCheckedValue == 'graph') {
+            summaryDisplay.showGraph();
+        } else if (outputTypeCheckedValue == 'text') {
+            summaryDisplay.showText();
         }
     });
 
-    // console.log(annualBreakdownObj);
-
-    pedInjuryArr = [];
-    bikeInjuryArr = [];
-    $.each(annualBreakdownObj, function(index, injuryObject) {
-        pedInjuryArr.push(injuryObject.pedInjuries);
-        bikeInjuryArr.push(injuryObject.bikeInjuries);
-    });
-
-    $('#breakdownGraph').highcharts({
-        chart: {
-            type: 'bar'
-        },
-        title: {
-            text: 'Annual Breakdown'
-        },
-        xAxis: {
-            categories: Object.keys(annualBreakdownObj)
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Number of Injuries'
-            },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold'
-                }
-            }
-        },
-        legend: {
-            reversed: true
-        },
-        plotOptions: {
-            series: {
-                stacking: 'normal',
-                dataLabels: {
-                    formatter: function() {
-                        if (this.y === 0) {
-                            return "";
-                        } else {
-                            return this.y;
-                        }
-                    },
-                    enabled: true,
-                    color: 'white',
-                    fontWeight: 'bold'
-                }
-            }
-        },
-        tooltip: {
-            formatter: function() {
-                return '<b>'+ this.x +'</b><br/>'+
-                    this.series.name +': '+ this.y +'<br/>'+
-                    'Total: '+ this.point.stackTotal;
-            }
-        },
-         series: 
-            [{
-                name: 'Pedestrian',
-                color: '#fdae68',
-                data: pedInjuryArr
-            },
-            {
-                name: 'Bicycle',
-                color: '#36a095',
-                data: bikeInjuryArr
-            }]
-    });
-
-}
-
-function personOrPeople(quantity) {
-    var s;
-    if(quantity == 1) {
-        s = quantity + " person";
-    } else if(quantity > 1) {
-        s = quantity + " people";
-    }
-    return s;
-}
-
-function crashOrCrashes(quantity) {
-    var s;
-    if(quantity == 1) {
-        s = quantity + " crash";
-    } else if(quantity > 1) {
-        s = quantity + " crashes";
-    }
-    return s;
-}
-
-function resizeGraphs() {
-    $("#summaryGraph").width($("#list").width()-5);
-    $("#breakdownGraph").width($("#list").width()-5);
-}
-
-function showGraph() {
-    $('#graphButton').addClass('active');
-    $('#textButton').removeClass('active');
-    $('#counterTotals').hide();
-    $('#graphs').show();
-    resizeGraphs();
-}
-
-function showText() {
-    $('#graphButton').removeClass('active');
-    $('#textButton').addClass('active');
-    $('#counterTotals').show();
-    $('#graphs').hide();
-    resizeGraphs();
-}
-
-$(document).ready(function() {
-    $('#graphButton').click(function() {
-        showGraph();
-        $.cookie('display', 'graph');
-    });
-    
-    $('#textButton').click(function() {
-        showText();
-        $.cookie('display', 'text');
-    });
-
-    if ($.cookie('display') == 'graph') {
-        showGraph();
+    var get = $.url().fparam('get');
+    if(get == 'yes') {
+        mapDisplay.showCrashes();
     }
 
-    if ($.cookie('display') == 'text') {
-        showText();
-    }
+
+    $('.btn').button();
 });
