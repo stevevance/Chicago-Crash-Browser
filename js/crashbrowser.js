@@ -91,7 +91,9 @@ var mapDisplay = (function() {
         map.addControl(new L.Control.Permalink({useLocation:true}));
         map.addControl(new L.control.locate({debug:false}));
         // add an OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tiles.mapbox.com/v3/foursquare.m3elv7vi/{z}/{x}/{y}.png', {
+        //var tiles = "https://{s}.tiles.mapbox.com/v3/foursquare.m3elv7vi/{z}/{x}/{y}.png";
+        var tiles = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+        L.tileLayer(tiles, {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(map);
