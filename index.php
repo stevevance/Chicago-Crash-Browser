@@ -15,6 +15,11 @@
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+if (typeof jQuery == 'undefined') {
+    document.write(unescape("%3Cscript src='/bower_components/jquery/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));
+}
+</script>
 </head>
 <body>
 <div id="body">
