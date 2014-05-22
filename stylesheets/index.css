@@ -118,9 +118,13 @@ h4 {
 	margin-top: 10px;
 }
 
-.btn-group {
+.btn-group, .input-group {
 	float: right;
 	margin-right: 10px;
+}
+
+.input-group {
+	width: 240px;
 }
 
 .searchValue {

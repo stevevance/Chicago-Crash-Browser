@@ -10,7 +10,8 @@
 <link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/L.Control.Locate.css" />
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="stylesheets/index.css" />
-<script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+<!-- <script src="//code.jquery.com/jquery-2.1.0.min.js"></script> -->
+<script src="bower_components/jquery/jquery.min.js"></script>
 <script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
@@ -48,7 +49,7 @@ if (typeof jQuery == 'undefined') {
 						</div>
 					</div>
 					<div class="configSet">
-						<div class="configLabel">Output Type:</div>
+						<div class="configLabel">Output type:</div>
 						<div class="btn-group" data-toggle="buttons" id="displaySelection">
 							<label class="btn btn-primary">
 								<input type="radio" name="outputType" value="graph" id="outputGraph">Graph</input>
@@ -57,6 +58,15 @@ if (typeof jQuery == 'undefined') {
 								<input type="radio" name="outputType" value="text" id="outputText">Text</input>
 							</label>
 						</div>
+					</div>
+				</div>
+				<div class="configSet">
+					<div class="configLabel">Chicago Address:</div>
+					<div class="input-group">
+						<input class="form-control" type="text" name="address" id="address" placeholder="121 N. LaSalle Street"/>
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button" name="goButton">Go</button>
+						</span>
 					</div>
 				</div>
 			</form>
