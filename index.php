@@ -61,7 +61,7 @@ if (typeof jQuery == 'undefined') {
 					</div>
 				</div>
 				<div class="configSet">
-					<div class="configLabel">Chicago Address:</div>
+					<div class="configLabel"><a href="#" data-toggle="modal" data-target="#address-modal">Chicago Address:</a></div>
 					<div class="input-group">
 						<input class="form-control" type="text" name="address" id="address" placeholder="121 N. LaSalle Street"/>
 						<span class="input-group-btn">
@@ -120,6 +120,20 @@ if (typeof jQuery == 'undefined') {
 			<div class="modal-body">
 				<p>Crash data for Chicago in 2005-2012 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by the Illinois Department of Transportation.</p>
 				<p><a href='https://github.com/stevevance/Chicago-Crash-Browser'>Fork it on GitHub</a>. <a href='https://tinyletter.com/chicagocrashes'>Subscribe to mailing list to get updates</a> -<a href="mailto:steve@stevevance.net">Steven Vance</a>, <a href='http://twitter.com/stevevance'>@stevevance</a>. Hosted by <a href='http://www.smartchicagocollaborative.org/projects/hosted-web-space/'>Smart Chicago Collaborative</a>.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="address-modal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content" id="address-modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<strong>Chicago Address Search</strong>
+			</div>
+			<div class="modal-body">
+				<p>Enter a valid Chicago address, and the map will recenter at that address. This feature is still in BETA at this time; some addresses may not work quite right, some of the time.</p>
 			</div>
 		</div>
 	</div>
