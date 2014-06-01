@@ -81,10 +81,13 @@ var mapDisplay = (function() {
     var circle;
     var dist;
     var markerGroup;
+    var self;
 
     var init = function() {
-        lat = $.url().fparam('lat') || 41.895924;
-        lng = $.url().fparam('lon') || -87.654921;
+        self = this;
+        var initLat = $.url().fparam('lat') || 41.895924;
+        var initLng = $.url().fparam('lon') || -87.654921;
+        setCoordinates(initLat, initLng);
         center = [lat, lng];
 
         map = L.map('map').setView(center, 16);
@@ -97,8 +100,7 @@ var mapDisplay = (function() {
         }).addTo(map);
 
         map.on('click', function(e) {
-            lat = e.latlng.lat;
-            lng = e.latlng.lng;
+            setCoordinates(e.latlng.lat, e.latlng.lng);
 
             showCrashes();
         });
@@ -108,6 +110,14 @@ var mapDisplay = (function() {
             spiderfyDistanceMultiplier:1.3
         });
 
+    };
+
+    /*
+    *   Let's consistently allow access mapDisplay's lat/lng pair with a setter.
+    */
+    var setCoordinates = function(newLat, newLng) {
+        lat = newLat;
+        lng = newLng;
     };
 
     /*
@@ -287,7 +297,8 @@ var mapDisplay = (function() {
         closePopup: map.closePopup,
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
-        getMetaData: getMetaData
+        getMetaData: getMetaData,
+        setCoordinates: setCoordinates
         };
 }());
 
@@ -553,6 +564,43 @@ var crashBrowser = (function() {
     var init = function() {};
 
     /*
+    *   Communicates with the OpenStreetMap API to get coordinates for a given (Chicago!) address.
+    *   Since this calls an external service, this needs to return a jQuery promise.
+    */
+    var fetchCoordsForAddress = function() {
+        var dfd = jQuery.Deferred();
+
+        if ($('#address').val()) {
+            $.getJSON('http://nominatim.openstreetmap.org/search?street=' + $('#address').val() + '&city=Chicago&state=IL&format=json', function(data) {
+                if (data.length > 0 && !!data[0].lat && !!data[0].lon) {
+                    dfd.resolve(data);
+                } else {
+                    dfd.reject();
+                }
+            }).fail(function() {
+                dfd.reject();
+            });
+        }
+        return dfd.promise();
+    };
+
+    var saveAddressAndShowCrashes = function() {
+        $.cookie('address', $('#address').val());
+        $.when( fetchCoordsForAddress() ).then(
+        function(data) {
+            mapDisplay.setCoordinates(data[0].lat, data[0].lon);
+            mapDisplay.showCrashes();
+        }, function() {
+            addressError();
+            mapDisplay.closePopup();
+        });
+    };
+
+    var addressError = function() {
+        $('#status').html('Could not locate this address. Please try again later, or use a valid Chicago address!');
+    };
+
+    /*
     *   Communicates with the backend API to get crash data for the distance provided.
     */
     var fetchCrashData = function() {
@@ -677,8 +725,10 @@ var crashBrowser = (function() {
     init();
 
     return {
+        fetchCoordsForAddress: fetchCoordsForAddress,
         fetchCrashData: fetchCrashData,
-        hasCrashes: hasCrashes
+        hasCrashes: hasCrashes,
+        saveAddressAndShowCrashes: saveAddressAndShowCrashes
     };
 }());
 
@@ -711,6 +761,12 @@ var init = function() {
         var searchRadius = $.cookie('searchRadius');
         $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true).parent().addClass('active');
     }
+
+    // Save address for future searches
+    if ($.cookie('address') !== undefined) {
+        $('input[name="address"]').val($.cookie('address'));
+        crashBrowser.saveAddressAndShowCrashes();
+    }
 };
 
 /*
@@ -738,11 +794,21 @@ $(document).ready(function() {
         }
     });
 
+    $('button[name="goButton"]').click(function() {
+        crashBrowser.saveAddressAndShowCrashes();
+    });
+
+    /*
+    *   For when someone submits the form using the <enter> key in an input field.
+    */
+    $('#configForm').submit(function() {
+        crashBrowser.saveAddressAndShowCrashes();
+    });
+
     var get = $.url().fparam('get');
     if(get == 'yes') {
         mapDisplay.showCrashes();
     }
-
 
     $('.btn').button();
 });
