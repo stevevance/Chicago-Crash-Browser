@@ -63,6 +63,6 @@ The data is zipped CSV files. Most of these don't have the field names. You can 
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_PersonExtract.txt.zip) 
 
 ### Field Names
-*   [Crash](this)
-*   [Vehicle](that)
-*   [Person](hello)
+*   [Crash](http://s3.amazonaws.com/chicagocrashes/field_names/crash field names.csv)
+*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/field_names/person field names.csv)
+*   [Person](http://s3.amazonaws.com/chicagocrashes/field_names/vehicle field names.csv)
