@@ -1,8 +1,8 @@
 # Data Sources
 
-This is a list of links to the motor vehicle crash data used to power the Chicago Crash Browser. The data was provided by the Illinois Department of Transportation's Division of Traffic Safety. 
+This is a list of links to the motor vehicle crash data used to power the [Chicago Crash Browser](http://chicagocrashes.org). The data was provided by the Illinois Department of Transportation's Division of Traffic Safety. 
 
-Some datasets have data for the City of Chicago and others have for the entire State of Illinois.
+Some datasets have data for crashes within the City of Chicago and others have crashes for the entire State of Illinois.
 
 ## Data Dictionary
 
