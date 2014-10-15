@@ -49,6 +49,5 @@ Some datasets have data for the City of Chicago and others have for the entire S
 ## 2012 - City of Chicago
 
 *   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_CrashExtract.txt.zip)
-
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_VehicleExtract.txt.zip)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_PersonExtract.txt.zip) 
