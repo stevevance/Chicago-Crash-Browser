@@ -6,7 +6,13 @@ Some datasets have data for the City of Chicago and others have for the entire S
 
 ## Data Dictionary
 
+*   Crash: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present crash file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present crash codes 10-13-09.docx)
+*   Vehicle: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present vehicle file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present vehicle codes 10-13-09.docx)
+*   Person: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present person file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present person codes 10-13-09.docx)
+
 ## Data Links
+
+The data is zipped CSV files. Most of these don't have the field names. You can add those using the field name files at the bottom. 
 
 ### 2005 - City of Chicago
 
@@ -55,3 +61,8 @@ Some datasets have data for the City of Chicago and others have for the entire S
 *   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_CrashExtract.txt.zip)
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_VehicleExtract.txt.zip)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_PersonExtract.txt.zip) 
+
+### Field Names
+*   [Crash](this)
+*   [Vehicle](that)
+*   [Person](hello)
