@@ -4,6 +4,9 @@ This is a list of links to the motor vehicle crash data used to power the [Chica
 
 Some datasets have data for crashes within the City of Chicago and others have crashes for the entire State of Illinois.
 
+## Getting Help
+If you need help understanding this data – it's dense – you can [contact Steven on Twitter](http://twitter.com/stevevance). 
+
 ## Data Dictionary
 
 *   Crash table: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present crash file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present crash codes 10-13-09.docx)
