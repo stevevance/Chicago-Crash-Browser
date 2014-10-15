@@ -4,8 +4,9 @@ This is a list of links to the motor vehicle crash data used to power the [Chica
 
 Some datasets have data for crashes within the City of Chicago and others have crashes for the entire State of Illinois.
 
-## Getting Help
-If you need help understanding this data – it's dense – you can [contact Steven on Twitter](http://twitter.com/stevevance). 
+## Notes / Getting Help
+*   Be careful comparing data 2005-2008 and 2009 to present because the reporting threshold changed. In the former period, the data will contain crashes that had no injuries and property damage of at least $500. In the latter period, the data will contain crashes that had no injuries but property damage of at least $1,500. If there was an injury, the data will contain that crash regardless of the property damage estimate. 
+*   If you need help understanding this data – it's dense – you can [contact Steven on Twitter](http://twitter.com/stevevance). 
 
 ## Data Dictionary
 
