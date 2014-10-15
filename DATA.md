@@ -6,9 +6,9 @@ Some datasets have data for crashes within the City of Chicago and others have c
 
 ## Data Dictionary
 
-*   Crash: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present crash file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present crash codes 10-13-09.docx)
-*   Vehicle: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present vehicle file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present vehicle codes 10-13-09.docx)
-*   Person: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present person file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present person codes 10-13-09.docx)
+*   Crash table: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present crash file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present crash codes 10-13-09.docx)
+*   Vehicle table: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present vehicle file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present vehicle codes 10-13-09.docx)
+*   Person table: [XLSX spreadsheet](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2001-present person file layout 10-13-09.xlsx) - [DOCument](http://s3.amazonaws.com/chicagocrashes/data_dictionary/2004-present person codes 10-13-09.docx)
 
 ## Data Links
 
