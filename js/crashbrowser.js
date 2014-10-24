@@ -106,7 +106,7 @@ var mapDisplay = (function() {
         });
 
         markerGroup = new L.MarkerClusterGroup({
-            maxClusterRadius:20,
+            maxClusterRadius:15,
             spiderfyDistanceMultiplier:1.3
         });
 

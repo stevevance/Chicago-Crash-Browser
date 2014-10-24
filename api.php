@@ -106,6 +106,39 @@ AND latitude < '.$north.' AND latitude > '.$south.'
 AND longitude > '.$west.' AND longitude < '.$east.' 
 ORDER BY year ASC, month ASC, day ASC';
 
+$sql8 = 'SELECT
+	"collType",
+	casenumber,
+	"totalInjuries",
+	"Total killed" AS "totalKilled",
+	"No injuries" AS "noInjuries",
+	MONTH,
+	DAY,
+	YEAR,
+	latitude,
+	longitude
+FROM
+	"'.$table.'" C
+WHERE
+	ST_DWithin (
+		(
+			
+				ST_Transform (
+					ST_GeomFromText (
+						\'POINT('.$lng.' '.$lat.')\',
+						4326
+					),
+					3435
+				)
+		),
+		geom_3435,
+		150
+	)
+ORDER BY
+	YEAR ASC,
+	MONTH ASC,
+	DAY ASC';
+
 // ERROR:  transform: couldn't project point (0 0 0): latitude or longitude exceeded limits (-14)
 
 //echo $choice;
