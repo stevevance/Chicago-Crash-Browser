@@ -93,11 +93,30 @@ var mapDisplay = (function() {
         map = L.map('map').setView(center, 16);
         map.addControl(new L.Control.Permalink({useLocation:true}));
         map.addControl(new L.control.locate({debug:false}));
-        // add an OpenStreetMap tile layer
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
-        }).addTo(map);
+        
+        /* TILE LAYERS */
+		var streets = L.tileLayer('https://{s}.tiles.mapbox.com/v3/foursquare.m3elv7vi/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			detectRetina:true,
+			maxZoom: 20,
+			maxNativeZoom: 19
+		});
+		var buildings = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			detectRetina:true,
+			maxZoom: 20,
+			maxNativeZoom: 19
+		});
+		
+		// Add the tile layers to an object
+		var baseMaps = {"Streets": streets, "Building Names": buildings};
+		streets.addTo(map); // load "streets" (Foursquare) by default
+		
+		// Create an empty object to which we might add data layers that can be toggled
+		var otherLayers =  {};
+		
+		// create a layer control that turns on/off layers
+		var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
             setCoordinates(e.latlng.lat, e.latlng.lng);
