@@ -133,7 +133,7 @@ var mapDisplay = (function() {
 
     /*
     *   Takes a feature row from the API and outputs basic information
-    *   for the crash.
+    *   for the crash in a Leaflet popup window
     */
     var getCrashDetails = function(feature) {
         var type = null;
@@ -145,6 +145,7 @@ var mapDisplay = (function() {
 
         return '<p><strong>' + type + '</strong></p><p>Case Number: ' + feature.casenumber + '<br/>Date: ' + feature.month + '/' + feature.day + '/' + (parseInt(feature.year) + 2000) + '<br/>' +
         'Injuries: ' + feature.totalInjuries + '<br/>' +
+        'Fatalities: ' + feature.totalKilled + '<br/>' +
         'Uninjured: ' + feature.noInjuries + '</p>';
     };
 
