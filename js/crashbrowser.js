@@ -370,7 +370,7 @@ var summaryDisplay = (function() {
                 text: 'Injury summary (2005-2012)'
             },
             xAxis: {
-                categories: ['Injuries']
+                categories: ['Injuries', 'Fatalities']
             },
             yAxis: {
                 min: 0,
@@ -409,12 +409,14 @@ var summaryDisplay = (function() {
                     {
                         name: 'Pedestrian',
                         color: '#fdae68',
-                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries]
+                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries, 
+                        		pedOutputObj === undefined ? '' : pedOutputObj.totalKilled]
                     },
                     {
                         name: 'Bicycle',
                         color: '#36a095',
-                        data: [bikeOutputObj === undefined ? '' : bikeOutputObj.totalInjuries]
+                        data: [bikeOutputObj === undefined ? '' : bikeOutputObj.totalInjuries,
+                        		bikeOutputObj === undefined ? '' : bikeOutputObj.totalKilled]
                     }
                 ]
         });
@@ -625,7 +627,8 @@ var crashBrowser = (function() {
     *       crashes: 2,
     *       crashesByYear: [2011 => 1, 2012 => 2],
     *       injuriesByYear: [2011 => 2, 2012 => 5],
-    *       noInjuriesByYear: [2011 => 3, 2012 => 7]
+    *       noInjuriesByYear: [2011 => 3, 2012 => 7],
+   	*		killedByYear: [2011 => 4, 2012 => 8]
     *   },
     *   {
     *       type: 'bike',
@@ -638,9 +641,11 @@ var crashBrowser = (function() {
     var SummaryObject = function() {
         this.crashes = 0;
         this.totalInjuries = 0;
+        this.totalKilled = 0;
         this.crashesByYear = [];
         this.injuriesByYear = [];
         this.noInjuriesByYear = [];
+        this.killedByYear = [];
     };
 
     /*
@@ -667,6 +672,13 @@ var crashBrowser = (function() {
             s.noInjuriesByYear[year] += parseInt(feature.noInjuries);
         } else {
             s.noInjuriesByYear[year] = parseInt(feature.noInjuries);
+        }
+        
+        s.totalKilled += parseInt(feature.totalKilled);
+        if(s.killedByYear[year]) {
+            s.killedByYear[year] += parseInt(feature.totalKilled);
+        } else {
+            s.killedByYear[year] = parseInt(feature.totalKilled);
         }
     };
 
