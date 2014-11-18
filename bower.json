@@ -1,10 +1,10 @@
 {
   "name": "Chicago-Crash-Browser",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/stevevance/Chicago-Crash-Browser",
   "authors": [
     "Robert Guico <rguico@gmail.com>",
-    "Steve Vance <svance@streetsblog.org>"
+    "Steven Vance <steve@stevevance.net>"
   ],
   "description": "Interactive map of pedestrian and bicycle-related crashes.",
   "license": "MIT",
