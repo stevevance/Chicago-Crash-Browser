@@ -20,15 +20,15 @@ Desired enhancements include:
 * Style changes
 * Update the API to return details like the number of rows returned and the time it took for the PostgreSQL server to run the query
 * Close the popup when the search results are returned (for some reason I cannot figure this out, and I thought it was pretty simple)
-* Make it tablet-friendly
+* Make it responsive
 * Count the number of crashes per year and give the bike/pedestrian numbers in a year by year breakdown
 * "Bookmark" the locations so a person can create a text list of locations and their resulting crash figures. This is so a user can create a report of several intersections for their neighborhood. 
 
 ##Data
 One table is currently used, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided to me, I stripped out all cities except Chicago ("City Code" != 1051).
 
-[CrashExtract data dictionary](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
-[Download the data](DATA.md)
+* [CrashExtract data dictionary](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
+* [Download the data](DATA.md)
 
 ##API
 The API returns JSON and has the following GET parameters:
