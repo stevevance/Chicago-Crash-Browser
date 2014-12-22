@@ -1,15 +1,9 @@
 Chicago Crash Browser
 =====================
 
-[Demo](http://chicagocrashes.org/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
+[Demo the Chicago Crash Browser](http://chicagocrashes.org/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
 
 The Chicago Crash Browser is an interface for the automobile crash data from the Illinois Department of Transportation (IDOT). Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by IDOT.
-
-##History
-* First Chicago bike crash map created in February 2011
-* Derek Eder created an enhanced version a bit later
-* Lots of press for the Chicago bike crash map
-* Attempted to create a public browser later in 2011, to get more details about the crashes, especially after I obtained additional years of data
 
 ##Purpose
 The purpose of the Crash Browser is two fold:
@@ -17,8 +11,6 @@ The purpose of the Crash Browser is two fold:
 1. Give planners, politicians, and policy makers the tools and information they need to make good decisions and prioritization about where to make investments about transportation safety. 
 
 2. Give activists and advocates the information they need to demand change in the transportation system in the most effective way. 
-
-The Chicago Crash Browser will, in addition to simple browsing, have a storytelling component to go beyond pure figures of crash frequencies at an intersection. 
 
 ##Enhancements
 Desired enhancements include:
@@ -32,10 +24,11 @@ Desired enhancements include:
 * Count the number of crashes per year and give the bike/pedestrian numbers in a year by year breakdown
 * "Bookmark" the locations so a person can create a text list of locations and their resulting crash figures. This is so a user can create a report of several intersections for their neighborhood. 
 
-##Data Structure
+##Data
 One table is currently used, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided to me, I stripped out all cities except Chicago ("City Code" != 1051).
 
 [CrashExtract data dictionary](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
+[Download the data](DATA.md)
 
 ##API
 The API returns JSON and has the following GET parameters:
@@ -53,7 +46,14 @@ In the webpage, the bounds are obtained via Leaflet.
 
 The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois StatePlane West feet) to be able to search distance in feet (this may not be the best method). This is the data's original projection although the records' WGS84 coordinates (provided by the data author) are the actual fields used.
 
+##History
+* First Chicago bike crash map created in February 2011
+* Derek Eder created an enhanced version a bit later
+* Lots of press for the Chicago bike crash map in 2011
+* Attempted to create a public browser later in 2011, to get more details about the crashes, especially after I obtained additional years of data
+
 ##Credits##
+* Smart Chicago Collaborative for hosting the site
 * Michael Carney and Sebastian Lew (who got me interested in automobile crash data in the first place after they asked if I had it)
 * Lori M. at IDOT (for providing the data)
 * Jerad Weiner
@@ -67,5 +67,5 @@ The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois 
 * Richard Lee who made the first edits via GitHub. 
 * Everyone who appreciates this work.
 
-##Cities outside Illinois##
-As much as I would love to provide this for outside Illinois, the fact is that the more cities (and their crashes) in the database, the slower this web application works.
+##Cities outside Chicago##
+I have no plans to include cities outside Chicago because of the amount of work it takes cleaning up the state's data.
