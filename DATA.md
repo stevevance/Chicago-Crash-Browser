@@ -1,4 +1,4 @@
-# Data Sources
+# Crash Data
 
 This is a list of links to the motor vehicle crash data used to power the [Chicago Crash Browser](http://chicagocrashes.org) created by [Steven Vance](http://stevevance.net). The data was provided by the Illinois Department of Transportation's Division of Traffic Safety. 
 
