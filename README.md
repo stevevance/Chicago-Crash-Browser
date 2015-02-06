@@ -65,6 +65,7 @@ The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois 
 * Bill Vassilakis
 * Trina Chiasson
 * Richard Lee who made the first edits via GitHub. 
+* Robert Guico who installed Bower (for dependencies) and cleaned up a lot of the JavaScript
 * Everyone who appreciates this work.
 
 ##Cities outside Chicago##
