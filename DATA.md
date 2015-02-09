@@ -73,10 +73,16 @@ The data is zipped CSV files. Most of these don't have the field names. You can 
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_VehicleExtract.txt.zip)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_PersonExtract.txt.zip) 
 
+### 2013 - State of Illinois (note changes in Data Dictionary above)
+*   [All three tables](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2013/StatewideExtract2013.zip) (80 MB)
+*   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2013/2013_CrashExtract.txt.zip)
+*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2013/2013_VehicleExtract.txt.zip)
+*   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2013/2013_PersonExtract.txt.zip) 
+
 ### Field Names for 2006-2012
 *   [Crash](http://s3.amazonaws.com/chicagocrashes/field_names/crash field names.csv)
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/field_names/person field names.csv)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/field_names/vehicle field names.csv)
 
-### Field Names for 2013-present unavailable
+### Field Names for 2013-present (currently unavailable)
 You can find these in the data dictionary, though. 
