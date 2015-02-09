@@ -25,9 +25,12 @@ Desired enhancements include:
 * "Bookmark" the locations so a person can create a text list of locations and their resulting crash figures. This is so a user can create a report of several intersections for their neighborhood. 
 
 ##Data
-One table is currently used, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided to me, I stripped out all cities except Chicago ("City Code" != 1051).
+The Chicago Crash Browser uses only one of the three tables the state provides, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided, all cities except Chicago ("City Code" != 1051) were stripped and uploaded to a PostgreSQL PostGIS-enabled database. 
 
-* [CrashExtract data dictionary](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
+However, you can download from our S3 server (provided by Smart Chicago Collaborative) all three tables for all years, and with all cities included (when applicable). 
+
+* [Data dictionary, 2004-2012](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
+* [Data dictionary, 2013-present](datadictionary/Illinois%20Traffic%20Crash%20Data%20Extract%20Metadata%20112014-Crash.docx)
 * [Download the data](DATA.md)
 
 ##API
