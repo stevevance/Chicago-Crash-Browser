@@ -82,6 +82,7 @@ var mapDisplay = (function() {
     var dist;
     var markerGroup;
     var self;
+    var isDrawing = false;
 
     var init = function() {
         self = this;
@@ -90,10 +91,10 @@ var mapDisplay = (function() {
         setCoordinates(initLat, initLng);
         center = [lat, lng];
 
-        map = L.map('map').setView(center, 16);
+        map = L.map('map', {drawControl: true}).setView(center, 16);
         map.addControl(new L.Control.Permalink({useLocation:true}));
         map.addControl(new L.control.locate({debug:false}));
-        
+
         /* TILE LAYERS */
 		var streets = L.tileLayer('https://{s}.tiles.mapbox.com/v3/foursquare.m3elv7vi/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -107,21 +108,34 @@ var mapDisplay = (function() {
 			maxZoom: 20,
 			maxNativeZoom: 19
 		});
-		
+
 		// Add the tile layers to an object
 		var baseMaps = {"Streets": streets, "Building Names": buildings};
 		streets.addTo(map); // load "streets" (Foursquare) by default
-		
+
 		// Create an empty object to which we might add data layers that can be toggled
 		var otherLayers =  {};
-		
+
 		// create a layer control that turns on/off layers
 		var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
-            setCoordinates(e.latlng.lat, e.latlng.lng);
+            if (!isDrawing) {
+                setCoordinates(e.latlng.lat, e.latlng.lng);
+                showCrashes({ 'areaType': 'circle' });
+            }
+        });
 
-            showCrashes();
+        map.on('draw:drawstart', function() {
+            isDrawing = true;
+        });
+
+        map.on('draw:drawend', function() {
+            isDrawing = false;
+        });
+
+        map.on('draw:created', function(e) {
+            showCrashes({ 'areaType': 'polygon' });
         });
 
         markerGroup = new L.MarkerClusterGroup({
@@ -142,12 +156,19 @@ var mapDisplay = (function() {
     /*
     *   Notifies the crashBrowser module to fetch updated crash data for
     *   the current latitude and longitude in the map.
+    *
+    *   @param opts Options hash that modifies the behavior of this method
+    *          areaType: 'polygon' or 'circle'
     */
-    var showCrashes = function() {
+    var showCrashes = function(opts) {
         $('#results').hide();
         $('#metadata-link').hide();
         dist = $('input[name="searchRadius"]:checked').val();
-        crashBrowser.fetchCrashData();
+        if (!opts || opts.areaType === 'circle') {
+            crashBrowser.fetchCrashDataByCircle();
+        } else {
+            console.log('Fetch by polygon here!');
+        }
     };
 
     /*
@@ -428,7 +449,7 @@ var summaryDisplay = (function() {
                     {
                         name: 'Pedestrian',
                         color: '#fdae68',
-                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries, 
+                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries,
                         		pedOutputObj === undefined ? '' : pedOutputObj.totalKilled]
                     },
                     {
@@ -625,7 +646,7 @@ var crashBrowser = (function() {
     /*
     *   Communicates with the backend API to get crash data for the distance provided.
     */
-    var fetchCrashData = function() {
+    var fetchCrashDataByCircle = function() {
         var url = mapDisplay.getAPIUrl();
         $.getJSON(url, function(data) {
             mapDisplay.clearCircle();
@@ -692,7 +713,7 @@ var crashBrowser = (function() {
         } else {
             s.noInjuriesByYear[year] = parseInt(feature.noInjuries);
         }
-        
+
         s.totalKilled += parseInt(feature.totalKilled);
         if(s.killedByYear[year]) {
             s.killedByYear[year] += parseInt(feature.totalKilled);
@@ -758,7 +779,7 @@ var crashBrowser = (function() {
 
     return {
         fetchCoordsForAddress: fetchCoordsForAddress,
-        fetchCrashData: fetchCrashData,
+        fetchCrashDataByCircle: fetchCrashDataByCircle,
         hasCrashes: hasCrashes,
         saveAddressAndShowCrashes: saveAddressAndShowCrashes
     };
