@@ -13,6 +13,7 @@
 <!-- <script src="//code.jquery.com/jquery-2.1.0.min.js"></script> -->
 <script src="bower_components/jquery/jquery.min.js"></script>
 <script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
+<script src="bower_components/lodash/lodash.min.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
