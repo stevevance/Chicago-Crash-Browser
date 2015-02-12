@@ -9,6 +9,10 @@ if(!empty($_GET)) {
 	$coords = trim(urldecode($_GET["coords"]));
 }
 
+// constant for ST_Transform
+$NAD83_ILLINOIS_EAST = 3435;
+$WGS_84 = 4326;
+
 $q = <<< HEREDOC
 SELECT
 	"collType",
@@ -22,8 +26,12 @@ SELECT
 	latitude,
 	longitude
 FROM $table c
-WHERE
-	ST_DWithin((SELECT ST_Transform(ST_GeomFromText('POLYGON(($1))')
+WHERE ST_WITHIN (
+	ST_TRANSFORM(
+		ST_GeomFromText('POLYGON(($1))', $WGS_84), $NAD83_ILLINOIS_EAST
+	),
+	ST_TRANSFORM(c.wgs84, $NAD83_ILLINOIS_EAST)
+)
 ORDER BY year ASC, month ASC, day ASC
 HEREDOC;
 
