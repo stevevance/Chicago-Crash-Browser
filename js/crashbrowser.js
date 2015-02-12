@@ -386,14 +386,12 @@ var mapDisplay = (function() {
         showCrashes: showCrashes,
         clearAreas: clearAreas,
         addCircle: addCircle,
+        addPoly: addPoly,
         closePopup: map.closePopup,
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData,
         setCoordinates: setCoordinates,
-        // temporary
-        poly: poly,
-        latlngs: latlngs
         };
 }());
 
