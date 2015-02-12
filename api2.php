@@ -1,5 +1,4 @@
 <?php
-//echo "test";
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
@@ -7,7 +6,7 @@ require_once("pg.php");
 error_reporting(0);
 
 if(!empty($_GET)) {
-	$coords = trim($_GET["coords"]);
+	$coords = trim(urldecode($_GET["coords"]));
 }
 
 $q = <<< HEREDOC
@@ -36,12 +35,10 @@ if(!empty($lat) && !empty($lng)) {
 
 // output JSON
 echo '{"response":{"sql":' . json_encode($q) . '},"crashes":[';
-
 echo pg_last_error($pg);
 
 $first = true;
 $r = pg_fetch_assoc($result);
-//print_r($r);
 while($r=pg_fetch_assoc($result)){
 
     if($first) {
