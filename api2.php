@@ -24,7 +24,7 @@ SELECT
 FROM $table c
 WHERE
 	ST_DWithin((SELECT ST_Transform(ST_GeomFromText('POLYGON(($1))')
-ORDER BY year ASC, month ASC, day ASC'
+ORDER BY year ASC, month ASC, day ASC
 HEREDOC;
 
 if(!empty($lat) && !empty($lng)) {
