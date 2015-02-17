@@ -5,6 +5,7 @@ header('Content-Type: application/json');
 require_once("pg.php");
 error_reporting(0);
 
+$coords = "";
 if(!empty($_GET)) {
 	$coords = trim(urldecode($_GET["coords"]));
 }
@@ -26,12 +27,7 @@ SELECT
 	latitude,
 	longitude
 FROM $table c
-WHERE ST_WITHIN (
-	ST_TRANSFORM(
-		ST_GeomFromText('POLYGON(($1))', $WGS_84), $NAD83_ILLINOIS_EAST
-	),
-	ST_TRANSFORM(c.wgs84, $NAD83_ILLINOIS_EAST)
-)
+WHERE ST_Within(c.wgs84, ST_GeomFromText('POLYGON(($1))', $WGS_84))
 ORDER BY year ASC, month ASC, day ASC
 HEREDOC;
 
@@ -42,7 +38,7 @@ if(!empty($lat) && !empty($lng)) {
 }
 
 // output JSON
-echo '{"response":{"sql":' . json_encode($q) . '},"crashes":[';
+echo '{"response":{"sql":' . json_encode($q) . ', "coords": ' . $coords . '},"crashes":[';
 echo pg_last_error($pg);
 
 $first = true;
