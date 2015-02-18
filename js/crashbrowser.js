@@ -300,7 +300,7 @@ var mapDisplay = (function() {
             }
         });
 
-        return 'http://chicagocrashes.org/api2.php?coords=' + coords;
+        return 'http://chicagocrashes.org/api2.php?coords=' + $.trim(coords);
     };
 
     /**
