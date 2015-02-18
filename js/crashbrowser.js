@@ -296,11 +296,11 @@ var mapDisplay = (function() {
         poly.getLatLngs().forEach(function (coord, index, collection) {
             coords += coord.lng + ' ' + coord.lat;
             if (index < collection.length - 1) {
-                coords += ', ';
+                coords += ',';
             }
         });
 
-        return 'http://chicagocrashes.org/api2.php?coords=' + $.trim(coords);
+        return 'http://chicagocrashes.org/api2.php?coords=' + coords;
     };
 
     /**
