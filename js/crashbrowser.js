@@ -141,19 +141,19 @@ var mapDisplay = (function() {
 		var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
-            if (!isDrawing) {
+            if (!mapDisplay.isDrawing) {
                 setCoordinates(e.latlng.lat, e.latlng.lng);
                 showCrashes({ 'areaType': 'circle' });
             }
         });
 
         map.on('draw:drawstart', function() {
-            isDrawing = true;
+            mapDisplay.isDrawing = true;
             mapDisplay.clearAreas();
         });
 
-        map.on('draw:drawend', function() {
-            isDrawing = false;
+        map.on('draw:drawstop', function() {
+            mapDisplay.isDrawing = false;
         });
 
         map.on('draw:created', function(e) {
@@ -392,6 +392,7 @@ var mapDisplay = (function() {
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData,
         setCoordinates: setCoordinates,
+        isDrawing: isDrawing
         };
 }());
 
