@@ -228,7 +228,6 @@ var mapDisplay = (function() {
             map.removeLayer(poly);
             markerGroup.clearLayers();
         }
-        map.setView([lat,lng], 18);
         map.closePopup();
     };
 
