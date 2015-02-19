@@ -8,6 +8,7 @@ error_reporting(0);
 $coords = "";
 if(!empty($_GET)) {
 	$coords = trim(urldecode($_GET["coords"]));
+    $coords = pg_escape_string($coords);
 }
 
 // constant for ST_Transform
@@ -26,20 +27,23 @@ SELECT
 	year,
 	latitude,
 	longitude
-FROM $table c
-WHERE ST_Within(c.wgs84, ST_GeomFromText('POLYGON(($1))', $WGS_84))
+FROM "$table" c
+WHERE ST_Within(c.wgs84, ST_GeomFromText('POLYGON(($coords))', $WGS_84))
 ORDER BY year ASC, month ASC, day ASC
 HEREDOC;
 
-if(!empty($lat) && !empty($lng)) {
-	$result = pg_prepare($pg, 'coords_query', $q);
-	$result = pg_execute($pg, 'coords_query', $coords);
-	$total = pg_num_rows($result);
+$result = pg_query($pg, $q);
+$total = pg_num_rows($result);
+
+if (!result) {
+    echo "An error occurred.\n";
 }
 
 // output JSON
-echo '{"response":{"sql":' . json_encode($q) . ', "coords": ' . $coords . '},"crashes":[';
-echo pg_last_error($pg);
+echo <<<HEREDOC
+{"response":{"coords": "$coords", "results": "$total"},"crashes":[
+HEREDOC;
+echo pg_result_error($result);
 
 $first = true;
 $r = pg_fetch_assoc($result);
