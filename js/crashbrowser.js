@@ -294,11 +294,11 @@ var mapDisplay = (function() {
 
         var coords = '';
         poly.getLatLngs().forEach(function (coord, index, collection) {
-            coords += coord.lng + ' ' + coord.lat;
-            if (index < collection.length - 1) {
-                coords += ',';
-            }
+            coords += coord.lng + ' ' + coord.lat + ',';
         });
+        // Append last point
+        var lastPoint = poly.getLatLngs()[0];
+        coords += lastPoint.lng + ' ' + lastPoint.lat;
 
         return 'http://chicagocrashes.org/api2.php?coords=' + coords;
     };
