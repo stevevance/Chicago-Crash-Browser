@@ -1,5 +1,5 @@
 /* jshint undef: true, unused: false */
-/* global L,Q,$,$$ */
+/* global L,Q,$,$$,console */
 
 'use strict';
 
@@ -79,9 +79,20 @@ var mapDisplay = (function() {
     var map;
     var center;
     var circle;
+    var poly;
     var dist;
     var markerGroup;
     var self;
+    var latlngs;
+    var isDrawing = false;
+
+    var shapeOptions = {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.3,
+        stroke: false,
+        clickable:false
+    };
 
     var init = function() {
         self = this;
@@ -90,10 +101,21 @@ var mapDisplay = (function() {
         setCoordinates(initLat, initLng);
         center = [lat, lng];
 
+        var drawOptions = {
+            draw: {
+                circle: false,
+                polyline: false,
+                marker: false
+            }
+        };
+
+        var drawControl = new L.Control.Draw(drawOptions);
+
         map = L.map('map').setView(center, 16);
         map.addControl(new L.Control.Permalink({useLocation:true}));
         map.addControl(new L.control.locate({debug:false}));
-        
+        map.addControl(drawControl);
+
         /* TILE LAYERS */
 		var streets = L.tileLayer('https://{s}.tiles.mapbox.com/v3/foursquare.m3elv7vi/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -107,21 +129,38 @@ var mapDisplay = (function() {
 			maxZoom: 20,
 			maxNativeZoom: 19
 		});
-		
+
 		// Add the tile layers to an object
-		var baseMaps = {"Streets": streets, "Building Names": buildings};
+		var baseMaps = {'Streets': streets, 'Building Names': buildings};
 		streets.addTo(map); // load "streets" (Foursquare) by default
-		
+
 		// Create an empty object to which we might add data layers that can be toggled
 		var otherLayers =  {};
-		
+
 		// create a layer control that turns on/off layers
 		var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
-            setCoordinates(e.latlng.lat, e.latlng.lng);
+            if (!mapDisplay.isDrawing) {
+                setCoordinates(e.latlng.lat, e.latlng.lng);
+                showCrashes({ 'areaType': 'circle' });
+            }
+        });
 
-            showCrashes();
+        map.on('draw:drawstart', function() {
+            mapDisplay.isDrawing = true;
+            mapDisplay.clearAreas();
+        });
+
+        map.on('draw:drawstop', function() {
+            mapDisplay.isDrawing = false;
+        });
+
+        map.on('draw:created', function(e) {
+            poly = e.layer;
+            showCrashes({
+                areaType: 'polygon'
+            });
         });
 
         markerGroup = new L.MarkerClusterGroup({
@@ -142,12 +181,20 @@ var mapDisplay = (function() {
     /*
     *   Notifies the crashBrowser module to fetch updated crash data for
     *   the current latitude and longitude in the map.
+    *
+    *   @param opts Options hash that modifies the behavior of this method
+    *          areaType: 'polygon' or 'circle'
+    *          layer: If polygon, the layer that was created
     */
-    var showCrashes = function() {
+    var showCrashes = function(opts) {
         $('#results').hide();
         $('#metadata-link').hide();
         dist = $('input[name="searchRadius"]:checked').val();
-        crashBrowser.fetchCrashData();
+        if (!opts || opts.areaType === 'circle') {
+            crashBrowser.fetchCrashDataByCircle();
+        } else {
+            crashBrowser.fetchCrashDataByPoly();
+        }
     };
 
     /*
@@ -171,13 +218,16 @@ var mapDisplay = (function() {
     /*
     *   Removes marker group and circle from the map.
     */
-    var clearCircle = function() {
+    var clearAreas = function() {
         $('#results').hide();
-        if(typeof circle !='undefined') {
+        if(typeof circle !== 'undefined') {
             map.removeLayer(circle);
             markerGroup.clearLayers();
         }
-        map.setView([lat,lng], 18);
+        if(typeof poly !== 'undefined') {
+            map.removeLayer(poly);
+            markerGroup.clearLayers();
+        }
         map.closePopup();
     };
 
@@ -186,17 +236,20 @@ var mapDisplay = (function() {
     */
     var addCircle = function() {
         // this is in linear distance and it probably won't match the spheroid distance of the RADIANS database query
-        var circleOptions = {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.3,
-            stroke: false,
-            clickable:false
-        };
-
         var meters = dist/3.2808399;
-        circle = new L.Circle([lat,lng], meters, circleOptions);
+        circle = new  L.Circle([lat,lng], meters, shapeOptions);
         map.addLayer(circle);
+
+        if (crashBrowser.hasCrashes()) {
+            map.fitBounds(markerGroup.getBounds());
+        }
+    };
+
+    /**
+    *   Adds a polygon to the map and fits the map boundaries to the marker group, if possible
+    */
+    var addPoly = function() {
+        map.addLayer(poly);
 
         if (crashBrowser.hasCrashes()) {
             map.fitBounds(markerGroup.getBounds());
@@ -230,6 +283,23 @@ var mapDisplay = (function() {
         east = northeast.lng;
 
         return 'http://chicagocrashes.org/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+dist;
+    };
+
+    /**
+    *   Returns the API url for the current map view if searching by polygon
+    */
+    var getAPIUrlForPoly = function () {
+        $('#status').html('Looking through the database...');
+
+        var coords = '';
+        poly.getLatLngs().forEach(function (coord, index, collection) {
+            coords += coord.lng + ' ' + coord.lat + ',';
+        });
+        // Append last point
+        var lastPoint = poly.getLatLngs()[0];
+        coords += lastPoint.lng + ' ' + lastPoint.lat;
+
+        return 'http://chicagocrashes.org/api2.php?coords=' + coords;
     };
 
     /**
@@ -311,14 +381,17 @@ var mapDisplay = (function() {
         bikeIcon: bikeIcon,
         pedestrianIcon: pedestrianIcon,
         getAPIUrl: getAPIUrl,
+        getAPIUrlForPoly: getAPIUrlForPoly,
         showCrashes: showCrashes,
-        clearCircle: clearCircle,
+        clearAreas: clearAreas,
         addCircle: addCircle,
+        addPoly: addPoly,
         closePopup: map.closePopup,
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData,
-        setCoordinates: setCoordinates
+        setCoordinates: setCoordinates,
+        isDrawing: isDrawing
         };
 }());
 
@@ -428,7 +501,7 @@ var summaryDisplay = (function() {
                     {
                         name: 'Pedestrian',
                         color: '#fdae68',
-                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries, 
+                        data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries,
                         		pedOutputObj === undefined ? '' : pedOutputObj.totalKilled]
                     },
                     {
@@ -590,7 +663,7 @@ var crashBrowser = (function() {
     *   Since this calls an external service, this needs to return a jQuery promise.
     */
     var fetchCoordsForAddress = function() {
-        var dfd = jQuery.Deferred();
+        var dfd = $.Deferred();
 
         if ($('#address').val()) {
             $.getJSON('http://nominatim.openstreetmap.org/search?street=' + $('#address').val() + '&city=Chicago&state=IL&format=json', function(data) {
@@ -625,10 +698,10 @@ var crashBrowser = (function() {
     /*
     *   Communicates with the backend API to get crash data for the distance provided.
     */
-    var fetchCrashData = function() {
+    var fetchCrashDataByCircle = function() {
         var url = mapDisplay.getAPIUrl();
         $.getJSON(url, function(data) {
-            mapDisplay.clearCircle();
+            mapDisplay.clearAreas();
             generateSummaries(data.crashes);
             mapDisplay.addCircle();
         }).fail(function(){
@@ -636,6 +709,18 @@ var crashBrowser = (function() {
             mapDisplay.closePopup();
         });
 
+    };
+
+    var fetchCrashDataByPoly = function () {
+        var url = mapDisplay.getAPIUrlForPoly();
+        $.getJSON(url, function(data) {
+            mapDisplay.clearAreas();
+            generateSummaries(data.crashes);
+            mapDisplay.addPoly();
+        }).fail(function () {
+            $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
+            mapDisplay.closePopup();
+        });
     };
 
     /*
@@ -692,7 +777,7 @@ var crashBrowser = (function() {
         } else {
             s.noInjuriesByYear[year] = parseInt(feature.noInjuries);
         }
-        
+
         s.totalKilled += parseInt(feature.totalKilled);
         if(s.killedByYear[year]) {
             s.killedByYear[year] += parseInt(feature.totalKilled);
@@ -758,7 +843,8 @@ var crashBrowser = (function() {
 
     return {
         fetchCoordsForAddress: fetchCoordsForAddress,
-        fetchCrashData: fetchCrashData,
+        fetchCrashDataByCircle: fetchCrashDataByCircle,
+        fetchCrashDataByPoly: fetchCrashDataByPoly,
         hasCrashes: hasCrashes,
         saveAddressAndShowCrashes: saveAddressAndShowCrashes
     };

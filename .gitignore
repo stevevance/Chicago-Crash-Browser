@@ -6,3 +6,5 @@ pg.php
 
 *.qgs
 cache/
+
+github_token

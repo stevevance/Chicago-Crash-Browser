@@ -8,11 +8,13 @@
 <link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="bower_components/leaflet.markerclusterer/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="bower_components/leaflet-locatecontrol/src/L.Control.Locate.css" />
+<link rel="stylesheet" href="bower_components/leaflet.draw/dist/leaflet.draw.css" />
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="stylesheets/index.css" />
 <!-- <script src="//code.jquery.com/jquery-2.1.0.min.js"></script> -->
 <script src="bower_components/jquery/jquery.min.js"></script>
 <script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
+<script src="bower_components/lodash/lodash.min.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -95,6 +97,7 @@ if (typeof jQuery == 'undefined') {
 	<script src="bower_components/leaflet-locatecontrol/src/L.Control.Locate.js"></script>
 	<script src="bower_components/leaflet-plugins/control/Permalink.js"></script>
 	<script src="bower_components/purl/purl.js"></script>
+	<script src="bower_components/leaflet.draw/dist/leaflet.draw.js"></script>
 	<script src="js/crashbrowser.js"></script>
 	<script type="text/javascript">
 
