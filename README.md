@@ -31,7 +31,6 @@ However, you can download from our S3 server (provided by Smart Chicago Collabor
 
 * [Data dictionary, 2004-2012](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
 * [Data dictionary, 2013-present](datadictionary/Illinois%20Traffic%20Crash%20Data%20Extract%20Metadata%20112014-Crash.docx)
-* [Download the data](DATA.md)
 
 ##API
 The API returns JSON and has the following GET parameters:
