@@ -43,10 +43,10 @@ if (!result) {
 
 echo pg_result_error($result);
 
-$first = true;
 $r = pg_fetch_assoc($result);
+$result = $r['result'] ? $r['result'] : '[]';
 // output JSON
 echo <<<HEREDOC
-{"response":{"coords": "$coords", "results": "$total"},"crashes": {$r['result']}}
+{"response":{"coords": "$coords", "results": "$total"},"crashes": $result}
 HEREDOC;
 ?>

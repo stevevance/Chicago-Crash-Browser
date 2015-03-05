@@ -154,6 +154,7 @@ if(!empty($lat) && !empty($lng)) {
 echo pg_last_error($pg);
 
 $r = pg_fetch_assoc($result);
+$result = $r['result'] ? $r['result'] : '[]';
 // output JSON
-echo '{"response":{"sql":' . json_encode($sql7) . '},"crashes":' . $r['result'] . '}';
+echo '{"response":{"sql":' . json_encode($sql7) . '},"crashes":' . $result . '}';
 ?>
