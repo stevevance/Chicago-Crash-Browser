@@ -8,8 +8,8 @@
 *   switch statements use === for comparisons.
 */
 var CollisionEnum = Object.freeze({
-    PEDESTRIAN: '1',
-    BICYCLIST: '2'
+    PEDESTRIAN: 1,
+    BICYCLIST: 2
 });
 
 /*

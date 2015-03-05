@@ -16,6 +16,7 @@ $NAD83_ILLINOIS_EAST = 3435;
 $WGS_84 = 4326;
 
 $q = <<< HEREDOC
+SELECT array_to_json(array_agg(row_to_json(t))) as result from (
 SELECT
 	"collType",
 	casenumber,
@@ -30,6 +31,7 @@ SELECT
 FROM "$table" c
 WHERE ST_Within(c.wgs84, ST_GeomFromText('POLYGON(($coords))', $WGS_84))
 ORDER BY year ASC, month ASC, day ASC
+) as t
 HEREDOC;
 
 $result = pg_query($pg, $q);
@@ -39,23 +41,12 @@ if (!result) {
     echo "An error occurred.\n";
 }
 
-// output JSON
-echo <<<HEREDOC
-{"response":{"coords": "$coords", "results": "$total"},"crashes":[
-HEREDOC;
 echo pg_result_error($result);
 
 $first = true;
 $r = pg_fetch_assoc($result);
-while($r=pg_fetch_assoc($result)){
-
-    if($first) {
-        $first = false;
-    } else {
-        echo ',';
-    }
-    echo json_encode($r)."\n";
-}
-echo ']}';
-
+// output JSON
+echo <<<HEREDOC
+{"response":{"coords": "$coords", "results": "$total"},"crashes": {$r['result']}}
+HEREDOC;
 ?>
