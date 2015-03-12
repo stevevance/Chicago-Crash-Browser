@@ -750,39 +750,39 @@ var crashBrowser = (function() {
         this.injuriesByYear = [];
         this.noInjuriesByYear = [];
         this.killedByYear = [];
-    };
 
-    /*
-    *   Helper function that updates a SummaryObject based on the feature read.
-    */
-    var addFeatureToSummary = function(feature, s) {
-        s.crashes++;
-        var year = feature.year*1+2000;
+        /*
+        *   Helper function that updates a SummaryObject based on the feature read.
+        */
+        this.addFeatureToSummary = function addFeatureToSummary(feature) {
+            this.crashes++;
+            var year = feature.year*1+2000;
 
-        if(s.crashesByYear[year] === undefined) {
-            s.crashesByYear[year] = 1;
-        } else {
-            s.crashesByYear[year]++;
-        }
+            if(this.crashesByYear[year] === undefined) {
+                this.crashesByYear[year] = 1;
+            } else {
+                this.crashesByYear[year]++;
+            }
 
-        s.totalInjuries += parseInt(feature.totalInjuries);
-        if(s.injuriesByYear[year]) {
-            s.injuriesByYear[year] += parseInt(feature.totalInjuries);
-        } else {
-            s.injuriesByYear[year] = parseInt(feature.totalInjuries);
-        }
+            this.totalInjuries += parseInt(feature.totalInjuries);
+            if(this.injuriesByYear[year]) {
+                this.injuriesByYear[year] += parseInt(feature.totalInjuries);
+            } else {
+                this.injuriesByYear[year] = parseInt(feature.totalInjuries);
+            }
 
-        if(s.noInjuriesByYear[year]) {
-            s.noInjuriesByYear[year] += parseInt(feature.noInjuries);
-        } else {
-            s.noInjuriesByYear[year] = parseInt(feature.noInjuries);
-        }
+            if(this.noInjuriesByYear[year]) {
+                this.noInjuriesByYear[year] += parseInt(feature.noInjuries);
+            } else {
+                this.noInjuriesByYear[year] = parseInt(feature.noInjuries);
+            }
 
-        s.totalKilled += parseInt(feature.totalKilled);
-        if(s.killedByYear[year]) {
-            s.killedByYear[year] += parseInt(feature.totalKilled);
-        } else {
-            s.killedByYear[year] = parseInt(feature.totalKilled);
+            this.totalKilled += parseInt(feature.totalKilled);
+            if(this.killedByYear[year]) {
+                this.killedByYear[year] += parseInt(feature.totalKilled);
+            } else {
+                this.killedByYear[year] = parseInt(feature.totalKilled);
+            }
         }
     };
 
@@ -805,7 +805,7 @@ var crashBrowser = (function() {
                         } else {
                             s = new SummaryObject();
                         }
-                        addFeatureToSummary(feature, s);
+                        s.addFeatureToSummary(feature);
                         summaryObjects.pedestrian = s;
                     break;
                     case CollisionEnum.BICYCLIST:
@@ -814,7 +814,7 @@ var crashBrowser = (function() {
                         } else {
                             s = new SummaryObject();
                         }
-                        addFeatureToSummary(feature, s);
+                        s.addFeatureToSummary(feature);
                         summaryObjects.bicycle = s;
                     break;
                 }
