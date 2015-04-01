@@ -23,6 +23,7 @@ SELECT
 	"totalInjuries",
 	"Total killed" as "totalKilled",
 	"No injuries" as "noInjuries",
+	"Crash severity" as "crashSeverity",
 	month,
 	day,
 	year,

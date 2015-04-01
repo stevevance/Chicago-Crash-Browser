@@ -38,8 +38,17 @@ $WGS_84 = 4326;
 
 $sql = <<< HEREDOC
 SELECT array_to_json(array_agg(row_to_json(t))) AS result FROM (
-SELECT "collType", casenumber, "totalInjuries", "Total killed" as "totalKilled", "No injuries" as "noInjuries",
-	month, day, year, latitude, longitude FROM "$table" c
+SELECT "collType",
+	casenumber,
+	"totalInjuries",
+	"Total killed" as "totalKilled",
+	"No injuries" as "noInjuries",
+	"Crash severity" as "crashSeverity",
+	month,
+	day,
+	year,
+	latitude,
+	longitude FROM "$table" c
 WHERE
 ST_DWithin((SELECT ST_Transform(ST_GeomFromText('POINT( $lng $lat )',$WGS_84),$NAD83_ILLINOIS_EAST)), ST_Transform(c.wgs84, $NAD83_ILLINOIS_EAST), $distance)
 AND latitude < $north AND latitude > $south
