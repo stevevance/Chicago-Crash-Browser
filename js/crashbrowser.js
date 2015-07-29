@@ -783,7 +783,7 @@ var crashBrowser = (function() {
             } else {
                 this.killedByYear[year] = parseInt(feature.totalKilled);
             }
-        }
+        };
     };
 
     /*
@@ -869,6 +869,13 @@ var init = function() {
             $('#outputText').prop('checked', true).parent().addClass('active');
             summaryDisplay.showText();
         }
+    }
+
+    var store = Rhaboo.persistent('crashBrowser');
+    if (store.addresses) {
+        console.log(store.addresses);
+    } else {
+        store.write('addresses', { title: 'Crash Browser' });
     }
 
     // When there isn't a searchRadius cookie, default to 150.
