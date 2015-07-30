@@ -1,5 +1,5 @@
 /* jshint undef: true, unused: false */
-/* global L,Q,$,$$,console */
+/* global L,Q,$,$$,console,Rhaboo,document */
 
 'use strict';
 
@@ -11,6 +11,8 @@ var CollisionEnum = Object.freeze({
     PEDESTRIAN: 1,
     BICYCLIST: 2
 });
+
+var store = Rhaboo.persistent('crashBrowser');
 
 /*
 *   Utility functions that can be used anywhere in the code.
@@ -141,6 +143,7 @@ var mapDisplay = (function() {
 		var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
+            $('#address').val('');
             if (!mapDisplay.isDrawing) {
                 setCoordinates(e.latlng.lat, e.latlng.lng);
                 showCrashes({ 'areaType': 'circle' });
@@ -502,13 +505,13 @@ var summaryDisplay = (function() {
                         name: 'Pedestrian',
                         color: '#fdae68',
                         data: [pedOutputObj === undefined ? '' : pedOutputObj.totalInjuries,
-                        		pedOutputObj === undefined ? '' : pedOutputObj.totalKilled]
+                                pedOutputObj === undefined ? '' : pedOutputObj.totalKilled]
                     },
                     {
                         name: 'Bicycle',
                         color: '#36a095',
                         data: [bikeOutputObj === undefined ? '' : bikeOutputObj.totalInjuries,
-                        		bikeOutputObj === undefined ? '' : bikeOutputObj.totalKilled]
+                                bikeOutputObj === undefined ? '' : bikeOutputObj.totalKilled]
                     }
                 ]
         });
@@ -657,6 +660,7 @@ var summaryDisplay = (function() {
 */
 var crashBrowser = (function() {
     var init = function() {};
+    var addresses = [];
 
     /*
     *   Communicates with the OpenStreetMap API to get coordinates for a given (Chicago!) address.
@@ -679,13 +683,33 @@ var crashBrowser = (function() {
         return dfd.promise();
     };
 
+    var setAddresses = function setAddresses(addrs) {
+        addresses = addrs;
+    };
+
+    var getAddresses = function getAddresses() {
+        return addresses;
+    };
+
     var saveAddressAndShowCrashes = function() {
-        $.cookie('address', $('#address').val());
+        var searchAddress = $('#address').val();
         $.when( fetchCoordsForAddress() ).then(
         function(data) {
+            if (addresses.indexOf(searchAddress) === -1) {
+                addresses.push(searchAddress);
+                if (addresses.length > 15) {
+                    addresses.shift();
+                }
+                store.write('addresses', addresses);
+            }
             mapDisplay.setCoordinates(data[0].lat, data[0].lon);
             mapDisplay.showCrashes();
         }, function() {
+            var badIdx = addresses.indexOf(searchAddress);
+            if (badIdx !== -1) {
+                addresses.splice(badIdx, 1);
+                store.write('addresses', addresses);
+            }
             addressError();
             mapDisplay.closePopup();
         });
@@ -732,7 +756,7 @@ var crashBrowser = (function() {
     *       crashesByYear: [2011 => 1, 2012 => 2],
     *       injuriesByYear: [2011 => 2, 2012 => 5],
     *       noInjuriesByYear: [2011 => 3, 2012 => 7],
-   	*		killedByYear: [2011 => 4, 2012 => 8]
+    *       killedByYear: [2011 => 4, 2012 => 8]
     *   },
     *   {
     *       type: 'bike',
@@ -740,7 +764,7 @@ var crashBrowser = (function() {
     *   }]
     */
 
-    var summaryObjects = [];
+    var summaryObjects;
 
     var SummaryObject = function() {
         this.crashes = 0;
@@ -791,7 +815,7 @@ var crashBrowser = (function() {
     *   loaded from the API.
     */
     var generateSummaries = function(crashes) {
-        var summaryObjects = {};
+        summaryObjects = {};
 
         if(crashes.length > 0) {
             $.each(crashes, function(i, feature) {
@@ -836,7 +860,7 @@ var crashBrowser = (function() {
     *   Helper function to determine easily if the app has any crashes.
     */
     var hasCrashes = function() {
-        return summaryObjects.length > 0;
+        return summaryObjects.bicycle || summaryObjects.pedestrian;
     };
 
     init();
@@ -846,7 +870,9 @@ var crashBrowser = (function() {
         fetchCrashDataByCircle: fetchCrashDataByCircle,
         fetchCrashDataByPoly: fetchCrashDataByPoly,
         hasCrashes: hasCrashes,
-        saveAddressAndShowCrashes: saveAddressAndShowCrashes
+        saveAddressAndShowCrashes: saveAddressAndShowCrashes,
+        setAddresses: setAddresses,
+        getAddresses: getAddresses
     };
 }());
 
@@ -871,13 +897,6 @@ var init = function() {
         }
     }
 
-    var store = Rhaboo.persistent('crashBrowser');
-    if (store.addresses) {
-        console.log(store.addresses);
-    } else {
-        store.write('addresses', { title: 'Crash Browser' });
-    }
-
     // When there isn't a searchRadius cookie, default to 150.
     if ($.cookie('searchRadius') === undefined) {
         $('input[name="searchRadius"][value="150"]').prop('checked', true).parent().addClass('active');
@@ -887,10 +906,9 @@ var init = function() {
         $('input[name="searchRadius"][value="' + searchRadius + '"]').prop('checked', true).parent().addClass('active');
     }
 
-    // Save address for future searches
-    if ($.cookie('address') !== undefined) {
-        $('input[name="address"]').val($.cookie('address'));
-        crashBrowser.saveAddressAndShowCrashes();
+    // Load stored addresses
+    if (store.addresses) {
+        crashBrowser.setAddresses(store.addresses);
     }
 };
 
@@ -926,8 +944,20 @@ $(document).ready(function() {
     /*
     *   For when someone submits the form using the <enter> key in an input field.
     */
-    $('#configForm').submit(function() {
+    $('#configForm').submit(function(evt) {
+        evt.preventDefault();
         crashBrowser.saveAddressAndShowCrashes();
+    });
+
+    if (crashBrowser.getAddresses().length > 0) {
+        $('#address').autocomplete({
+            source: crashBrowser.getAddresses(),
+            minLength: 0
+        });
+    }
+
+    $('#address').focus(function () {
+        $('#address').autocomplete('search', '');
     });
 
     var get = $.url().fparam('get');
