@@ -1,3 +1,22 @@
+require('jquery');
+require('rhaboo');
+require('jquery-ui/ui/core');
+require('jquery-ui/ui/widget');
+require('jquery-ui/ui/position');
+require('jquery-ui/ui/menu');
+require('jquery-ui/ui/autocomplete');
+require('jquery-cookie/jquery.cookie');
+require('lodash');
+
+require('leaflet-dist/leaflet-src');
+require('leaflet.markerclusterer');
+require('leaflet-locatecontrol/src/L.Control.Locate');
+require('leaflet-plugins/control/Permalink');
+require('purl');
+require('leaflet.draw');
+require('bootstrap');
+require('highcharts/highcharts');
+
 /* jshint undef: true, unused: false */
 /* global L,Q,$,$$,console,Rhaboo,document */
 
