@@ -62,7 +62,7 @@ define(['util', 'jquery'], function (Utility, $) {
               type: 'bar'
           },
           title: {
-              text: 'Injury summary (2005-2012)'
+              text: 'Injury summary (2009-2013)'
           },
           xAxis: {
               categories: ['Injuries', 'Fatalities']

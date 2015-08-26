@@ -126,7 +126,7 @@ define(['util', 'map', 'summary', 'jquery'], function (Utility, map, s, $) {
         var s;
         map.addFeatureToMap(feature);
 
-        switch (feature.collType) {
+        switch (parseInt(feature.collType)) {
           case Utility.CollisionEnum.PEDESTRIAN:
             if ('pedestrian' in summary) {
                 s = summary.pedestrian;
