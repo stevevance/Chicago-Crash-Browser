@@ -8,6 +8,8 @@
 *   switch statements use === for comparisons.
 */
 var CollisionEnum = Object.freeze({
+	/* this expects the Object to come in as an integer, but sometimes the crash data may output it
+	* as a string with a leading zero */
     PEDESTRIAN: 1,
     BICYCLIST: 2
 });
@@ -113,7 +115,7 @@ var mapDisplay = (function() {
 
         var drawControl = new L.Control.Draw(drawOptions);
 
-        map = L.map('map').setView(center, 16);
+        map = L.map('map').setView(center, 18);
         map.addControl(new L.Control.Permalink({useLocation:true}));
         map.addControl(new L.control.locate({debug:false}));
         map.addControl(drawControl);
@@ -131,10 +133,26 @@ var mapDisplay = (function() {
 			maxZoom: 20,
 			maxNativeZoom: 19
 		});
+		var satelliteMQ = L.tileLayer('http://oatile{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			detectRetina:true,
+			maxZoom: 20,
+			maxNativeZoom: 19,
+			subdomains: '1234'
+		});
+		var satellite = L.tileLayer('https://api.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic3RldmV2YW5jZSIsImEiOiJqRVdYSnFjIn0.cmW3_zqwZpvcwPYc_C2SPQ', {
+			attribution: '<a href="http://mapbox.com">Mapbox</a>',
+			detectRetina:true,
+			maxZoom: 20,
+			maxNativeZoom: 19,
+			unloadInvisibleTiles: true,
+			updateWhenIdle: true,
+			reuseTiles: true
+		});
 
 		// Add the tile layers to an object
-		var baseMaps = {'Streets': streets, 'Building Names': buildings};
-		streets.addTo(map); // load "streets" (Foursquare) by default
+		var baseMaps = {'Streets': streets, 'Building Names': buildings, "Satellite": satellite};
+		satellite.addTo(map); // load "satellite" by default
 
 		// Create an empty object to which we might add data layers that can be toggled
 		var otherLayers =  {};
@@ -285,7 +303,8 @@ var mapDisplay = (function() {
         north = northeast.lat;
         east = northeast.lng;
 
-        return 'http://chicagocrashes.org/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+dist;
+        //return '/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+dist;
+        return '/api2.php?lat='+lat+'&lng='+lng+'&distance='+dist;
     };
 
     /**
@@ -302,7 +321,7 @@ var mapDisplay = (function() {
         var lastPoint = poly.getLatLngs()[0];
         coords += lastPoint.lng + ' ' + lastPoint.lat;
 
-        return 'http://chicagocrashes.org/api2.php?coords=' + coords;
+        return '/api2.php?coords=' + coords;
     };
 
     /**
@@ -316,8 +335,10 @@ var mapDisplay = (function() {
 
         if (feature.collType == CollisionEnum.PEDESTRIAN) {
             iconValue = mapDisplay.pedestrianIcon;
-        } else {
+        } else if(feature.collType == CollisionEnum.BICYCLIST) {
             iconValue = mapDisplay.bikeIcon;
+        } else {
+	        iconValue = mapDisplay.otherIcon;
         }
 
         marker = new L.Marker(
@@ -366,6 +387,16 @@ var mapDisplay = (function() {
         shadowAnchor: [25, 38],
         popupAnchor: [0, -38],
     });
+    
+    var otherIcon = L.icon({
+        iconUrl: 'images/icon_carcrash.png',
+        shadowUrl: 'images/icon_shadow.png',
+        iconSize: [32, 37],
+        iconAnchor: [16, 38],
+        shadowSize: [51, 37],
+        shadowAnchor: [25, 38],
+        popupAnchor: [0, -38],
+    });
 
     /**
     *   Returns a map metadata object.
@@ -383,6 +414,7 @@ var mapDisplay = (function() {
     return {
         bikeIcon: bikeIcon,
         pedestrianIcon: pedestrianIcon,
+        otherIcon: otherIcon,
         getAPIUrl: getAPIUrl,
         getAPIUrlForPoly: getAPIUrlForPoly,
         showCrashes: showCrashes,
@@ -462,7 +494,7 @@ var summaryDisplay = (function() {
                 type: 'bar'
             },
             title: {
-                text: 'Injury summary (2005-2012)'
+                text: 'Injury summary (2009-2013)'
             },
             xAxis: {
                 categories: ['Injuries', 'Fatalities']
@@ -818,11 +850,12 @@ var crashBrowser = (function() {
         summaryObjects = {};
 
         if(crashes.length > 0) {
+        	console.log("Response has crashes; generating summary data to display in the charts");
             $.each(crashes, function(i, feature) {
                 var s;
                 mapDisplay.addFeatureToMap(feature);
-
-                switch (feature.collType) {
+				
+                switch (parseInt(feature.collType)) {
                     case CollisionEnum.PEDESTRIAN:
                         if ('pedestrian' in summaryObjects) {
                             s = summaryObjects.pedestrian;
