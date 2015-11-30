@@ -10,7 +10,6 @@ define(['util'], function (Utility) {
     var poly;
     var dist;
     var markerGroup;
-    var latlngs;
     var isDrawing = false;
 
     var shapeOptions = {
@@ -87,7 +86,7 @@ define(['util'], function (Utility) {
 
         map.on('draw:created', function(e) {
             poly = e.layer;
-            showCrashes({
+            $('body').trigger('search', {
                 areaType: 'polygon'
             });
         });
@@ -104,12 +103,6 @@ define(['util'], function (Utility) {
     var setCoordinates = function(newLat, newLng) {
         lat = newLat;
         lng = newLng;
-    };
-
-
-    var showCrashes = function() {
-        clearAreas();
-        addCircle();
     };
 
     /*
@@ -135,13 +128,12 @@ define(['util'], function (Utility) {
     */
     var clearAreas = function() {
         $('#results').hide();
-        if(typeof circle !== 'undefined') {
+        markerGroup.clearLayers();
+        if (typeof circle !== 'undefined') {
             map.removeLayer(circle);
-            markerGroup.clearLayers();
         }
-        if(typeof poly !== 'undefined') {
+        if (typeof poly !== 'undefined') {
             map.removeLayer(poly);
-            markerGroup.clearLayers();
         }
         map.closePopup();
     };
@@ -154,10 +146,9 @@ define(['util'], function (Utility) {
         var meters = Utility.getDistance() / 3.2808399;
         circle = new  L.Circle([lat,lng], meters, shapeOptions);
         map.addLayer(circle);
-
-        // if (crashes.hasCrashes()) {
+        if (markerGroup.getLayers().length > 0) {
             map.fitBounds(markerGroup.getBounds());
-        // }
+        }
     };
 
     /**
@@ -165,10 +156,9 @@ define(['util'], function (Utility) {
     */
     var addPoly = function() {
         map.addLayer(poly);
-
-        // if (crashes.hasCrashes()) {
+        if (markerGroup.getLayers().length > 0) {
             map.fitBounds(markerGroup.getBounds());
-        // }
+        }
     };
 
     /**
@@ -297,7 +287,6 @@ define(['util'], function (Utility) {
         pedestrianIcon: pedestrianIcon,
         getAPIUrl: getAPIUrl,
         getAPIUrlForPoly: getAPIUrlForPoly,
-        showCrashes: showCrashes,
         clearAreas: clearAreas,
         addCircle: addCircle,
         addPoly: addPoly,

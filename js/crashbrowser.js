@@ -128,7 +128,17 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
         init();
 
         $('body').on('search', function (event, opts) {
-            crashes.getCrashes(opts);
+            map.clearAreas();
+            crashes
+                .getCrashes(opts)
+                .done(function () {
+                    if (opts.areaType === 'circle') {
+                        map.addCircle();
+                    } else {
+                        map.addPoly();
+                    }
+                    map.finalizeMarkerGroup();
+                });
         });
 
         $('input[name="searchRadius"]:radio').change(function() {

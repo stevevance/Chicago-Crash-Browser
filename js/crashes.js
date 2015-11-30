@@ -1,7 +1,7 @@
 /* global define, $ */
 'use strict';
 
-define(['util', 'map'], function (Utility, map) {
+define(['util', 'map', 'summary'], function (Utility, map, s) {
   var summary;
 
   /*
@@ -21,13 +21,13 @@ define(['util', 'map'], function (Utility, map) {
       } else {
           fn = fetchCrashDataByPoly;
       }
-      fn().done(function (data) {
+      return fn().done(function (data) {
           generateSummaries(data.crashes);
       }).fail(function () {
           $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
           map.closePopup();
       });
-  };
+  }
 
   /*
   *   Communicates with the backend API to get crash data for the distance provided.
@@ -117,7 +117,7 @@ define(['util', 'map'], function (Utility, map) {
   */
   function hasCrashes() {
     return summary.bicycle || summary.pedestrian;
-  };
+  }
 
   /*
   *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on features
@@ -152,13 +152,11 @@ define(['util', 'map'], function (Utility, map) {
           break;
         }
       });
-      map.finalizeMarkerGroup();
-
       var metaDataObj = map.getMetaData();
 
-      // summaryDisplay.outputCrashDataText(summary.bicycle, summary.pedestrian);
-      // summaryDisplay.outputCrashDataGraph(summary.bicycle, summary.pedestrian);
-      // summaryDisplay.populateMetaData(metaDataObj);
+      s.outputCrashDataText(summary.bicycle, summary.pedestrian);
+      s.outputCrashDataGraph(summary.bicycle, summary.pedestrian);
+      s.populateMetaData(metaDataObj);
 
     } else {
         $('#status').html('No crashes found within ' + map.getMetaData().dist + ' feet of this location');

@@ -174,7 +174,17 @@
 	        init();
 
 	        $('body').on('search', function (event, opts) {
-	            crashes.getCrashes(opts);
+	            map.clearAreas();
+	            crashes
+	                .getCrashes(opts)
+	                .done(function () {
+	                    if (opts.areaType === 'circle') {
+	                        map.addCircle();
+	                    } else {
+	                        map.addPoly();
+	                    }
+	                    map.finalizeMarkerGroup();
+	                });
 	        });
 
 	        $('input[name="searchRadius"]:radio').change(function() {
@@ -36104,7 +36114,7 @@
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define, $ */
 	'use strict';
 
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(33)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, map) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(33), __webpack_require__(34)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, map, s) {
 	  var summary;
 
 	  /*
@@ -36124,13 +36134,13 @@
 	      } else {
 	          fn = fetchCrashDataByPoly;
 	      }
-	      fn().done(function (data) {
+	      return fn().done(function (data) {
 	          generateSummaries(data.crashes);
 	      }).fail(function () {
 	          $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
 	          map.closePopup();
 	      });
-	  };
+	  }
 
 	  /*
 	  *   Communicates with the backend API to get crash data for the distance provided.
@@ -36220,7 +36230,7 @@
 	  */
 	  function hasCrashes() {
 	    return summary.bicycle || summary.pedestrian;
-	  };
+	  }
 
 	  /*
 	  *   Creates summaryObjects.bicycle and summaryObjects.pedestrian based on features
@@ -36255,13 +36265,11 @@
 	          break;
 	        }
 	      });
-	      map.finalizeMarkerGroup();
-
 	      var metaDataObj = map.getMetaData();
 
-	      // summaryDisplay.outputCrashDataText(summary.bicycle, summary.pedestrian);
-	      // summaryDisplay.outputCrashDataGraph(summary.bicycle, summary.pedestrian);
-	      // summaryDisplay.populateMetaData(metaDataObj);
+	      s.outputCrashDataText(summary.bicycle, summary.pedestrian);
+	      s.outputCrashDataGraph(summary.bicycle, summary.pedestrian);
+	      s.populateMetaData(metaDataObj);
 
 	    } else {
 	        $('#status').html('No crashes found within ' + map.getMetaData().dist + ' feet of this location');
@@ -36291,7 +36299,6 @@
 	    var poly;
 	    var dist;
 	    var markerGroup;
-	    var latlngs;
 	    var isDrawing = false;
 
 	    var shapeOptions = {
@@ -36368,7 +36375,7 @@
 
 	        map.on('draw:created', function(e) {
 	            poly = e.layer;
-	            showCrashes({
+	            $('body').trigger('search', {
 	                areaType: 'polygon'
 	            });
 	        });
@@ -36385,12 +36392,6 @@
 	    var setCoordinates = function(newLat, newLng) {
 	        lat = newLat;
 	        lng = newLng;
-	    };
-
-
-	    var showCrashes = function() {
-	        clearAreas();
-	        addCircle();
 	    };
 
 	    /*
@@ -36416,13 +36417,12 @@
 	    */
 	    var clearAreas = function() {
 	        $('#results').hide();
-	        if(typeof circle !== 'undefined') {
+	        markerGroup.clearLayers();
+	        if (typeof circle !== 'undefined') {
 	            map.removeLayer(circle);
-	            markerGroup.clearLayers();
 	        }
-	        if(typeof poly !== 'undefined') {
+	        if (typeof poly !== 'undefined') {
 	            map.removeLayer(poly);
-	            markerGroup.clearLayers();
 	        }
 	        map.closePopup();
 	    };
@@ -36435,10 +36435,9 @@
 	        var meters = Utility.getDistance() / 3.2808399;
 	        circle = new  L.Circle([lat,lng], meters, shapeOptions);
 	        map.addLayer(circle);
-
-	        // if (crashes.hasCrashes()) {
+	        if (markerGroup.getLayers().length > 0) {
 	            map.fitBounds(markerGroup.getBounds());
-	        // }
+	        }
 	    };
 
 	    /**
@@ -36446,10 +36445,9 @@
 	    */
 	    var addPoly = function() {
 	        map.addLayer(poly);
-
-	        // if (crashes.hasCrashes()) {
+	        if (markerGroup.getLayers().length > 0) {
 	            map.fitBounds(markerGroup.getBounds());
-	        // }
+	        }
 	    };
 
 	    /**
@@ -36578,7 +36576,6 @@
 	        pedestrianIcon: pedestrianIcon,
 	        getAPIUrl: getAPIUrl,
 	        getAPIUrlForPoly: getAPIUrlForPoly,
-	        showCrashes: showCrashes,
 	        clearAreas: clearAreas,
 	        addCircle: addCircle,
 	        addPoly: addPoly,
@@ -36595,7 +36592,7 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility) {
 	  /**
 	  *   Issue #28: Since some crashes may not have any injuries, we need a helper function
 	  *   that catches this condition and returns 0 instead.
@@ -36845,7 +36842,7 @@
 	      showGraph: showGraph,
 	      showText: showText
 	  };
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }
 /******/ ]);
