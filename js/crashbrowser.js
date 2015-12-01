@@ -1,16 +1,15 @@
 /* jshint undef: true, unused: false */
-/* global L,Q,$,$$,console,Rhaboo,document,require,define */
+/* global L,Q,$$,console,Rhaboo,document,require,define */
 'use strict';
 
-require('jquery');
 require('rhaboo');
+
 require('jquery-ui/ui/core');
 require('jquery-ui/ui/widget');
 require('jquery-ui/ui/position');
 require('jquery-ui/ui/menu');
 require('jquery-ui/ui/autocomplete');
 require('jquery-cookie/jquery.cookie');
-require('lodash');
 
 require('leaflet-dist/leaflet-src');
 require('leaflet.markerclusterer');
@@ -23,9 +22,9 @@ require('highcharts/highcharts');
 
 
 
-var store = Rhaboo.persistent('crashBrowser');
 
-define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, summary) {
+define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crashes, map, summary, $) {
+    var store = Rhaboo.persistent('crashBrowser');
     var addresses = [];
 
     /*

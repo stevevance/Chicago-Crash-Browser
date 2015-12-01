@@ -1,7 +1,7 @@
-/* global define, $ */
+/* global define */
 'use strict';
 
-define(['util', 'map', 'summary'], function (Utility, map, s) {
+define(['util', 'map', 'summary', 'jquery'], function (Utility, map, s, $) {
   var summary;
 
   /*

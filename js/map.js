@@ -1,14 +1,13 @@
-/* global define, $, L */
+/* global define, L */
 'use strict';
 
-define(['util'], function (Utility) {
+define(['util', 'jquery'], function (Utility, $) {
     var lat;
     var lng;
     var map;
     var center;
     var circle;
     var poly;
-    var dist;
     var markerGroup;
     var isDrawing = false;
 
@@ -63,7 +62,7 @@ define(['util'], function (Utility) {
         var otherLayers =  {};
 
         // create a layer control that turns on/off layers
-        var control = L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
+        L.control.layers(baseMaps, otherLayers, {collapsed: false, autoZIndex:false}).addTo(map);
 
         map.on('click', function(e) {
             $('#address').val('');
@@ -201,7 +200,7 @@ define(['util'], function (Utility) {
         $('#status').html('Looking through the database...');
 
         var coords = '';
-        poly.getLatLngs().forEach(function (coord, index, collection) {
+        poly.getLatLngs().forEach(function (coord) {
             coords += coord.lng + ' ' + coord.lat + ',';
         });
         // Append last point
