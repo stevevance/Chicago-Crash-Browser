@@ -1,6 +1,6 @@
-/* global define, $ */
+/* global define */
 
-define(function () {
+define(['jquery'], function ($) {
     'use strict';
     var getDistance = function () {
         return $('input[name="searchRadius"]:checked').val();

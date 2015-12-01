@@ -286,8 +286,6 @@ define(['util', 'jquery'], function (Utility, $) {
     init();
 
     return {
-        bikeIcon: bikeIcon,
-        pedestrianIcon: pedestrianIcon,
         getAPIUrl: getAPIUrl,
         getAPIUrlForPoly: getAPIUrlForPoly,
         clearAreas: clearAreas,
@@ -297,7 +295,6 @@ define(['util', 'jquery'], function (Utility, $) {
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData,
-        setCoordinates: setCoordinates,
-        isDrawing: isDrawing
+        setCoordinates: setCoordinates
     };
 });

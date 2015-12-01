@@ -45,31 +45,28 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* jshint undef: true, unused: false */
-	/* global L,Q,$$,console,Rhaboo,document,require,define */
+	/* global Rhaboo,require,define */
 	'use strict';
 
-	__webpack_require__(3);
+	__webpack_require__(1);
 
-	__webpack_require__(4);
+	__webpack_require__(2);
 	__webpack_require__(5);
 	__webpack_require__(6);
 	__webpack_require__(7);
 	__webpack_require__(8);
 	__webpack_require__(9);
 
+	__webpack_require__(10);
 	__webpack_require__(11);
 	__webpack_require__(12);
 	__webpack_require__(13);
 	__webpack_require__(14);
 	__webpack_require__(15);
 	__webpack_require__(16);
-	__webpack_require__(17);
-	__webpack_require__(30);
+	__webpack_require__(29);
 
-
-
-
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(32), __webpack_require__(33), __webpack_require__(34), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, crashes, map, summary, $) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30), __webpack_require__(31), __webpack_require__(32), __webpack_require__(33), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, crashes, map, summary, $) {
 	    var store = Rhaboo.persistent('crashBrowser');
 	    var addresses = [];
 
@@ -173,13 +170,6 @@
 	        if (store.addresses) {
 	            setAddresses(store.addresses);
 	        }
-	    };
-
-	    /*
-	    *  Assign module methods to various events.
-	    */
-	    $(document).ready(function() {
-	        init();
 
 	        $('body').on('search', function (event, opts) {
 	            if (!opts) {
@@ -248,19 +238,896 @@
 	        }
 
 	        $('.btn').button();
-	    });
-
-	    return {
-	        fetchCoordsForAddress: fetchCoordsForAddress,
-	        saveAddressAndShowCrashes: saveAddressAndShowCrashes,
-	        setAddresses: setAddresses,
-	        getAddresses: getAddresses
 	    };
+
+	    $(document).ready(init);
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
 /* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var require;var require;/* WEBPACK VAR INJECTION */(function(global) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	//This is for efficiently serialising objects you know the contents of.
+
+	//It's not a JSON replacement. It's for when you want to control exactly
+	//  how things are encoded, want to do that hierarchially, and want to
+	//  write the en- and decoding code near each other for each bit of the
+	//  hierarchy.
+
+	"use strict"
+
+	//Functional basics...
+	var typeOf = function(x) { return x===null ? 'null' : typeof x}
+	var id = function(x) { return x;}
+	var konst = function(k) { return function (x) {return k;}}
+	var eq = function(a) { return function (b) { return a===b; }}
+	var map = function (horse) { return function (cart) { return cart.map(horse); }}
+
+	//Slightly less basic...
+	var runSnd = function(fs) { return function (x) { return fs[1]!==undefined ? [fs[0], fs[1](x)] : [fs[0]]}}
+	var thru = function (dir) { return function (ps) { return function (xs) {
+	  var res = [];
+	  for (var i=0; i<ps.length && i<xs.length; i++) res[i] = ps[i](dir)(xs[i]);
+	  return res;
+	}}}
+
+	//A parunpar is a function of boolean that returns an encoder or decoder for true and false respectively.
+	//A valid one obeys the laws:
+	//  pp(false)( pp(true)(x) ) === x
+	//  pp(true)( pp(false)(x) ) === x
+
+	//Fundamental parunpars...
+	var string_pp    = function (dir) { return function (x)  { return x.toString(); }}
+	var number_pp    = function (dir) { return function (x)  { return dir ? x.toString() : Number(x); }}
+	var boolean_pp   = function (dir) { return function (x)  { return dir ? (x ? 't' : 'f') : (x==='t'); }}
+	var null_pp      = function (dir) { return function (x)  { return dir ? '' : null; }}
+	var undefined_pp = function (dir) { return function (x)  { return dir ? '' : undefined; }}
+
+	//Compose two parunpars. p2 is closest to the encoded text.
+	var pipe = function (p1) { return function (p2) { return function (dir) { return function (x) {
+	  return dir ? p2(dir)(p1(dir)(x)) : p1(dir)(p2(dir)(x)) ;
+	}}}}
+
+	//Chops a string into fields by column widths. Result always has cols.length+1 elements.
+	var chop = function(cols) { return function (s) {
+	  var res = [], i=0;
+	  for ( var i=0; i<cols.length && s.length; s=s.substring(cols[i++]) )
+	    res.push(s.substring(0, cols[i]));
+	  res.push(s);
+	  return res;
+	}}
+
+	//Maps a column list and a list of parunpars onto a parunpar that allocates a fixed width to each parunpar...
+	var fixedWidth = function (cols) { return function (ps) { return function (dir) { return function (x) {
+	  return dir ? thru(dir)(ps)(x).join('') : thru(dir)(ps)(chop(cols)(x)) ;
+	}}}}
+
+	//Work around IE bug
+	function mysplit(x, sep) {
+	  var res = x.split(sep);
+	  if (res.length==1 && res[0]==undefined)
+	    delete res[0];
+	  return res;
+	}
+
+	//Maps a separator and a list of parunpars onto a parunpar that serialises each with the sep in between
+	//Doesn't think about what happens if the sep occurs in the serialisation of any field.
+	var sepBy = function (sep) { return function (ps) { return function (dir) { return function (x) {
+	  return dir ? thru(dir)(ps)(x).join(sep) : thru(dir)(ps)(mysplit(x,sep)) ;
+	}}}}
+
+	//Maps one parunpar onto one that uses esc to POST-escape occurences of sep.
+	//Doesn't work if sep or esc are special characters in regex syntax, so certainly not /, \ or ^
+	//Feel free to use borng alphanumeric characters for either.
+	var escape = function (sep, esc) { return function (p) { return function (dir) { return function (x) {
+	  return dir ? p(dir)(x).replace(RegExp(sep,'g'),sep+esc) : p(dir)(x.replace(RegExp(sep+esc,'g'), sep));
+	}}}}
+
+	//Like sepBy except that all fields are escaped to avoid conflict with the separator.
+	var sepByEsc = function (sep, esc) { return function (ps) { return function (dir) { return function (x) {
+	  return sepBy (dir ? sep : RegExp(sep+"(?!"+esc+")","g")) ( map (escape(sep,esc)) (ps) ) (dir) (x)
+	}}}}
+
+	//You can use this for everything...
+	var tuple = sepByEsc(';',':');
+
+	//Exercise for the reader: write something for arrays of unnknown length but homogeneous contents.
+
+	module.exports = { typeOf:typeOf, id:id, konst:konst, eq:eq, map:map, runSnd:runSnd,
+	  string_pp:string_pp, number_pp:number_pp, boolean_pp:boolean_pp, null_pp:null_pp,
+	  undefined_pp:undefined_pp, thru:thru, chop:chop, fixedWidth:fixedWidth, sepBy:sepBy,
+	  escape:escape, sepByEsc:sepByEsc, tuple:tuple, pipe:pipe  }
+
+
+	},{}],2:[function(require,module,exports){
+	var R = require('./core');
+
+	//All these will be changed but the new versions will use the originals...
+	var Array_rhaboo_originals = Array_rhaboo_originals || {
+	  pop : Array.prototype.pop,
+	  push : Array.prototype.push,
+	  shift : Array.prototype.shift,
+	  unshift : Array.prototype.unshift,
+	  splice : Array.prototype.splice,
+	  reverse : Array.prototype.reverse,
+	  sort : Array.prototype.sort,
+	  fill : Array.prototype.fill,
+	};
+
+	//Worst case scenario:
+	var Array_rhaboo_defensively = function(mutator) {
+	  return function () {
+	    var slotnum=undefined, refs, storage;
+	    //Note the slotnum and refcount then totally remove it from Storage...
+	    if (this._rhaboo) {
+	      storage = this._rhaboo.storage;
+	      slotnum = this._rhaboo.slotnum;
+	      refs = this._rhaboo.refs;
+	      R.release(this, true); //true means force release even if there are other references
+	    }
+	    //Do the requested change ...
+	    var retval = Array_rhaboo_originals[mutator].apply(this, arguments);
+	    //Recreate it, specifying the same slotnum and refcount...
+	    if (slotnum!==undefined) { //otherwise it never was persisted
+	      R.addRef(this, storage, slotnum, refs);
+	    }
+	    return retval;
+	  }
+	}
+
+	//This can be better cos it leaves the existing part of the array unchanged
+	Array.prototype.push = function () {
+	  var l1 = this.length;
+	  var ret = Array_rhaboo_originals.push.apply(this, arguments);
+	  var l2 = this.length;
+	  //Just persist the new elements...
+	  if ( this._rhaboo !== undefined && l2>l1 ) {
+	    for (var i=l1; i<l2; i++) {
+	      R.storeProp(this, i); //This might be writing each slot twice
+	    }
+	    R.updateSlot(this); //for length
+	  }
+	  return ret;
+	}
+
+	//Even better: just unpersist the last element
+	Array.prototype.pop = function () {
+	  var l = this.length;
+	  if ( this._rhaboo !== undefined && l>0 ) {
+	    R.forgetProp(this, l-1);
+	  }
+	  var ret = Array_rhaboo_originals.pop.apply(this, arguments);
+	  if ( this._rhaboo !== undefined && l>0 ) {
+	    R.updateSlot(this); //for length
+	  }
+	  return ret;
+	}
+
+	Object.defineProperty(Array.prototype, 'write', { value: function(prop, val) {
+	  Object.prototype.write.call(this, prop, val);
+	  R.updateSlot(this); //for length
+	}});
+
+	//TODO: reverse/sort(unless sparse?) don't need initial delete, shift/unshift similarly
+	//Array.prototype.push = Array_rhaboo_defensively("push");
+	//Array.prototype.pop = Array_rhaboo_defensively("pop");
+	Array.prototype.shift = Array_rhaboo_defensively("shift");
+	Array.prototype.unshift = Array_rhaboo_defensively("unshift");
+	Array.prototype.splice = Array_rhaboo_defensively("splice");
+	Array.prototype.reverse = Array_rhaboo_defensively("reverse");
+	Array.prototype.sort = Array_rhaboo_defensively("sort");
+	Array.prototype.fill = Array_rhaboo_defensively("fill");
+	//Array.prototype.write = Array.prototype._rhaboo_defensively("write");
+
+	module.exports = {
+	  persistent : R.persistent,
+	  perishable : R.perishable,
+	  algorithm : "sand"
+	};
+
+
+	},{"./core":3}],3:[function(require,module,exports){
+	(function (global){
+	"use strict"
+
+	/* EXAMPLE OF STORAGE FORMAT:
+
+	_RHABOO_NEXT_SLOT             17
+	_rhaboo_Cliches demo          &0                                 The root.
+	_rhaboo_0                     Object;initialised=1               It's an Object whose first property is called initialised with the value in slot 1.
+	_rhaboo_1                     ?t;cliches=2                       initialised is a bool with the value t. The root's next child is called cliches and lives in slot 2.
+	_rhaboo_2                     &3;silly=16                        cliches is a reference to what's in slot 3. The root's next child is called silly and lives in slot 16.
+	_rhaboo_3                     Array=3;0=4                        cliches is an Array of length 3 whose 0th element is in slot 4.
+	_rhaboo_4                     &5;1=8                             cliches[0] is a reference to what's in slot 5 and cliches[1] lives in slot 8
+	_rhaboo_5                     Object;text=6                      cliches[0] references this Object whose first member is called text and lives in slot 6
+	_rhaboo_6                     $24x7;count=7                      text is a string saying "24x7" and the next sibling is called count and lives in slot 7
+	_rhaboo_7                     #5                                 count is the number 5
+	_rhaboo_8                     &9;2=12                            cliches[1] is a reference to what's in slot 9, which resembles slot 5
+	_rhaboo_9                     Object;text=10                     Etc...
+	_rhaboo_10                    $dialogging;count=11
+	_rhaboo_11                    #3
+	_rhaboo_12                    &13
+	_rhaboo_13                    Object;text=14
+	_rhaboo_14                    box;count=15
+	_rhaboo_15                    #12
+	_rhaboo_16                    &9                                 silly is a reference to what's in slot 9, which we already mentioned
+
+	means:
+
+	{
+	  initialised: true,
+	  cliches: [
+	    { count: 5,  text: "24x7" },
+	    { count: 3,  text: "dialogging" },
+	    { count: 12, text: "outside of the box" }
+	  ],
+	  silly: <reference to same object as cliches[1]>
+	}
+
+	*/
+
+	//Polyfill constructor.name in IE
+	//Thanks to Matthew Sharley for this.
+	if (Function.prototype.name === undefined && Object.defineProperty !== undefined) {
+	    Object.defineProperty(Function.prototype, 'name', {
+	        get: function() {
+	            var funcNameRegex = /function\s([^(]{1,})\(/;
+	            var results = (funcNameRegex).exec((this).toString());
+	            return (results && results.length > 1) ? results[1].trim() : "";
+	        },
+	        set: function(value) {}
+	    });
+	}
+
+	var ls_prefix = "_rhaboo_";
+
+	var built = {};
+
+	//The serialiser...
+
+	var P = require('parunpar');
+
+	var tuple2 = P.sepByEsc('=',':')
+
+	//En/decode property name : slot number pairs...
+	var right_pp = tuple2([P.string_pp, P.number_pp])
+
+	/*
+	//Leaving this here for didactic reasons
+	var left_o_pp = P.pipe(
+	  function (dir) { return function (x) {
+	    return dir ? ( x.length!==undefined ? [x.constructor.name, x.length] : [x.constructor.name] ) //can't simplify this cos we actually restore undefineds
+	               : ( new global[x[0]](x[1]) )
+	  }})(tuple2([P.string_pp, P.number_pp]));
+	*/
+
+	//These pps are a bit of a mess right now...
+
+	//left_o_pp en/decodes objects (not to be confused with references to objects)
+	//  The first and last lines just pack the 1 or 2 element array handled by the bit in between
+	//  3 lines encoding, 1 line decoding
+	//  The three encoding lines handle dates, arrays, and everything else respectively.
+	//  The constructor name is always stored and looked for in the global scope,
+	//    so if you have your own classes they should have the constructor name set up properly -
+	//    Crockford style won't work.
+	//  (There was a plan to allow any class to define a constructorParameters function
+	//    that would return something to be stored here like the date string or array length is.)
+	var left_o_pp = P.pipe(
+	  function (dir) { return function (x) {
+	    return dir ? (
+	                   x.constructor.name === 'Date' ? [x.constructor.name, x.toString() ] :
+	                   x.length!==undefined ? [x.constructor.name, x.length.toString()] :
+	                   [x.constructor.name] ) //can't simplify this cos we actually restore undefineds
+	               : ( new global[x[0]]( x[0]=='Date'?x[1]:x[1]?Number(x[1]):undefined ) )
+	               //: ( new global[x[0]]( x[1] ) )
+	  }})(tuple2([P.string_pp, P.string_pp]));
+
+	//Similarly, the first and last lines pack the array handled by the middle bit
+	//  which contains a single-character type code and string representation of the value.
+	//The packing is a single string with a fixed width of 1 for the first field.
+	var left_l_pp = function (storage) { return P.pipe(
+	  function (dir) { return function (x) {
+	    return dir ?
+	      ( P.runSnd({ //runSnd(arr)(x) returns arr if arr only has one element, or [arr[0], arr[1](x)] if it has two
+	      string:      ['$', P.id ],
+	      number:      ['#', String ],
+	      boolean:     ['?', function (x) {return x?'t':'f'} ],
+	      'null':      ['~'],
+	      'undefined': ['_'],
+	      object:      ['&', function(x){return x._rhaboo.slotnum;} ]
+	    } [P.typeOf(x)]) (x) ) : //P.typeOf behaves sanely on nulls etc
+	    (  {
+	      '$': P.id,
+	      '#': Number,
+	      '?': P.eq('t'),
+	      '~': P.konst(null),
+	      '_': P.konst(undefined),
+	      '&': restore(storage),
+	    } [x[0]] (x[1]))
+	}}) (P.fixedWidth([1])([P.string_pp, P.string_pp]));}
+
+	var slot_o_pp  = P.tuple([left_o_pp, right_pp]);
+	//That takes something like [object,[nextprop,nextslot]]
+
+	var slot_l_pp  = function ( storage) { return P.tuple([left_l_pp(storage), right_pp]); }
+	//That takes something like [value,[nextprop,nextslot]]
+
+	function persistent(key) { return construct(  localStorage, key); }
+	function perishable(key) { return construct(sessionStorage, key); }
+
+	function construct(storage, key) {
+	  var praw = storage.getItem(ls_prefix+key); //Likely contains "&0" where 0 is the slot number with the root object in
+
+	  if (praw) {
+	    var decoded = slot_l_pp(storage)(false)(praw); //Sees the & and calls restore
+	    built={}; //Thanks to janmotum on github for alerting me to the necessity for this line
+	    return decoded[0];
+	  } else { //virgin (not catching fullness here cos it would mean you're flooding LS with something other than rhaboo)
+	    var ob = {};
+	    Object.defineProperty(ob, "_rhaboo", { value: {storage:storage}, writable: true, configurable: true, enumerable: false});
+	    var ret = addRef(ob); //Persist an empty object. It will know its slot number afterwards.
+	    storage.setItem(ls_prefix+key, left_l_pp(storage)(true)(ret)); //left_l_pp in encoding mode
+	    //   just returns "&0" where 0 is the slotnum which ret acquired during addRef
+	    return ret;
+	  }
+	}
+
+	//Restore an object from a slot
+	//Definitely an object (cos we get here through left_l_pp when it sees a &)
+	function restore(storage) { return function(slotnum) {
+	  if ( built[slotnum]!==undefined ) //important for multiple references to the same object
+	    return addRef(built[slotnum]);
+	  var raw = storage.getItem(ls_prefix+slotnum)
+	  if (raw===undefined || raw===null) //means we ran out of storage when storing
+	    return undefined;
+	  //Read the constructor name and its optional parameter from the LHS of the slot contents
+	  //  and run that to make decoded[0]. decoded[1] is an array with a prop name and slot number
+	  //  for the first child...
+	  var decoded = slot_o_pp(false)(raw);
+	  //Insert a default _rhaboo ...
+	  Object.defineProperty(decoded[0], "_rhaboo", { value: {
+	    storage: storage,
+	    slotnum : slotnum,
+	    refs : 1,
+	    kids : { }
+	  }, writable: true, configurable: true, enumerable:false });
+	  //Remember not to do that again...
+	  built[slotnum] = decoded[0];
+	  //Recursively build the children using augment...
+	  return (decoded.length>1) ? augment(decoded[0], decoded[1][0], decoded[1][1]) : decoded[0];
+	}}
+
+	//that is a half-built object and we are adding a child called propname whose
+	//  type, value and possible successor is written in propslot...
+	function augment(that, propname, propslot) {
+	  var praw = that._rhaboo.storage.getItem(ls_prefix+propslot);
+	  if (praw===undefined || praw===null) //ran out of storage when storing
+	    return that;
+	  //We use slot_l_pp because we know it's a value not an object, because if it was an object then
+	  //  it would be a reference to another slot containing the object...
+	  var decoded = slot_l_pp(that._rhaboo.storage)(false)(praw);
+	  that[propname] = decoded[0];
+	  //Maintain the doubly-linked list in memory...
+	  appendKid(that, propname, propslot);
+	  //Recurse:
+	  return (decoded.length>1) ? augment(that, decoded[1][0], decoded[1][1]) : that;
+	}
+
+	//These kid functions ONLY manipulate the list in memory and don't touch Storage
+
+	function appendKid(that, prop, slotnum) {
+	  //_rhaboo.prev is the tail of the list of children. _rhaboo.next is the head
+	  //So the new child will be referenced by either the formerly last child's next, or the global head which is _rhaboo.next
+	  var target = that._rhaboo.prev!==undefined ? that._rhaboo.kids[that._rhaboo.prev] : that._rhaboo;
+	  //Either way, it's now target.next and the global tail (_rhaboo.prev) that must reference the new child
+	  that._rhaboo.kids[prop] = { slotnum: slotnum, prev: that._rhaboo.prev }; //New child's prev points to old tail, and has no next.
+	  target.next = that._rhaboo.prev = prop;
+	}
+
+	function removeKid(that, prop) {
+	  var kid = that._rhaboo.kids[prop];
+	  (that._rhaboo.kids[kid.prev] || that._rhaboo).next = kid.next; //Victim's precursor's next or global head becomes victim's successor
+	  (that._rhaboo.kids[kid.next] || that._rhaboo).prev = kid.prev; //Victim's successor's prev or global tail because victim's precursor
+	  delete that._rhaboo.kids[prop]; //Delete victim's node
+	}
+
+	//Correct the contents of the Storage slot for either that or that[prop]
+	//Dual use: prop==undefined means persist that / else persist the prop
+	function updateSlot(that, prop) {
+	  var bare = []; //This is what we'll encode with parunpars to make the slot contents
+	  bare.push(prop!==undefined ? that[prop] : that); //First, the data itself
+	  //Now then, both _rhaboo and _rhaboo.kids[prop] have a next and prev.
+	  //  For the latter, they implement a doubly linked list in memory
+	  //    (although it's only singly linked in Storage)
+	  //  For the former, next means head and prev means tail.
+	  //  Either way, if there's a next, then its property name and slot number
+	  //    go on the right hand side of the slot contents
+	  var kid = prop!==undefined ? that._rhaboo.kids[prop] : that._rhaboo;
+	  if (kid.next!==undefined)
+	    bare.push([kid.next, that._rhaboo.kids[kid.next].slotnum]);
+	  var encoded = (prop!==undefined ? slot_l_pp(that._rhaboo.storage) : slot_o_pp)(true)(bare);
+	  try {
+	    that._rhaboo.storage.setItem(ls_prefix+kid.slotnum, encoded);
+	  } catch (e) {
+	    if (isQuotaExceeded(e))
+	      //just in case some partial junk is left in there...
+	      that._rhaboo.storage.removeItem(ls_prefix+kid.slotnum, encoded);
+	      console.log("Local storage quota exceeded by rhaboo");
+	      throw (e);
+	      //now the restore phase will tolerate surprisingly empty slots.
+	  }
+	}
+
+	function isQuotaExceeded(e) { //Thanks crocodillon.com
+	  var quotaExceeded = false;
+	  if (e) {
+	    if (e.code) {
+	      switch (e.code) {
+	        case 22:
+	          quotaExceeded = true;
+	        break;
+	        case 1014:
+	          // Firefox
+	          if (e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+	          quotaExceeded = true;
+	        }
+	        break;
+	      }
+	    } else if (e.number === -2147024882) {
+	      // Internet Explorer 8
+	      quotaExceeded = true;
+	    }
+	  }
+	  return quotaExceeded;
+	}
+
+	//Reserve a slot (if not already done) for a child of that called prop
+	function slotFor(that, prop) {
+	  if (that._rhaboo.kids[prop]===undefined) {
+	    var slotnum = newSlot(that._rhaboo.storage);
+	    appendKid(that, prop, slotnum); //Manage the linked list of children in _rhaboo
+	    updateSlot(that, that._rhaboo.kids[prop].prev); //The formerly last child now needs a reference to the new one
+	    //This slot is about to be written by caller
+	  }
+	}
+
+	//An unpersisted object is given a _rhaboo member with a storage slot, a refcount of 1 and no children
+	//An already persisted one just gets its refcount incremented
+	//The slotnum are refs parameters are usually undefined, except for a certain hack involving arrays
+	function addRef(that, storage, slotnum, refs) {
+	  if (that._rhaboo!==undefined && that._rhaboo.slotnum!==undefined)
+	    that._rhaboo.refs++;
+	  else {
+	    if (that._rhaboo===undefined) Object.defineProperty(that, "_rhaboo", { value: { }, writable: true, configurable: true, enumerable:false});
+	    if (storage!==undefined) that._rhaboo.storage = storage;
+	    that._rhaboo.slotnum = slotnum!==undefined ? slotnum : newSlot(that._rhaboo.storage);
+	    that._rhaboo.refs = refs!==undefined ? refs : 1;
+	    that._rhaboo.kids = {};
+	    updateSlot(that);
+	    for (var prop in that) if (that.hasOwnProperty(prop) && prop !=='_rhaboo')
+	      storeProp(that, prop);
+	  }
+	  return that;
+	}
+
+	function storeProp(that, prop) {
+	  slotFor(that, prop);
+	  if (P.typeOf(that[prop]) === 'object') {
+	    if (that[prop]._rhaboo===undefined) //probably true
+	      Object.defineProperty(that[prop], "_rhaboo", { value: {storage: that._rhaboo.storage}, writable: true, configurable: true, enumerable:false});
+	    addRef(that[prop]);
+	  }
+	  updateSlot(that, prop);
+	}
+
+	function release(that, force) {
+	  var target, propname;
+	  that._rhaboo.refs--;
+	  if (force || that._rhaboo.refs === 0) {
+	    for (propname = undefined, target = that._rhaboo;
+	         target;
+	         target = that._rhaboo.kids[propname=target.next]) {
+	      that._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
+	      if (propname!==undefined && P.typeOf(that[propname]) == 'object')
+	        release(that[propname]); //recurse for any object-valued properties
+	    }
+	    delete that._rhaboo;
+	  }
+	}
+
+	function forgetProp(that, prop) {
+	  var target = that._rhaboo.kids[prop];
+	  if (target===undefined) return; //This can happen if you sort a sparse array
+	  var prevname = target.prev;
+	  that._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
+	  if (P.typeOf(that[prop]) == 'object')
+	    release(that[prop]);
+	  removeKid(that, prop);
+	  updateSlot(that, prevname);
+	}
+
+	//The main API
+	//Assumes that this is persistent already, but not that val is.
+	Object.defineProperty(Object.prototype, 'write', { value: function(prop, val) {
+	  slotFor(this, prop); //Reserves a slot if not already reserved.
+	  if (P.typeOf(this[prop]) === 'object') //Unpersist old value
+	    release(this[prop]);
+	  this[prop] = val;
+	  if (P.typeOf(val) === 'object') {
+	    if (val._rhaboo===undefined) //probably true
+	      Object.defineProperty(val, "_rhaboo", { value: {storage: this._rhaboo.storage}, writable: true, configurable: true, enumerable: false});
+	    addRef(val); //Persist val, whether already persisted or not
+	  }
+	  updateSlot(this, prop); //Write the slot for val itself
+	  return this;
+	}});
+
+	Object.defineProperty(Object.prototype, 'erase', { value: function(prop) {
+	  if (!this.hasOwnProperty(prop))
+	    return this;
+	  if (P.typeOf(this[prop]) === 'object')
+	    release(this[prop]);
+	  var target = this._rhaboo.kids[prop];
+	  this._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
+	  var prevname = target.prev;
+	  removeKid(this, prop);
+	  updateSlot(this, prevname);
+	  delete this[prop];
+	  return this;
+	}});
+
+	var keyOfStoredNextSlot = '_RHABOO_NEXT_SLOT'
+	var storedNextSlot=[0,0];
+	for (var i =0; i<2; i++) { //0 is local, 1 is session
+	  storedNextSlot[i] = localStorage.getItem(keyOfStoredNextSlot) || 0;
+	  storedNextSlot[i] = Number(storedNextSlot[i]);
+	}
+
+	//Grab a new slot
+	function newSlot(storage) {
+	  var i = (storage===localStorage) ? 0 : 1;
+	  var ret = storedNextSlot[i];
+	  storedNextSlot[i]++;
+	  storage.setItem(keyOfStoredNextSlot, storedNextSlot[i]);
+	  return ret;
+	}
+
+	module.exports = {
+	  persistent : persistent,
+	  perishable : perishable,
+	  addRef: addRef,
+	  release: release,
+	  storeProp : storeProp,
+	  forgetProp : forgetProp,
+	  updateSlot : updateSlot,
+	};
+
+
+
+	}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+	},{"parunpar":1}],4:[function(require,module,exports){
+	(function (global){
+	global.Rhaboo = require('./arr');
+
+
+	}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+	},{"./arr":2}]},{},[4]);
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * jQuery UI Core 1.11.4
+	 * http://jqueryui.com
+	 *
+	 * Copyright jQuery Foundation and other contributors
+	 * Released under the MIT license.
+	 * http://jquery.org/license
+	 *
+	 * http://api.jqueryui.com/category/ui-core/
+	 */
+	(function( factory ) {
+		if ( true ) {
+
+			// AMD. Register as an anonymous module.
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+
+			// Browser globals
+			factory( jQuery );
+		}
+	}(function( $ ) {
+
+	// $.ui might exist from components with no dependencies, e.g., $.ui.position
+	$.ui = $.ui || {};
+
+	$.extend( $.ui, {
+		version: "1.11.4",
+
+		keyCode: {
+			BACKSPACE: 8,
+			COMMA: 188,
+			DELETE: 46,
+			DOWN: 40,
+			END: 35,
+			ENTER: 13,
+			ESCAPE: 27,
+			HOME: 36,
+			LEFT: 37,
+			PAGE_DOWN: 34,
+			PAGE_UP: 33,
+			PERIOD: 190,
+			RIGHT: 39,
+			SPACE: 32,
+			TAB: 9,
+			UP: 38
+		}
+	});
+
+	// plugins
+	$.fn.extend({
+		scrollParent: function( includeHidden ) {
+			var position = this.css( "position" ),
+				excludeStaticParent = position === "absolute",
+				overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/,
+				scrollParent = this.parents().filter( function() {
+					var parent = $( this );
+					if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
+						return false;
+					}
+					return overflowRegex.test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+				}).eq( 0 );
+
+			return position === "fixed" || !scrollParent.length ? $( this[ 0 ].ownerDocument || document ) : scrollParent;
+		},
+
+		uniqueId: (function() {
+			var uuid = 0;
+
+			return function() {
+				return this.each(function() {
+					if ( !this.id ) {
+						this.id = "ui-id-" + ( ++uuid );
+					}
+				});
+			};
+		})(),
+
+		removeUniqueId: function() {
+			return this.each(function() {
+				if ( /^ui-id-\d+$/.test( this.id ) ) {
+					$( this ).removeAttr( "id" );
+				}
+			});
+		}
+	});
+
+	// selectors
+	function focusable( element, isTabIndexNotNaN ) {
+		var map, mapName, img,
+			nodeName = element.nodeName.toLowerCase();
+		if ( "area" === nodeName ) {
+			map = element.parentNode;
+			mapName = map.name;
+			if ( !element.href || !mapName || map.nodeName.toLowerCase() !== "map" ) {
+				return false;
+			}
+			img = $( "img[usemap='#" + mapName + "']" )[ 0 ];
+			return !!img && visible( img );
+		}
+		return ( /^(input|select|textarea|button|object)$/.test( nodeName ) ?
+			!element.disabled :
+			"a" === nodeName ?
+				element.href || isTabIndexNotNaN :
+				isTabIndexNotNaN) &&
+			// the element and all of its ancestors must be visible
+			visible( element );
+	}
+
+	function visible( element ) {
+		return $.expr.filters.visible( element ) &&
+			!$( element ).parents().addBack().filter(function() {
+				return $.css( this, "visibility" ) === "hidden";
+			}).length;
+	}
+
+	$.extend( $.expr[ ":" ], {
+		data: $.expr.createPseudo ?
+			$.expr.createPseudo(function( dataName ) {
+				return function( elem ) {
+					return !!$.data( elem, dataName );
+				};
+			}) :
+			// support: jQuery <1.8
+			function( elem, i, match ) {
+				return !!$.data( elem, match[ 3 ] );
+			},
+
+		focusable: function( element ) {
+			return focusable( element, !isNaN( $.attr( element, "tabindex" ) ) );
+		},
+
+		tabbable: function( element ) {
+			var tabIndex = $.attr( element, "tabindex" ),
+				isTabIndexNaN = isNaN( tabIndex );
+			return ( isTabIndexNaN || tabIndex >= 0 ) && focusable( element, !isTabIndexNaN );
+		}
+	});
+
+	// support: jQuery <1.8
+	if ( !$( "<a>" ).outerWidth( 1 ).jquery ) {
+		$.each( [ "Width", "Height" ], function( i, name ) {
+			var side = name === "Width" ? [ "Left", "Right" ] : [ "Top", "Bottom" ],
+				type = name.toLowerCase(),
+				orig = {
+					innerWidth: $.fn.innerWidth,
+					innerHeight: $.fn.innerHeight,
+					outerWidth: $.fn.outerWidth,
+					outerHeight: $.fn.outerHeight
+				};
+
+			function reduce( elem, size, border, margin ) {
+				$.each( side, function() {
+					size -= parseFloat( $.css( elem, "padding" + this ) ) || 0;
+					if ( border ) {
+						size -= parseFloat( $.css( elem, "border" + this + "Width" ) ) || 0;
+					}
+					if ( margin ) {
+						size -= parseFloat( $.css( elem, "margin" + this ) ) || 0;
+					}
+				});
+				return size;
+			}
+
+			$.fn[ "inner" + name ] = function( size ) {
+				if ( size === undefined ) {
+					return orig[ "inner" + name ].call( this );
+				}
+
+				return this.each(function() {
+					$( this ).css( type, reduce( this, size ) + "px" );
+				});
+			};
+
+			$.fn[ "outer" + name] = function( size, margin ) {
+				if ( typeof size !== "number" ) {
+					return orig[ "outer" + name ].call( this, size );
+				}
+
+				return this.each(function() {
+					$( this).css( type, reduce( this, size, true, margin ) + "px" );
+				});
+			};
+		});
+	}
+
+	// support: jQuery <1.8
+	if ( !$.fn.addBack ) {
+		$.fn.addBack = function( selector ) {
+			return this.add( selector == null ?
+				this.prevObject : this.prevObject.filter( selector )
+			);
+		};
+	}
+
+	// support: jQuery 1.6.1, 1.6.2 (http://bugs.jquery.com/ticket/9413)
+	if ( $( "<a>" ).data( "a-b", "a" ).removeData( "a-b" ).data( "a-b" ) ) {
+		$.fn.removeData = (function( removeData ) {
+			return function( key ) {
+				if ( arguments.length ) {
+					return removeData.call( this, $.camelCase( key ) );
+				} else {
+					return removeData.call( this );
+				}
+			};
+		})( $.fn.removeData );
+	}
+
+	// deprecated
+	$.ui.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
+
+	$.fn.extend({
+		focus: (function( orig ) {
+			return function( delay, fn ) {
+				return typeof delay === "number" ?
+					this.each(function() {
+						var elem = this;
+						setTimeout(function() {
+							$( elem ).focus();
+							if ( fn ) {
+								fn.call( elem );
+							}
+						}, delay );
+					}) :
+					orig.apply( this, arguments );
+			};
+		})( $.fn.focus ),
+
+		disableSelection: (function() {
+			var eventType = "onselectstart" in document.createElement( "div" ) ?
+				"selectstart" :
+				"mousedown";
+
+			return function() {
+				return this.bind( eventType + ".ui-disableSelection", function( event ) {
+					event.preventDefault();
+				});
+			};
+		})(),
+
+		enableSelection: function() {
+			return this.unbind( ".ui-disableSelection" );
+		},
+
+		zIndex: function( zIndex ) {
+			if ( zIndex !== undefined ) {
+				return this.css( "zIndex", zIndex );
+			}
+
+			if ( this.length ) {
+				var elem = $( this[ 0 ] ), position, value;
+				while ( elem.length && elem[ 0 ] !== document ) {
+					// Ignore z-index if position is set to a value where z-index is ignored by the browser
+					// This makes behavior of this function consistent across browsers
+					// WebKit always returns auto if the element is positioned
+					position = elem.css( "position" );
+					if ( position === "absolute" || position === "relative" || position === "fixed" ) {
+						// IE returns 0 when zIndex is not specified
+						// other browsers return a string
+						// we ignore the case of nested elements with an explicit value of 0
+						// <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
+						value = parseInt( elem.css( "zIndex" ), 10 );
+						if ( !isNaN( value ) && value !== 0 ) {
+							return value;
+						}
+					}
+					elem = elem.parent();
+				}
+			}
+
+			return 0;
+		}
+	});
+
+	// $.ui.plugin is deprecated. Use $.widget() extensions instead.
+	$.ui.plugin = {
+		add: function( module, option, set ) {
+			var i,
+				proto = $.ui[ module ].prototype;
+			for ( i in set ) {
+				proto.plugins[ i ] = proto.plugins[ i ] || [];
+				proto.plugins[ i ].push( [ option, set[ i ] ] );
+			}
+		},
+		call: function( instance, name, args, allowDisconnected ) {
+			var i,
+				set = instance.plugins[ name ];
+
+			if ( !set ) {
+				return;
+			}
+
+			if ( !allowDisconnected && ( !instance.element[ 0 ].parentNode || instance.element[ 0 ].parentNode.nodeType === 11 ) ) {
+				return;
+			}
+
+			for ( i = 0; i < set.length; i++ ) {
+				if ( instance.options[ set[ i ][ 0 ] ] ) {
+					set[ i ][ 1 ].apply( instance.element, args );
+				}
+			}
+		}
+	};
+
+	}));
+
+
+/***/ },
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*!
@@ -9093,10 +9960,10 @@
 
 	})( window );
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
 
 /***/ },
-/* 2 */
+/* 4 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -9109,888 +9976,6 @@
 		}
 		return module;
 	}
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var require;var require;/* WEBPACK VAR INJECTION */(function(global) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-	//This is for efficiently serialising objects you know the contents of.
-
-	//It's not a JSON replacement. It's for when you want to control exactly
-	//  how things are encoded, want to do that hierarchially, and want to
-	//  write the en- and decoding code near each other for each bit of the
-	//  hierarchy.
-
-	"use strict"
-
-	//Functional basics...
-	var typeOf = function(x) { return x===null ? 'null' : typeof x}
-	var id = function(x) { return x;}
-	var konst = function(k) { return function (x) {return k;}}
-	var eq = function(a) { return function (b) { return a===b; }}
-	var map = function (horse) { return function (cart) { return cart.map(horse); }}
-
-	//Slightly less basic...
-	var runSnd = function(fs) { return function (x) { return fs[1]!==undefined ? [fs[0], fs[1](x)] : [fs[0]]}}
-	var thru = function (dir) { return function (ps) { return function (xs) {
-	  var res = [];
-	  for (var i=0; i<ps.length && i<xs.length; i++) res[i] = ps[i](dir)(xs[i]);
-	  return res;
-	}}}
-
-	//A parunpar is a function of boolean that returns an encoder or decoder for true and false respectively.
-	//A valid one obeys the laws:
-	//  pp(false)( pp(true)(x) ) === x
-	//  pp(true)( pp(false)(x) ) === x
-
-	//Fundamental parunpars...
-	var string_pp    = function (dir) { return function (x)  { return x.toString(); }}
-	var number_pp    = function (dir) { return function (x)  { return dir ? x.toString() : Number(x); }}
-	var boolean_pp   = function (dir) { return function (x)  { return dir ? (x ? 't' : 'f') : (x==='t'); }}
-	var null_pp      = function (dir) { return function (x)  { return dir ? '' : null; }}
-	var undefined_pp = function (dir) { return function (x)  { return dir ? '' : undefined; }}
-
-	//Compose two parunpars. p2 is closest to the encoded text.
-	var pipe = function (p1) { return function (p2) { return function (dir) { return function (x) {
-	  return dir ? p2(dir)(p1(dir)(x)) : p1(dir)(p2(dir)(x)) ;
-	}}}}
-
-	//Chops a string into fields by column widths. Result always has cols.length+1 elements.
-	var chop = function(cols) { return function (s) {
-	  var res = [], i=0;
-	  for ( var i=0; i<cols.length && s.length; s=s.substring(cols[i++]) )
-	    res.push(s.substring(0, cols[i]));
-	  res.push(s);
-	  return res;
-	}}
-
-	//Maps a column list and a list of parunpars onto a parunpar that allocates a fixed width to each parunpar...
-	var fixedWidth = function (cols) { return function (ps) { return function (dir) { return function (x) {
-	  return dir ? thru(dir)(ps)(x).join('') : thru(dir)(ps)(chop(cols)(x)) ;
-	}}}}
-
-	//Work around IE bug
-	function mysplit(x, sep) {
-	  var res = x.split(sep);
-	  if (res.length==1 && res[0]==undefined)
-	    delete res[0];
-	  return res;
-	}
-
-	//Maps a separator and a list of parunpars onto a parunpar that serialises each with the sep in between
-	//Doesn't think about what happens if the sep occurs in the serialisation of any field.
-	var sepBy = function (sep) { return function (ps) { return function (dir) { return function (x) {
-	  return dir ? thru(dir)(ps)(x).join(sep) : thru(dir)(ps)(mysplit(x,sep)) ;
-	}}}}
-
-	//Maps one parunpar onto one that uses esc to POST-escape occurences of sep.
-	//Doesn't work if sep or esc are special characters in regex syntax, so certainly not /, \ or ^
-	//Feel free to use borng alphanumeric characters for either.
-	var escape = function (sep, esc) { return function (p) { return function (dir) { return function (x) {
-	  return dir ? p(dir)(x).replace(RegExp(sep,'g'),sep+esc) : p(dir)(x.replace(RegExp(sep+esc,'g'), sep));
-	}}}}
-
-	//Like sepBy except that all fields are escaped to avoid conflict with the separator.
-	var sepByEsc = function (sep, esc) { return function (ps) { return function (dir) { return function (x) {
-	  return sepBy (dir ? sep : RegExp(sep+"(?!"+esc+")","g")) ( map (escape(sep,esc)) (ps) ) (dir) (x)
-	}}}}
-
-	//You can use this for everything...
-	var tuple = sepByEsc(';',':');
-
-	//Exercise for the reader: write something for arrays of unnknown length but homogeneous contents.
-
-	module.exports = { typeOf:typeOf, id:id, konst:konst, eq:eq, map:map, runSnd:runSnd,
-	  string_pp:string_pp, number_pp:number_pp, boolean_pp:boolean_pp, null_pp:null_pp,
-	  undefined_pp:undefined_pp, thru:thru, chop:chop, fixedWidth:fixedWidth, sepBy:sepBy,
-	  escape:escape, sepByEsc:sepByEsc, tuple:tuple, pipe:pipe  }
-
-
-	},{}],2:[function(require,module,exports){
-	var R = require('./core');
-
-	//All these will be changed but the new versions will use the originals...
-	var Array_rhaboo_originals = Array_rhaboo_originals || {
-	  pop : Array.prototype.pop,
-	  push : Array.prototype.push,
-	  shift : Array.prototype.shift,
-	  unshift : Array.prototype.unshift,
-	  splice : Array.prototype.splice,
-	  reverse : Array.prototype.reverse,
-	  sort : Array.prototype.sort,
-	  fill : Array.prototype.fill,
-	};
-
-	//Worst case scenario:
-	var Array_rhaboo_defensively = function(mutator) {
-	  return function () {
-	    var slotnum=undefined, refs, storage;
-	    //Note the slotnum and refcount then totally remove it from Storage...
-	    if (this._rhaboo) {
-	      storage = this._rhaboo.storage;
-	      slotnum = this._rhaboo.slotnum;
-	      refs = this._rhaboo.refs;
-	      R.release(this, true); //true means force release even if there are other references
-	    }
-	    //Do the requested change ...
-	    var retval = Array_rhaboo_originals[mutator].apply(this, arguments);
-	    //Recreate it, specifying the same slotnum and refcount...
-	    if (slotnum!==undefined) { //otherwise it never was persisted
-	      R.addRef(this, storage, slotnum, refs);
-	    }
-	    return retval;
-	  }
-	}
-
-	//This can be better cos it leaves the existing part of the array unchanged
-	Array.prototype.push = function () {
-	  var l1 = this.length;
-	  var ret = Array_rhaboo_originals.push.apply(this, arguments);
-	  var l2 = this.length;
-	  //Just persist the new elements...
-	  if ( this._rhaboo !== undefined && l2>l1 ) {
-	    for (var i=l1; i<l2; i++) {
-	      R.storeProp(this, i); //This might be writing each slot twice
-	    }
-	    R.updateSlot(this); //for length
-	  }
-	  return ret;
-	}
-
-	//Even better: just unpersist the last element
-	Array.prototype.pop = function () {
-	  var l = this.length;
-	  if ( this._rhaboo !== undefined && l>0 ) {
-	    R.forgetProp(this, l-1);
-	  }
-	  var ret = Array_rhaboo_originals.pop.apply(this, arguments);
-	  if ( this._rhaboo !== undefined && l>0 ) {
-	    R.updateSlot(this); //for length
-	  }
-	  return ret;
-	}
-
-	Object.defineProperty(Array.prototype, 'write', { value: function(prop, val) {
-	  Object.prototype.write.call(this, prop, val);
-	  R.updateSlot(this); //for length
-	}});
-
-	//TODO: reverse/sort(unless sparse?) don't need initial delete, shift/unshift similarly
-	//Array.prototype.push = Array_rhaboo_defensively("push");
-	//Array.prototype.pop = Array_rhaboo_defensively("pop");
-	Array.prototype.shift = Array_rhaboo_defensively("shift");
-	Array.prototype.unshift = Array_rhaboo_defensively("unshift");
-	Array.prototype.splice = Array_rhaboo_defensively("splice");
-	Array.prototype.reverse = Array_rhaboo_defensively("reverse");
-	Array.prototype.sort = Array_rhaboo_defensively("sort");
-	Array.prototype.fill = Array_rhaboo_defensively("fill");
-	//Array.prototype.write = Array.prototype._rhaboo_defensively("write");
-
-	module.exports = {
-	  persistent : R.persistent,
-	  perishable : R.perishable,
-	  algorithm : "sand"
-	};
-
-
-	},{"./core":3}],3:[function(require,module,exports){
-	(function (global){
-	"use strict"
-
-	/* EXAMPLE OF STORAGE FORMAT:
-
-	_RHABOO_NEXT_SLOT             17
-	_rhaboo_Cliches demo          &0                                 The root.
-	_rhaboo_0                     Object;initialised=1               It's an Object whose first property is called initialised with the value in slot 1.
-	_rhaboo_1                     ?t;cliches=2                       initialised is a bool with the value t. The root's next child is called cliches and lives in slot 2.
-	_rhaboo_2                     &3;silly=16                        cliches is a reference to what's in slot 3. The root's next child is called silly and lives in slot 16.
-	_rhaboo_3                     Array=3;0=4                        cliches is an Array of length 3 whose 0th element is in slot 4.
-	_rhaboo_4                     &5;1=8                             cliches[0] is a reference to what's in slot 5 and cliches[1] lives in slot 8
-	_rhaboo_5                     Object;text=6                      cliches[0] references this Object whose first member is called text and lives in slot 6
-	_rhaboo_6                     $24x7;count=7                      text is a string saying "24x7" and the next sibling is called count and lives in slot 7
-	_rhaboo_7                     #5                                 count is the number 5
-	_rhaboo_8                     &9;2=12                            cliches[1] is a reference to what's in slot 9, which resembles slot 5
-	_rhaboo_9                     Object;text=10                     Etc...
-	_rhaboo_10                    $dialogging;count=11
-	_rhaboo_11                    #3
-	_rhaboo_12                    &13
-	_rhaboo_13                    Object;text=14
-	_rhaboo_14                    box;count=15
-	_rhaboo_15                    #12
-	_rhaboo_16                    &9                                 silly is a reference to what's in slot 9, which we already mentioned
-
-	means:
-
-	{
-	  initialised: true,
-	  cliches: [
-	    { count: 5,  text: "24x7" },
-	    { count: 3,  text: "dialogging" },
-	    { count: 12, text: "outside of the box" }
-	  ],
-	  silly: <reference to same object as cliches[1]>
-	}
-
-	*/
-
-	//Polyfill constructor.name in IE
-	//Thanks to Matthew Sharley for this.
-	if (Function.prototype.name === undefined && Object.defineProperty !== undefined) {
-	    Object.defineProperty(Function.prototype, 'name', {
-	        get: function() {
-	            var funcNameRegex = /function\s([^(]{1,})\(/;
-	            var results = (funcNameRegex).exec((this).toString());
-	            return (results && results.length > 1) ? results[1].trim() : "";
-	        },
-	        set: function(value) {}
-	    });
-	}
-
-	var ls_prefix = "_rhaboo_";
-
-	var built = {};
-
-	//The serialiser...
-
-	var P = require('parunpar');
-
-	var tuple2 = P.sepByEsc('=',':')
-
-	//En/decode property name : slot number pairs...
-	var right_pp = tuple2([P.string_pp, P.number_pp])
-
-	/*
-	//Leaving this here for didactic reasons
-	var left_o_pp = P.pipe(
-	  function (dir) { return function (x) {
-	    return dir ? ( x.length!==undefined ? [x.constructor.name, x.length] : [x.constructor.name] ) //can't simplify this cos we actually restore undefineds
-	               : ( new global[x[0]](x[1]) )
-	  }})(tuple2([P.string_pp, P.number_pp]));
-	*/
-
-	//These pps are a bit of a mess right now...
-
-	//left_o_pp en/decodes objects (not to be confused with references to objects)
-	//  The first and last lines just pack the 1 or 2 element array handled by the bit in between
-	//  3 lines encoding, 1 line decoding
-	//  The three encoding lines handle dates, arrays, and everything else respectively.
-	//  The constructor name is always stored and looked for in the global scope,
-	//    so if you have your own classes they should have the constructor name set up properly -
-	//    Crockford style won't work.
-	//  (There was a plan to allow any class to define a constructorParameters function
-	//    that would return something to be stored here like the date string or array length is.)
-	var left_o_pp = P.pipe(
-	  function (dir) { return function (x) {
-	    return dir ? (
-	                   x.constructor.name === 'Date' ? [x.constructor.name, x.toString() ] :
-	                   x.length!==undefined ? [x.constructor.name, x.length.toString()] :
-	                   [x.constructor.name] ) //can't simplify this cos we actually restore undefineds
-	               : ( new global[x[0]]( x[0]=='Date'?x[1]:x[1]?Number(x[1]):undefined ) )
-	               //: ( new global[x[0]]( x[1] ) )
-	  }})(tuple2([P.string_pp, P.string_pp]));
-
-	//Similarly, the first and last lines pack the array handled by the middle bit
-	//  which contains a single-character type code and string representation of the value.
-	//The packing is a single string with a fixed width of 1 for the first field.
-	var left_l_pp = function (storage) { return P.pipe(
-	  function (dir) { return function (x) {
-	    return dir ?
-	      ( P.runSnd({ //runSnd(arr)(x) returns arr if arr only has one element, or [arr[0], arr[1](x)] if it has two
-	      string:      ['$', P.id ],
-	      number:      ['#', String ],
-	      boolean:     ['?', function (x) {return x?'t':'f'} ],
-	      'null':      ['~'],
-	      'undefined': ['_'],
-	      object:      ['&', function(x){return x._rhaboo.slotnum;} ]
-	    } [P.typeOf(x)]) (x) ) : //P.typeOf behaves sanely on nulls etc
-	    (  {
-	      '$': P.id,
-	      '#': Number,
-	      '?': P.eq('t'),
-	      '~': P.konst(null),
-	      '_': P.konst(undefined),
-	      '&': restore(storage),
-	    } [x[0]] (x[1]))
-	}}) (P.fixedWidth([1])([P.string_pp, P.string_pp]));}
-
-	var slot_o_pp  = P.tuple([left_o_pp, right_pp]);
-	//That takes something like [object,[nextprop,nextslot]]
-
-	var slot_l_pp  = function ( storage) { return P.tuple([left_l_pp(storage), right_pp]); }
-	//That takes something like [value,[nextprop,nextslot]]
-
-	function persistent(key) { return construct(  localStorage, key); }
-	function perishable(key) { return construct(sessionStorage, key); }
-
-	function construct(storage, key) {
-	  var praw = storage.getItem(ls_prefix+key); //Likely contains "&0" where 0 is the slot number with the root object in
-
-	  if (praw) {
-	    var decoded = slot_l_pp(storage)(false)(praw); //Sees the & and calls restore
-	    built={}; //Thanks to janmotum on github for alerting me to the necessity for this line
-	    return decoded[0];
-	  } else { //virgin (not catching fullness here cos it would mean you're flooding LS with something other than rhaboo)
-	    var ob = {};
-	    Object.defineProperty(ob, "_rhaboo", { value: {storage:storage}, writable: true, configurable: true, enumerable: false});
-	    var ret = addRef(ob); //Persist an empty object. It will know its slot number afterwards.
-	    storage.setItem(ls_prefix+key, left_l_pp(storage)(true)(ret)); //left_l_pp in encoding mode
-	    //   just returns "&0" where 0 is the slotnum which ret acquired during addRef
-	    return ret;
-	  }
-	}
-
-	//Restore an object from a slot
-	//Definitely an object (cos we get here through left_l_pp when it sees a &)
-	function restore(storage) { return function(slotnum) {
-	  if ( built[slotnum]!==undefined ) //important for multiple references to the same object
-	    return addRef(built[slotnum]);
-	  var raw = storage.getItem(ls_prefix+slotnum)
-	  if (raw===undefined || raw===null) //means we ran out of storage when storing
-	    return undefined;
-	  //Read the constructor name and its optional parameter from the LHS of the slot contents
-	  //  and run that to make decoded[0]. decoded[1] is an array with a prop name and slot number
-	  //  for the first child...
-	  var decoded = slot_o_pp(false)(raw);
-	  //Insert a default _rhaboo ...
-	  Object.defineProperty(decoded[0], "_rhaboo", { value: {
-	    storage: storage,
-	    slotnum : slotnum,
-	    refs : 1,
-	    kids : { }
-	  }, writable: true, configurable: true, enumerable:false });
-	  //Remember not to do that again...
-	  built[slotnum] = decoded[0];
-	  //Recursively build the children using augment...
-	  return (decoded.length>1) ? augment(decoded[0], decoded[1][0], decoded[1][1]) : decoded[0];
-	}}
-
-	//that is a half-built object and we are adding a child called propname whose
-	//  type, value and possible successor is written in propslot...
-	function augment(that, propname, propslot) {
-	  var praw = that._rhaboo.storage.getItem(ls_prefix+propslot);
-	  if (praw===undefined || praw===null) //ran out of storage when storing
-	    return that;
-	  //We use slot_l_pp because we know it's a value not an object, because if it was an object then
-	  //  it would be a reference to another slot containing the object...
-	  var decoded = slot_l_pp(that._rhaboo.storage)(false)(praw);
-	  that[propname] = decoded[0];
-	  //Maintain the doubly-linked list in memory...
-	  appendKid(that, propname, propslot);
-	  //Recurse:
-	  return (decoded.length>1) ? augment(that, decoded[1][0], decoded[1][1]) : that;
-	}
-
-	//These kid functions ONLY manipulate the list in memory and don't touch Storage
-
-	function appendKid(that, prop, slotnum) {
-	  //_rhaboo.prev is the tail of the list of children. _rhaboo.next is the head
-	  //So the new child will be referenced by either the formerly last child's next, or the global head which is _rhaboo.next
-	  var target = that._rhaboo.prev!==undefined ? that._rhaboo.kids[that._rhaboo.prev] : that._rhaboo;
-	  //Either way, it's now target.next and the global tail (_rhaboo.prev) that must reference the new child
-	  that._rhaboo.kids[prop] = { slotnum: slotnum, prev: that._rhaboo.prev }; //New child's prev points to old tail, and has no next.
-	  target.next = that._rhaboo.prev = prop;
-	}
-
-	function removeKid(that, prop) {
-	  var kid = that._rhaboo.kids[prop];
-	  (that._rhaboo.kids[kid.prev] || that._rhaboo).next = kid.next; //Victim's precursor's next or global head becomes victim's successor
-	  (that._rhaboo.kids[kid.next] || that._rhaboo).prev = kid.prev; //Victim's successor's prev or global tail because victim's precursor
-	  delete that._rhaboo.kids[prop]; //Delete victim's node
-	}
-
-	//Correct the contents of the Storage slot for either that or that[prop]
-	//Dual use: prop==undefined means persist that / else persist the prop
-	function updateSlot(that, prop) {
-	  var bare = []; //This is what we'll encode with parunpars to make the slot contents
-	  bare.push(prop!==undefined ? that[prop] : that); //First, the data itself
-	  //Now then, both _rhaboo and _rhaboo.kids[prop] have a next and prev.
-	  //  For the latter, they implement a doubly linked list in memory
-	  //    (although it's only singly linked in Storage)
-	  //  For the former, next means head and prev means tail.
-	  //  Either way, if there's a next, then its property name and slot number
-	  //    go on the right hand side of the slot contents
-	  var kid = prop!==undefined ? that._rhaboo.kids[prop] : that._rhaboo;
-	  if (kid.next!==undefined)
-	    bare.push([kid.next, that._rhaboo.kids[kid.next].slotnum]);
-	  var encoded = (prop!==undefined ? slot_l_pp(that._rhaboo.storage) : slot_o_pp)(true)(bare);
-	  try {
-	    that._rhaboo.storage.setItem(ls_prefix+kid.slotnum, encoded);
-	  } catch (e) {
-	    if (isQuotaExceeded(e))
-	      //just in case some partial junk is left in there...
-	      that._rhaboo.storage.removeItem(ls_prefix+kid.slotnum, encoded);
-	      console.log("Local storage quota exceeded by rhaboo");
-	      throw (e);
-	      //now the restore phase will tolerate surprisingly empty slots.
-	  }
-	}
-
-	function isQuotaExceeded(e) { //Thanks crocodillon.com
-	  var quotaExceeded = false;
-	  if (e) {
-	    if (e.code) {
-	      switch (e.code) {
-	        case 22:
-	          quotaExceeded = true;
-	        break;
-	        case 1014:
-	          // Firefox
-	          if (e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-	          quotaExceeded = true;
-	        }
-	        break;
-	      }
-	    } else if (e.number === -2147024882) {
-	      // Internet Explorer 8
-	      quotaExceeded = true;
-	    }
-	  }
-	  return quotaExceeded;
-	}
-
-	//Reserve a slot (if not already done) for a child of that called prop
-	function slotFor(that, prop) {
-	  if (that._rhaboo.kids[prop]===undefined) {
-	    var slotnum = newSlot(that._rhaboo.storage);
-	    appendKid(that, prop, slotnum); //Manage the linked list of children in _rhaboo
-	    updateSlot(that, that._rhaboo.kids[prop].prev); //The formerly last child now needs a reference to the new one
-	    //This slot is about to be written by caller
-	  }
-	}
-
-	//An unpersisted object is given a _rhaboo member with a storage slot, a refcount of 1 and no children
-	//An already persisted one just gets its refcount incremented
-	//The slotnum are refs parameters are usually undefined, except for a certain hack involving arrays
-	function addRef(that, storage, slotnum, refs) {
-	  if (that._rhaboo!==undefined && that._rhaboo.slotnum!==undefined)
-	    that._rhaboo.refs++;
-	  else {
-	    if (that._rhaboo===undefined) Object.defineProperty(that, "_rhaboo", { value: { }, writable: true, configurable: true, enumerable:false});
-	    if (storage!==undefined) that._rhaboo.storage = storage;
-	    that._rhaboo.slotnum = slotnum!==undefined ? slotnum : newSlot(that._rhaboo.storage);
-	    that._rhaboo.refs = refs!==undefined ? refs : 1;
-	    that._rhaboo.kids = {};
-	    updateSlot(that);
-	    for (var prop in that) if (that.hasOwnProperty(prop) && prop !=='_rhaboo')
-	      storeProp(that, prop);
-	  }
-	  return that;
-	}
-
-	function storeProp(that, prop) {
-	  slotFor(that, prop);
-	  if (P.typeOf(that[prop]) === 'object') {
-	    if (that[prop]._rhaboo===undefined) //probably true
-	      Object.defineProperty(that[prop], "_rhaboo", { value: {storage: that._rhaboo.storage}, writable: true, configurable: true, enumerable:false});
-	    addRef(that[prop]);
-	  }
-	  updateSlot(that, prop);
-	}
-
-	function release(that, force) {
-	  var target, propname;
-	  that._rhaboo.refs--;
-	  if (force || that._rhaboo.refs === 0) {
-	    for (propname = undefined, target = that._rhaboo;
-	         target;
-	         target = that._rhaboo.kids[propname=target.next]) {
-	      that._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
-	      if (propname!==undefined && P.typeOf(that[propname]) == 'object')
-	        release(that[propname]); //recurse for any object-valued properties
-	    }
-	    delete that._rhaboo;
-	  }
-	}
-
-	function forgetProp(that, prop) {
-	  var target = that._rhaboo.kids[prop];
-	  if (target===undefined) return; //This can happen if you sort a sparse array
-	  var prevname = target.prev;
-	  that._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
-	  if (P.typeOf(that[prop]) == 'object')
-	    release(that[prop]);
-	  removeKid(that, prop);
-	  updateSlot(that, prevname);
-	}
-
-	//The main API
-	//Assumes that this is persistent already, but not that val is.
-	Object.defineProperty(Object.prototype, 'write', { value: function(prop, val) {
-	  slotFor(this, prop); //Reserves a slot if not already reserved.
-	  if (P.typeOf(this[prop]) === 'object') //Unpersist old value
-	    release(this[prop]);
-	  this[prop] = val;
-	  if (P.typeOf(val) === 'object') {
-	    if (val._rhaboo===undefined) //probably true
-	      Object.defineProperty(val, "_rhaboo", { value: {storage: this._rhaboo.storage}, writable: true, configurable: true, enumerable: false});
-	    addRef(val); //Persist val, whether already persisted or not
-	  }
-	  updateSlot(this, prop); //Write the slot for val itself
-	  return this;
-	}});
-
-	Object.defineProperty(Object.prototype, 'erase', { value: function(prop) {
-	  if (!this.hasOwnProperty(prop))
-	    return this;
-	  if (P.typeOf(this[prop]) === 'object')
-	    release(this[prop]);
-	  var target = this._rhaboo.kids[prop];
-	  this._rhaboo.storage.removeItem(ls_prefix+target.slotnum);
-	  var prevname = target.prev;
-	  removeKid(this, prop);
-	  updateSlot(this, prevname);
-	  delete this[prop];
-	  return this;
-	}});
-
-	var keyOfStoredNextSlot = '_RHABOO_NEXT_SLOT'
-	var storedNextSlot=[0,0];
-	for (var i =0; i<2; i++) { //0 is local, 1 is session
-	  storedNextSlot[i] = localStorage.getItem(keyOfStoredNextSlot) || 0;
-	  storedNextSlot[i] = Number(storedNextSlot[i]);
-	}
-
-	//Grab a new slot
-	function newSlot(storage) {
-	  var i = (storage===localStorage) ? 0 : 1;
-	  var ret = storedNextSlot[i];
-	  storedNextSlot[i]++;
-	  storage.setItem(keyOfStoredNextSlot, storedNextSlot[i]);
-	  return ret;
-	}
-
-	module.exports = {
-	  persistent : persistent,
-	  perishable : perishable,
-	  addRef: addRef,
-	  release: release,
-	  storeProp : storeProp,
-	  forgetProp : forgetProp,
-	  updateSlot : updateSlot,
-	};
-
-
-
-	}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-	},{"parunpar":1}],4:[function(require,module,exports){
-	(function (global){
-	global.Rhaboo = require('./arr');
-
-
-	}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-	},{"./arr":2}]},{},[4]);
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	 * jQuery UI Core 1.11.4
-	 * http://jqueryui.com
-	 *
-	 * Copyright jQuery Foundation and other contributors
-	 * Released under the MIT license.
-	 * http://jquery.org/license
-	 *
-	 * http://api.jqueryui.com/category/ui-core/
-	 */
-	(function( factory ) {
-		if ( true ) {
-
-			// AMD. Register as an anonymous module.
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(1) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-
-			// Browser globals
-			factory( jQuery );
-		}
-	}(function( $ ) {
-
-	// $.ui might exist from components with no dependencies, e.g., $.ui.position
-	$.ui = $.ui || {};
-
-	$.extend( $.ui, {
-		version: "1.11.4",
-
-		keyCode: {
-			BACKSPACE: 8,
-			COMMA: 188,
-			DELETE: 46,
-			DOWN: 40,
-			END: 35,
-			ENTER: 13,
-			ESCAPE: 27,
-			HOME: 36,
-			LEFT: 37,
-			PAGE_DOWN: 34,
-			PAGE_UP: 33,
-			PERIOD: 190,
-			RIGHT: 39,
-			SPACE: 32,
-			TAB: 9,
-			UP: 38
-		}
-	});
-
-	// plugins
-	$.fn.extend({
-		scrollParent: function( includeHidden ) {
-			var position = this.css( "position" ),
-				excludeStaticParent = position === "absolute",
-				overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/,
-				scrollParent = this.parents().filter( function() {
-					var parent = $( this );
-					if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
-						return false;
-					}
-					return overflowRegex.test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
-				}).eq( 0 );
-
-			return position === "fixed" || !scrollParent.length ? $( this[ 0 ].ownerDocument || document ) : scrollParent;
-		},
-
-		uniqueId: (function() {
-			var uuid = 0;
-
-			return function() {
-				return this.each(function() {
-					if ( !this.id ) {
-						this.id = "ui-id-" + ( ++uuid );
-					}
-				});
-			};
-		})(),
-
-		removeUniqueId: function() {
-			return this.each(function() {
-				if ( /^ui-id-\d+$/.test( this.id ) ) {
-					$( this ).removeAttr( "id" );
-				}
-			});
-		}
-	});
-
-	// selectors
-	function focusable( element, isTabIndexNotNaN ) {
-		var map, mapName, img,
-			nodeName = element.nodeName.toLowerCase();
-		if ( "area" === nodeName ) {
-			map = element.parentNode;
-			mapName = map.name;
-			if ( !element.href || !mapName || map.nodeName.toLowerCase() !== "map" ) {
-				return false;
-			}
-			img = $( "img[usemap='#" + mapName + "']" )[ 0 ];
-			return !!img && visible( img );
-		}
-		return ( /^(input|select|textarea|button|object)$/.test( nodeName ) ?
-			!element.disabled :
-			"a" === nodeName ?
-				element.href || isTabIndexNotNaN :
-				isTabIndexNotNaN) &&
-			// the element and all of its ancestors must be visible
-			visible( element );
-	}
-
-	function visible( element ) {
-		return $.expr.filters.visible( element ) &&
-			!$( element ).parents().addBack().filter(function() {
-				return $.css( this, "visibility" ) === "hidden";
-			}).length;
-	}
-
-	$.extend( $.expr[ ":" ], {
-		data: $.expr.createPseudo ?
-			$.expr.createPseudo(function( dataName ) {
-				return function( elem ) {
-					return !!$.data( elem, dataName );
-				};
-			}) :
-			// support: jQuery <1.8
-			function( elem, i, match ) {
-				return !!$.data( elem, match[ 3 ] );
-			},
-
-		focusable: function( element ) {
-			return focusable( element, !isNaN( $.attr( element, "tabindex" ) ) );
-		},
-
-		tabbable: function( element ) {
-			var tabIndex = $.attr( element, "tabindex" ),
-				isTabIndexNaN = isNaN( tabIndex );
-			return ( isTabIndexNaN || tabIndex >= 0 ) && focusable( element, !isTabIndexNaN );
-		}
-	});
-
-	// support: jQuery <1.8
-	if ( !$( "<a>" ).outerWidth( 1 ).jquery ) {
-		$.each( [ "Width", "Height" ], function( i, name ) {
-			var side = name === "Width" ? [ "Left", "Right" ] : [ "Top", "Bottom" ],
-				type = name.toLowerCase(),
-				orig = {
-					innerWidth: $.fn.innerWidth,
-					innerHeight: $.fn.innerHeight,
-					outerWidth: $.fn.outerWidth,
-					outerHeight: $.fn.outerHeight
-				};
-
-			function reduce( elem, size, border, margin ) {
-				$.each( side, function() {
-					size -= parseFloat( $.css( elem, "padding" + this ) ) || 0;
-					if ( border ) {
-						size -= parseFloat( $.css( elem, "border" + this + "Width" ) ) || 0;
-					}
-					if ( margin ) {
-						size -= parseFloat( $.css( elem, "margin" + this ) ) || 0;
-					}
-				});
-				return size;
-			}
-
-			$.fn[ "inner" + name ] = function( size ) {
-				if ( size === undefined ) {
-					return orig[ "inner" + name ].call( this );
-				}
-
-				return this.each(function() {
-					$( this ).css( type, reduce( this, size ) + "px" );
-				});
-			};
-
-			$.fn[ "outer" + name] = function( size, margin ) {
-				if ( typeof size !== "number" ) {
-					return orig[ "outer" + name ].call( this, size );
-				}
-
-				return this.each(function() {
-					$( this).css( type, reduce( this, size, true, margin ) + "px" );
-				});
-			};
-		});
-	}
-
-	// support: jQuery <1.8
-	if ( !$.fn.addBack ) {
-		$.fn.addBack = function( selector ) {
-			return this.add( selector == null ?
-				this.prevObject : this.prevObject.filter( selector )
-			);
-		};
-	}
-
-	// support: jQuery 1.6.1, 1.6.2 (http://bugs.jquery.com/ticket/9413)
-	if ( $( "<a>" ).data( "a-b", "a" ).removeData( "a-b" ).data( "a-b" ) ) {
-		$.fn.removeData = (function( removeData ) {
-			return function( key ) {
-				if ( arguments.length ) {
-					return removeData.call( this, $.camelCase( key ) );
-				} else {
-					return removeData.call( this );
-				}
-			};
-		})( $.fn.removeData );
-	}
-
-	// deprecated
-	$.ui.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
-
-	$.fn.extend({
-		focus: (function( orig ) {
-			return function( delay, fn ) {
-				return typeof delay === "number" ?
-					this.each(function() {
-						var elem = this;
-						setTimeout(function() {
-							$( elem ).focus();
-							if ( fn ) {
-								fn.call( elem );
-							}
-						}, delay );
-					}) :
-					orig.apply( this, arguments );
-			};
-		})( $.fn.focus ),
-
-		disableSelection: (function() {
-			var eventType = "onselectstart" in document.createElement( "div" ) ?
-				"selectstart" :
-				"mousedown";
-
-			return function() {
-				return this.bind( eventType + ".ui-disableSelection", function( event ) {
-					event.preventDefault();
-				});
-			};
-		})(),
-
-		enableSelection: function() {
-			return this.unbind( ".ui-disableSelection" );
-		},
-
-		zIndex: function( zIndex ) {
-			if ( zIndex !== undefined ) {
-				return this.css( "zIndex", zIndex );
-			}
-
-			if ( this.length ) {
-				var elem = $( this[ 0 ] ), position, value;
-				while ( elem.length && elem[ 0 ] !== document ) {
-					// Ignore z-index if position is set to a value where z-index is ignored by the browser
-					// This makes behavior of this function consistent across browsers
-					// WebKit always returns auto if the element is positioned
-					position = elem.css( "position" );
-					if ( position === "absolute" || position === "relative" || position === "fixed" ) {
-						// IE returns 0 when zIndex is not specified
-						// other browsers return a string
-						// we ignore the case of nested elements with an explicit value of 0
-						// <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-						value = parseInt( elem.css( "zIndex" ), 10 );
-						if ( !isNaN( value ) && value !== 0 ) {
-							return value;
-						}
-					}
-					elem = elem.parent();
-				}
-			}
-
-			return 0;
-		}
-	});
-
-	// $.ui.plugin is deprecated. Use $.widget() extensions instead.
-	$.ui.plugin = {
-		add: function( module, option, set ) {
-			var i,
-				proto = $.ui[ module ].prototype;
-			for ( i in set ) {
-				proto.plugins[ i ] = proto.plugins[ i ] || [];
-				proto.plugins[ i ].push( [ option, set[ i ] ] );
-			}
-		},
-		call: function( instance, name, args, allowDisconnected ) {
-			var i,
-				set = instance.plugins[ name ];
-
-			if ( !set ) {
-				return;
-			}
-
-			if ( !allowDisconnected && ( !instance.element[ 0 ].parentNode || instance.element[ 0 ].parentNode.nodeType === 11 ) ) {
-				return;
-			}
-
-			for ( i = 0; i < set.length; i++ ) {
-				if ( instance.options[ set[ i ][ 0 ] ] ) {
-					set[ i ][ 1 ].apply( instance.element, args );
-				}
-			}
-		}
-	};
-
-	}));
 
 
 /***/ },
@@ -10011,7 +9996,7 @@
 		if ( true ) {
 
 			// AMD. Register as an anonymous module.
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(1) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 
 			// Browser globals
@@ -10575,7 +10560,7 @@
 		if ( true ) {
 
 			// AMD. Register as an anonymous module.
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(1) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3) ], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 
 			// Browser globals
@@ -11099,8 +11084,8 @@
 
 			// AMD. Register as an anonymous module.
 			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-				__webpack_require__(1),
-				__webpack_require__(4),
+				__webpack_require__(3),
+				__webpack_require__(2),
 				__webpack_require__(5),
 				__webpack_require__(6)
 			], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -11751,8 +11736,8 @@
 
 			// AMD. Register as an anonymous module.
 			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-				__webpack_require__(1),
-				__webpack_require__(4),
+				__webpack_require__(3),
+				__webpack_require__(2),
 				__webpack_require__(5),
 				__webpack_require__(6),
 				__webpack_require__(7)
@@ -12380,7 +12365,7 @@
 	(function (factory) {
 		if (true) {
 			// AMD. Register as anonymous module.
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 			// Browser globals.
 			factory(jQuery);
@@ -12490,8 +12475,7 @@
 
 
 /***/ },
-/* 10 */,
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -21687,7 +21671,7 @@
 	}(window, document));
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	/*
@@ -21698,7 +21682,7 @@
 	!function(t,e){L.MarkerClusterGroup=L.FeatureGroup.extend({options:{maxClusterRadius:80,iconCreateFunction:null,spiderfyOnMaxZoom:!0,showCoverageOnHover:!0,zoomToBoundsOnClick:!0,singleMarkerMode:!1,disableClusteringAtZoom:null,removeOutsideVisibleBounds:!0,animateAddingMarkers:!1,spiderfyDistanceMultiplier:1,polygonOptions:{}},initialize:function(t){L.Util.setOptions(this,t),this.options.iconCreateFunction||(this.options.iconCreateFunction=this._defaultIconCreateFunction),this._featureGroup=L.featureGroup(),this._featureGroup.on(L.FeatureGroup.EVENTS,this._propagateEvent,this),this._nonPointGroup=L.featureGroup(),this._nonPointGroup.on(L.FeatureGroup.EVENTS,this._propagateEvent,this),this._inZoomAnimation=0,this._needsClustering=[],this._needsRemoving=[],this._currentShownBounds=null,this._queue=[]},addLayer:function(t){if(t instanceof L.LayerGroup){var e=[];for(var i in t._layers)e.push(t._layers[i]);return this.addLayers(e)}if(!t.getLatLng)return this._nonPointGroup.addLayer(t),this;if(!this._map)return this._needsClustering.push(t),this;if(this.hasLayer(t))return this;this._unspiderfy&&this._unspiderfy(),this._addLayer(t,this._maxZoom);var n=t,s=this._map.getZoom();if(t.__parent)for(;n.__parent._zoom>=s;)n=n.__parent;return this._currentShownBounds.contains(n.getLatLng())&&(this.options.animateAddingMarkers?this._animationAddLayer(t,n):this._animationAddLayerNonAnimated(t,n)),this},removeLayer:function(t){if(t instanceof L.LayerGroup){var e=[];for(var i in t._layers)e.push(t._layers[i]);return this.removeLayers(e)}return t.getLatLng?this._map?t.__parent?(this._unspiderfy&&(this._unspiderfy(),this._unspiderfyLayer(t)),this._removeLayer(t,!0),this._featureGroup.hasLayer(t)&&(this._featureGroup.removeLayer(t),t.setOpacity&&t.setOpacity(1)),this):this:(!this._arraySplice(this._needsClustering,t)&&this.hasLayer(t)&&this._needsRemoving.push(t),this):(this._nonPointGroup.removeLayer(t),this)},addLayers:function(t){var e,i,n,s=this._map,r=this._featureGroup,o=this._nonPointGroup;for(e=0,i=t.length;i>e;e++)if(n=t[e],n.getLatLng){if(!this.hasLayer(n))if(s){if(this._addLayer(n,this._maxZoom),n.__parent&&2===n.__parent.getChildCount()){var a=n.__parent.getAllChildMarkers(),h=a[0]===n?a[1]:a[0];r.removeLayer(h)}}else this._needsClustering.push(n)}else o.addLayer(n);return s&&(r.eachLayer(function(t){t instanceof L.MarkerCluster&&t._iconNeedsUpdate&&t._updateIcon()}),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds)),this},removeLayers:function(t){var e,i,n,s=this._featureGroup,r=this._nonPointGroup;if(!this._map){for(e=0,i=t.length;i>e;e++)n=t[e],this._arraySplice(this._needsClustering,n),r.removeLayer(n);return this}for(e=0,i=t.length;i>e;e++)n=t[e],n.__parent?(this._removeLayer(n,!0,!0),s.hasLayer(n)&&(s.removeLayer(n),n.setOpacity&&n.setOpacity(1))):r.removeLayer(n);return this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds),s.eachLayer(function(t){t instanceof L.MarkerCluster&&t._updateIcon()}),this},clearLayers:function(){return this._map||(this._needsClustering=[],delete this._gridClusters,delete this._gridUnclustered),this._noanimationUnspiderfy&&this._noanimationUnspiderfy(),this._featureGroup.clearLayers(),this._nonPointGroup.clearLayers(),this.eachLayer(function(t){delete t.__parent}),this._map&&this._generateInitialClusters(),this},getBounds:function(){var t=new L.LatLngBounds;if(this._topClusterLevel)t.extend(this._topClusterLevel._bounds);else for(var e=this._needsClustering.length-1;e>=0;e--)t.extend(this._needsClustering[e].getLatLng());return t.extend(this._nonPointGroup.getBounds()),t},eachLayer:function(t,e){var i,n=this._needsClustering.slice();for(this._topClusterLevel&&this._topClusterLevel.getAllChildMarkers(n),i=n.length-1;i>=0;i--)t.call(e,n[i]);this._nonPointGroup.eachLayer(t,e)},getLayers:function(){var t=[];return this.eachLayer(function(e){t.push(e)}),t},getLayer:function(t){var e=null;return this.eachLayer(function(i){L.stamp(i)===t&&(e=i)}),e},hasLayer:function(t){if(!t)return!1;var e,i=this._needsClustering;for(e=i.length-1;e>=0;e--)if(i[e]===t)return!0;for(i=this._needsRemoving,e=i.length-1;e>=0;e--)if(i[e]===t)return!1;return!(!t.__parent||t.__parent._group!==this)||this._nonPointGroup.hasLayer(t)},zoomToShowLayer:function(t,e){var i=function(){if((t._icon||t.__parent._icon)&&!this._inZoomAnimation)if(this._map.off("moveend",i,this),this.off("animationend",i,this),t._icon)e();else if(t.__parent._icon){var n=function(){this.off("spiderfied",n,this),e()};this.on("spiderfied",n,this),t.__parent.spiderfy()}};t._icon&&this._map.getBounds().contains(t.getLatLng())?e():t.__parent._zoom<this._map.getZoom()?(this._map.on("moveend",i,this),this._map.panTo(t.getLatLng())):(this._map.on("moveend",i,this),this.on("animationend",i,this),this._map.setView(t.getLatLng(),t.__parent._zoom+1),t.__parent.zoomToBounds())},onAdd:function(t){this._map=t;var e,i,n;if(!isFinite(this._map.getMaxZoom()))throw"Map has no maxZoom specified";for(this._featureGroup.onAdd(t),this._nonPointGroup.onAdd(t),this._gridClusters||this._generateInitialClusters(),e=0,i=this._needsRemoving.length;i>e;e++)n=this._needsRemoving[e],this._removeLayer(n,!0);for(this._needsRemoving=[],e=0,i=this._needsClustering.length;i>e;e++)n=this._needsClustering[e],n.getLatLng?n.__parent||this._addLayer(n,this._maxZoom):this._featureGroup.addLayer(n);this._needsClustering=[],this._map.on("zoomend",this._zoomEnd,this),this._map.on("moveend",this._moveEnd,this),this._spiderfierOnAdd&&this._spiderfierOnAdd(),this._bindEvents(),this._zoom=this._map.getZoom(),this._currentShownBounds=this._getExpandedVisibleBounds(),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds)},onRemove:function(t){t.off("zoomend",this._zoomEnd,this),t.off("moveend",this._moveEnd,this),this._unbindEvents(),this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim",""),this._spiderfierOnRemove&&this._spiderfierOnRemove(),this._hideCoverage(),this._featureGroup.onRemove(t),this._nonPointGroup.onRemove(t),this._featureGroup.clearLayers(),this._map=null},getVisibleParent:function(t){for(var e=t;e&&!e._icon;)e=e.__parent;return e||null},_arraySplice:function(t,e){for(var i=t.length-1;i>=0;i--)if(t[i]===e)return t.splice(i,1),!0},_removeLayer:function(t,e,i){var n=this._gridClusters,s=this._gridUnclustered,r=this._featureGroup,o=this._map;if(e)for(var a=this._maxZoom;a>=0&&s[a].removeObject(t,o.project(t.getLatLng(),a));a--);var h,_=t.__parent,u=_._markers;for(this._arraySplice(u,t);_&&(_._childCount--,!(_._zoom<0));)e&&_._childCount<=1?(h=_._markers[0]===t?_._markers[1]:_._markers[0],n[_._zoom].removeObject(_,o.project(_._cLatLng,_._zoom)),s[_._zoom].addObject(h,o.project(h.getLatLng(),_._zoom)),this._arraySplice(_.__parent._childClusters,_),_.__parent._markers.push(h),h.__parent=_.__parent,_._icon&&(r.removeLayer(_),i||r.addLayer(h))):(_._recalculateBounds(),i&&_._icon||_._updateIcon()),_=_.__parent;delete t.__parent},_isOrIsParent:function(t,e){for(;e;){if(t===e)return!0;e=e.parentNode}return!1},_propagateEvent:function(t){if(t.layer instanceof L.MarkerCluster){if(t.originalEvent&&this._isOrIsParent(t.layer._icon,t.originalEvent.relatedTarget))return;t.type="cluster"+t.type}this.fire(t.type,t)},_defaultIconCreateFunction:function(t){var e=t.getChildCount(),i=" marker-cluster-";return i+=10>e?"small":100>e?"medium":"large",new L.DivIcon({html:"<div><span>"+e+"</span></div>",className:"marker-cluster"+i,iconSize:new L.Point(40,40)})},_bindEvents:function(){var t=this._map,e=this.options.spiderfyOnMaxZoom,i=this.options.showCoverageOnHover,n=this.options.zoomToBoundsOnClick;(e||n)&&this.on("clusterclick",this._zoomOrSpiderfy,this),i&&(this.on("clustermouseover",this._showCoverage,this),this.on("clustermouseout",this._hideCoverage,this),t.on("zoomend",this._hideCoverage,this))},_zoomOrSpiderfy:function(t){var e=this._map;e.getMaxZoom()===e.getZoom()?this.options.spiderfyOnMaxZoom&&t.layer.spiderfy():this.options.zoomToBoundsOnClick&&t.layer.zoomToBounds(),t.originalEvent&&13===t.originalEvent.keyCode&&e._container.focus()},_showCoverage:function(t){var e=this._map;this._inZoomAnimation||(this._shownPolygon&&e.removeLayer(this._shownPolygon),t.layer.getChildCount()>2&&t.layer!==this._spiderfied&&(this._shownPolygon=new L.Polygon(t.layer.getConvexHull(),this.options.polygonOptions),e.addLayer(this._shownPolygon)))},_hideCoverage:function(){this._shownPolygon&&(this._map.removeLayer(this._shownPolygon),this._shownPolygon=null)},_unbindEvents:function(){var t=this.options.spiderfyOnMaxZoom,e=this.options.showCoverageOnHover,i=this.options.zoomToBoundsOnClick,n=this._map;(t||i)&&this.off("clusterclick",this._zoomOrSpiderfy,this),e&&(this.off("clustermouseover",this._showCoverage,this),this.off("clustermouseout",this._hideCoverage,this),n.off("zoomend",this._hideCoverage,this))},_zoomEnd:function(){this._map&&(this._mergeSplitClusters(),this._zoom=this._map._zoom,this._currentShownBounds=this._getExpandedVisibleBounds())},_moveEnd:function(){if(!this._inZoomAnimation){var t=this._getExpandedVisibleBounds();this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,this._zoom,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._map._zoom,t),this._currentShownBounds=t}},_generateInitialClusters:function(){var t=this._map.getMaxZoom(),e=this.options.maxClusterRadius;this.options.disableClusteringAtZoom&&(t=this.options.disableClusteringAtZoom-1),this._maxZoom=t,this._gridClusters={},this._gridUnclustered={};for(var i=t;i>=0;i--)this._gridClusters[i]=new L.DistanceGrid(e),this._gridUnclustered[i]=new L.DistanceGrid(e);this._topClusterLevel=new L.MarkerCluster(this,-1)},_addLayer:function(t,e){var i,n,s=this._gridClusters,r=this._gridUnclustered;for(this.options.singleMarkerMode&&(t.options.icon=this.options.iconCreateFunction({getChildCount:function(){return 1},getAllChildMarkers:function(){return[t]}}));e>=0;e--){i=this._map.project(t.getLatLng(),e);var o=s[e].getNearObject(i);if(o)return o._addChild(t),t.__parent=o,void 0;if(o=r[e].getNearObject(i)){var a=o.__parent;a&&this._removeLayer(o,!1);var h=new L.MarkerCluster(this,e,o,t);s[e].addObject(h,this._map.project(h._cLatLng,e)),o.__parent=h,t.__parent=h;var _=h;for(n=e-1;n>a._zoom;n--)_=new L.MarkerCluster(this,n,_),s[n].addObject(_,this._map.project(o.getLatLng(),n));for(a._addChild(_),n=e;n>=0&&r[n].removeObject(o,this._map.project(o.getLatLng(),n));n--);return}r[e].addObject(t,i)}this._topClusterLevel._addChild(t),t.__parent=this._topClusterLevel},_enqueue:function(t){this._queue.push(t),this._queueTimeout||(this._queueTimeout=setTimeout(L.bind(this._processQueue,this),300))},_processQueue:function(){for(var t=0;t<this._queue.length;t++)this._queue[t].call(this);this._queue.length=0,clearTimeout(this._queueTimeout),this._queueTimeout=null},_mergeSplitClusters:function(){this._processQueue(),this._zoom<this._map._zoom&&this._currentShownBounds.contains(this._getExpandedVisibleBounds())?(this._animationStart(),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,this._zoom,this._getExpandedVisibleBounds()),this._animationZoomIn(this._zoom,this._map._zoom)):this._zoom>this._map._zoom?(this._animationStart(),this._animationZoomOut(this._zoom,this._map._zoom)):this._moveEnd()},_getExpandedVisibleBounds:function(){if(!this.options.removeOutsideVisibleBounds)return this.getBounds();var t=this._map,e=t.getBounds(),i=e._southWest,n=e._northEast,s=L.Browser.mobile?0:Math.abs(i.lat-n.lat),r=L.Browser.mobile?0:Math.abs(i.lng-n.lng);return new L.LatLngBounds(new L.LatLng(i.lat-s,i.lng-r,!0),new L.LatLng(n.lat+s,n.lng+r,!0))},_animationAddLayerNonAnimated:function(t,e){if(e===t)this._featureGroup.addLayer(t);else if(2===e._childCount){e._addToMap();var i=e.getAllChildMarkers();this._featureGroup.removeLayer(i[0]),this._featureGroup.removeLayer(i[1])}else e._updateIcon()}}),L.MarkerClusterGroup.include(L.DomUtil.TRANSITION?{_animationStart:function(){this._map._mapPane.className+=" leaflet-cluster-anim",this._inZoomAnimation++},_animationEnd:function(){this._map&&(this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim","")),this._inZoomAnimation--,this.fire("animationend")},_animationZoomIn:function(t,e){var i,n=this._getExpandedVisibleBounds(),s=this._featureGroup;this._topClusterLevel._recursively(n,t,0,function(r){var o,a=r._latlng,h=r._markers;for(n.contains(a)||(a=null),r._isSingleParent()&&t+1===e?(s.removeLayer(r),r._recursivelyAddChildrenToMap(null,e,n)):(r.setOpacity(0),r._recursivelyAddChildrenToMap(a,e,n)),i=h.length-1;i>=0;i--)o=h[i],n.contains(o._latlng)||s.removeLayer(o)}),this._forceLayout(),this._topClusterLevel._recursivelyBecomeVisible(n,e),s.eachLayer(function(t){t instanceof L.MarkerCluster||!t._icon||t.setOpacity(1)}),this._topClusterLevel._recursively(n,t,e,function(t){t._recursivelyRestoreChildPositions(e)}),this._enqueue(function(){this._topClusterLevel._recursively(n,t,0,function(t){s.removeLayer(t),t.setOpacity(1)}),this._animationEnd()})},_animationZoomOut:function(t,e){this._animationZoomOutSingle(this._topClusterLevel,t-1,e),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds()),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t,this._getExpandedVisibleBounds())},_animationZoomOutSingle:function(t,e,i){var n=this._getExpandedVisibleBounds();t._recursivelyAnimateChildrenInAndAddSelfToMap(n,e+1,i);var s=this;this._forceLayout(),t._recursivelyBecomeVisible(n,i),this._enqueue(function(){if(1===t._childCount){var r=t._markers[0];r.setLatLng(r.getLatLng()),r.setOpacity&&r.setOpacity(1)}else t._recursively(n,i,0,function(t){t._recursivelyRemoveChildrenFromMap(n,e+1)});s._animationEnd()})},_animationAddLayer:function(t,e){var i=this,n=this._featureGroup;n.addLayer(t),e!==t&&(e._childCount>2?(e._updateIcon(),this._forceLayout(),this._animationStart(),t._setPos(this._map.latLngToLayerPoint(e.getLatLng())),t.setOpacity(0),this._enqueue(function(){n.removeLayer(t),t.setOpacity(1),i._animationEnd()})):(this._forceLayout(),i._animationStart(),i._animationZoomOutSingle(e,this._map.getMaxZoom(),this._map.getZoom())))},_forceLayout:function(){L.Util.falseFn(e.body.offsetWidth)}}:{_animationStart:function(){},_animationZoomIn:function(t,e){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds())},_animationZoomOut:function(t,e){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,e,this._getExpandedVisibleBounds())},_animationAddLayer:function(t,e){this._animationAddLayerNonAnimated(t,e)}}),L.markerClusterGroup=function(t){return new L.MarkerClusterGroup(t)},L.MarkerCluster=L.Marker.extend({initialize:function(t,e,i,n){L.Marker.prototype.initialize.call(this,i?i._cLatLng||i.getLatLng():new L.LatLng(0,0),{icon:this}),this._group=t,this._zoom=e,this._markers=[],this._childClusters=[],this._childCount=0,this._iconNeedsUpdate=!0,this._bounds=new L.LatLngBounds,i&&this._addChild(i),n&&this._addChild(n)},getAllChildMarkers:function(t){t=t||[];for(var e=this._childClusters.length-1;e>=0;e--)this._childClusters[e].getAllChildMarkers(t);for(var i=this._markers.length-1;i>=0;i--)t.push(this._markers[i]);return t},getChildCount:function(){return this._childCount},zoomToBounds:function(){for(var t,e=this._childClusters.slice(),i=this._group._map,n=i.getBoundsZoom(this._bounds),s=this._zoom+1,r=i.getZoom();e.length>0&&n>s;){s++;var o=[];for(t=0;t<e.length;t++)o=o.concat(e[t]._childClusters);e=o}n>s?this._group._map.setView(this._latlng,s):r>=n?this._group._map.setView(this._latlng,r+1):this._group._map.fitBounds(this._bounds)},getBounds:function(){var t=new L.LatLngBounds;return t.extend(this._bounds),t},_updateIcon:function(){this._iconNeedsUpdate=!0,this._icon&&this.setIcon(this)},createIcon:function(){return this._iconNeedsUpdate&&(this._iconObj=this._group.options.iconCreateFunction(this),this._iconNeedsUpdate=!1),this._iconObj.createIcon()},createShadow:function(){return this._iconObj.createShadow()},_addChild:function(t,e){this._iconNeedsUpdate=!0,this._expandBounds(t),t instanceof L.MarkerCluster?(e||(this._childClusters.push(t),t.__parent=this),this._childCount+=t._childCount):(e||this._markers.push(t),this._childCount++),this.__parent&&this.__parent._addChild(t,!0)},_expandBounds:function(t){var e,i=t._wLatLng||t._latlng;t instanceof L.MarkerCluster?(this._bounds.extend(t._bounds),e=t._childCount):(this._bounds.extend(i),e=1),this._cLatLng||(this._cLatLng=t._cLatLng||i);var n=this._childCount+e;this._wLatLng?(this._wLatLng.lat=(i.lat*e+this._wLatLng.lat*this._childCount)/n,this._wLatLng.lng=(i.lng*e+this._wLatLng.lng*this._childCount)/n):this._latlng=this._wLatLng=new L.LatLng(i.lat,i.lng)},_addToMap:function(t){t&&(this._backupLatlng=this._latlng,this.setLatLng(t)),this._group._featureGroup.addLayer(this)},_recursivelyAnimateChildrenIn:function(t,e,i){this._recursively(t,0,i-1,function(t){var i,n,s=t._markers;for(i=s.length-1;i>=0;i--)n=s[i],n._icon&&(n._setPos(e),n.setOpacity(0))},function(t){var i,n,s=t._childClusters;for(i=s.length-1;i>=0;i--)n=s[i],n._icon&&(n._setPos(e),n.setOpacity(0))})},_recursivelyAnimateChildrenInAndAddSelfToMap:function(t,e,i){this._recursively(t,i,0,function(n){n._recursivelyAnimateChildrenIn(t,n._group._map.latLngToLayerPoint(n.getLatLng()).round(),e),n._isSingleParent()&&e-1===i?(n.setOpacity(1),n._recursivelyRemoveChildrenFromMap(t,e)):n.setOpacity(0),n._addToMap()})},_recursivelyBecomeVisible:function(t,e){this._recursively(t,0,e,null,function(t){t.setOpacity(1)})},_recursivelyAddChildrenToMap:function(t,e,i){this._recursively(i,-1,e,function(n){if(e!==n._zoom)for(var s=n._markers.length-1;s>=0;s--){var r=n._markers[s];i.contains(r._latlng)&&(t&&(r._backupLatlng=r.getLatLng(),r.setLatLng(t),r.setOpacity&&r.setOpacity(0)),n._group._featureGroup.addLayer(r))}},function(e){e._addToMap(t)})},_recursivelyRestoreChildPositions:function(t){for(var e=this._markers.length-1;e>=0;e--){var i=this._markers[e];i._backupLatlng&&(i.setLatLng(i._backupLatlng),delete i._backupLatlng)}if(t-1===this._zoom)for(var n=this._childClusters.length-1;n>=0;n--)this._childClusters[n]._restorePosition();else for(var s=this._childClusters.length-1;s>=0;s--)this._childClusters[s]._recursivelyRestoreChildPositions(t)},_restorePosition:function(){this._backupLatlng&&(this.setLatLng(this._backupLatlng),delete this._backupLatlng)},_recursivelyRemoveChildrenFromMap:function(t,e,i){var n,s;this._recursively(t,-1,e-1,function(t){for(s=t._markers.length-1;s>=0;s--)n=t._markers[s],i&&i.contains(n._latlng)||(t._group._featureGroup.removeLayer(n),n.setOpacity&&n.setOpacity(1))},function(t){for(s=t._childClusters.length-1;s>=0;s--)n=t._childClusters[s],i&&i.contains(n._latlng)||(t._group._featureGroup.removeLayer(n),n.setOpacity&&n.setOpacity(1))})},_recursively:function(t,e,i,n,s){var r,o,a=this._childClusters,h=this._zoom;if(e>h)for(r=a.length-1;r>=0;r--)o=a[r],t.intersects(o._bounds)&&o._recursively(t,e,i,n,s);else if(n&&n(this),s&&this._zoom===i&&s(this),i>h)for(r=a.length-1;r>=0;r--)o=a[r],t.intersects(o._bounds)&&o._recursively(t,e,i,n,s)},_recalculateBounds:function(){var t,e=this._markers,i=this._childClusters;for(this._bounds=new L.LatLngBounds,delete this._wLatLng,t=e.length-1;t>=0;t--)this._expandBounds(e[t]);for(t=i.length-1;t>=0;t--)this._expandBounds(i[t])},_isSingleParent:function(){return this._childClusters.length>0&&this._childClusters[0]._childCount===this._childCount}}),L.DistanceGrid=function(t){this._cellSize=t,this._sqCellSize=t*t,this._grid={},this._objectPoint={}},L.DistanceGrid.prototype={addObject:function(t,e){var i=this._getCoord(e.x),n=this._getCoord(e.y),s=this._grid,r=s[n]=s[n]||{},o=r[i]=r[i]||[],a=L.Util.stamp(t);this._objectPoint[a]=e,o.push(t)},updateObject:function(t,e){this.removeObject(t),this.addObject(t,e)},removeObject:function(t,e){var i,n,s=this._getCoord(e.x),r=this._getCoord(e.y),o=this._grid,a=o[r]=o[r]||{},h=a[s]=a[s]||[];for(delete this._objectPoint[L.Util.stamp(t)],i=0,n=h.length;n>i;i++)if(h[i]===t)return h.splice(i,1),1===n&&delete a[s],!0},eachObject:function(t,e){var i,n,s,r,o,a,h,_=this._grid;for(i in _){o=_[i];for(n in o)for(a=o[n],s=0,r=a.length;r>s;s++)h=t.call(e,a[s]),h&&(s--,r--)}},getNearObject:function(t){var e,i,n,s,r,o,a,h,_=this._getCoord(t.x),u=this._getCoord(t.y),l=this._objectPoint,d=this._sqCellSize,p=null;for(e=u-1;u+1>=e;e++)if(s=this._grid[e])for(i=_-1;_+1>=i;i++)if(r=s[i])for(n=0,o=r.length;o>n;n++)a=r[n],h=this._sqDist(l[L.Util.stamp(a)],t),d>h&&(d=h,p=a);return p},_getCoord:function(t){return Math.floor(t/this._cellSize)},_sqDist:function(t,e){var i=e.x-t.x,n=e.y-t.y;return i*i+n*n}},function(){L.QuickHull={getDistant:function(t,e){var i=e[1].lat-e[0].lat,n=e[0].lng-e[1].lng;return n*(t.lat-e[0].lat)+i*(t.lng-e[0].lng)},findMostDistantPointFromBaseLine:function(t,e){var i,n,s,r=0,o=null,a=[];for(i=e.length-1;i>=0;i--)n=e[i],s=this.getDistant(n,t),s>0&&(a.push(n),s>r&&(r=s,o=n));return{maxPoint:o,newPoints:a}},buildConvexHull:function(t,e){var i=[],n=this.findMostDistantPointFromBaseLine(t,e);return n.maxPoint?(i=i.concat(this.buildConvexHull([t[0],n.maxPoint],n.newPoints)),i=i.concat(this.buildConvexHull([n.maxPoint,t[1]],n.newPoints))):[t[0]]},getConvexHull:function(t){var e,i=!1,n=!1,s=null,r=null;for(e=t.length-1;e>=0;e--){var o=t[e];(i===!1||o.lat>i)&&(s=o,i=o.lat),(n===!1||o.lat<n)&&(r=o,n=o.lat)}var a=[].concat(this.buildConvexHull([r,s],t),this.buildConvexHull([s,r],t));return a}}}(),L.MarkerCluster.include({getConvexHull:function(){var t,e,i=this.getAllChildMarkers(),n=[];for(e=i.length-1;e>=0;e--)t=i[e].getLatLng(),n.push(t);return L.QuickHull.getConvexHull(n)}}),L.MarkerCluster.include({_2PI:2*Math.PI,_circleFootSeparation:25,_circleStartAngle:Math.PI/6,_spiralFootSeparation:28,_spiralLengthStart:11,_spiralLengthFactor:5,_circleSpiralSwitchover:9,spiderfy:function(){if(this._group._spiderfied!==this&&!this._group._inZoomAnimation){var t,e=this.getAllChildMarkers(),i=this._group,n=i._map,s=n.latLngToLayerPoint(this._latlng);this._group._unspiderfy(),this._group._spiderfied=this,e.length>=this._circleSpiralSwitchover?t=this._generatePointsSpiral(e.length,s):(s.y+=10,t=this._generatePointsCircle(e.length,s)),this._animationSpiderfy(e,t)}},unspiderfy:function(t){this._group._inZoomAnimation||(this._animationUnspiderfy(t),this._group._spiderfied=null)},_generatePointsCircle:function(t,e){var i,n,s=this._group.options.spiderfyDistanceMultiplier*this._circleFootSeparation*(2+t),r=s/this._2PI,o=this._2PI/t,a=[];for(a.length=t,i=t-1;i>=0;i--)n=this._circleStartAngle+i*o,a[i]=new L.Point(e.x+r*Math.cos(n),e.y+r*Math.sin(n))._round();return a},_generatePointsSpiral:function(t,e){var i,n=this._group.options.spiderfyDistanceMultiplier*this._spiralLengthStart,s=this._group.options.spiderfyDistanceMultiplier*this._spiralFootSeparation,r=this._group.options.spiderfyDistanceMultiplier*this._spiralLengthFactor,o=0,a=[];for(a.length=t,i=t-1;i>=0;i--)o+=s/n+5e-4*i,a[i]=new L.Point(e.x+n*Math.cos(o),e.y+n*Math.sin(o))._round(),n+=this._2PI*r/o;return a},_noanimationUnspiderfy:function(){var t,e,i=this._group,n=i._map,s=i._featureGroup,r=this.getAllChildMarkers();for(this.setOpacity(1),e=r.length-1;e>=0;e--)t=r[e],s.removeLayer(t),t._preSpiderfyLatlng&&(t.setLatLng(t._preSpiderfyLatlng),delete t._preSpiderfyLatlng),t.setZIndexOffset&&t.setZIndexOffset(0),t._spiderLeg&&(n.removeLayer(t._spiderLeg),delete t._spiderLeg);i._spiderfied=null}}),L.MarkerCluster.include(L.DomUtil.TRANSITION?{SVG_ANIMATION:function(){return e.createElementNS("http://www.w3.org/2000/svg","animate").toString().indexOf("SVGAnimate")>-1}(),_animationSpiderfy:function(t,i){var n,s,r,o,a=this,h=this._group,_=h._map,u=h._featureGroup,l=_.latLngToLayerPoint(this._latlng);for(n=t.length-1;n>=0;n--)s=t[n],s.setOpacity?(s.setZIndexOffset(1e6),s.setOpacity(0),u.addLayer(s),s._setPos(l)):u.addLayer(s);h._forceLayout(),h._animationStart();var d=L.Path.SVG?0:.3,p=L.Path.SVG_NS;for(n=t.length-1;n>=0;n--)if(o=_.layerPointToLatLng(i[n]),s=t[n],s._preSpiderfyLatlng=s._latlng,s.setLatLng(o),s.setOpacity&&s.setOpacity(1),r=new L.Polyline([a._latlng,o],{weight:1.5,color:"#222",opacity:d}),_.addLayer(r),s._spiderLeg=r,L.Path.SVG&&this.SVG_ANIMATION){var c=r._path.getTotalLength();r._path.setAttribute("stroke-dasharray",c+","+c);var m=e.createElementNS(p,"animate");m.setAttribute("attributeName","stroke-dashoffset"),m.setAttribute("begin","indefinite"),m.setAttribute("from",c),m.setAttribute("to",0),m.setAttribute("dur",.25),r._path.appendChild(m),m.beginElement(),m=e.createElementNS(p,"animate"),m.setAttribute("attributeName","stroke-opacity"),m.setAttribute("attributeName","stroke-opacity"),m.setAttribute("begin","indefinite"),m.setAttribute("from",0),m.setAttribute("to",.5),m.setAttribute("dur",.25),r._path.appendChild(m),m.beginElement()}if(a.setOpacity(.3),L.Path.SVG)for(this._group._forceLayout(),n=t.length-1;n>=0;n--)s=t[n]._spiderLeg,s.options.opacity=.5,s._path.setAttribute("stroke-opacity",.5);setTimeout(function(){h._animationEnd(),h.fire("spiderfied")},200)},_animationUnspiderfy:function(t){var e,i,n,s=this._group,r=s._map,o=s._featureGroup,a=t?r._latLngToNewLayerPoint(this._latlng,t.zoom,t.center):r.latLngToLayerPoint(this._latlng),h=this.getAllChildMarkers(),_=L.Path.SVG&&this.SVG_ANIMATION;for(s._animationStart(),this.setOpacity(1),i=h.length-1;i>=0;i--)e=h[i],e._preSpiderfyLatlng&&(e.setLatLng(e._preSpiderfyLatlng),delete e._preSpiderfyLatlng,e.setOpacity?(e._setPos(a),e.setOpacity(0)):o.removeLayer(e),_&&(n=e._spiderLeg._path.childNodes[0],n.setAttribute("to",n.getAttribute("from")),n.setAttribute("from",0),n.beginElement(),n=e._spiderLeg._path.childNodes[1],n.setAttribute("from",.5),n.setAttribute("to",0),n.setAttribute("stroke-opacity",0),n.beginElement(),e._spiderLeg._path.setAttribute("stroke-opacity",0)));setTimeout(function(){var t=0;for(i=h.length-1;i>=0;i--)e=h[i],e._spiderLeg&&t++;for(i=h.length-1;i>=0;i--)e=h[i],e._spiderLeg&&(e.setOpacity&&(e.setOpacity(1),e.setZIndexOffset(0)),t>1&&o.removeLayer(e),r.removeLayer(e._spiderLeg),delete e._spiderLeg);s._animationEnd()},200)}}:{_animationSpiderfy:function(t,e){var i,n,s,r,o=this._group,a=o._map,h=o._featureGroup;for(i=t.length-1;i>=0;i--)r=a.layerPointToLatLng(e[i]),n=t[i],n._preSpiderfyLatlng=n._latlng,n.setLatLng(r),n.setZIndexOffset&&n.setZIndexOffset(1e6),h.addLayer(n),s=new L.Polyline([this._latlng,r],{weight:1.5,color:"#222"}),a.addLayer(s),n._spiderLeg=s;this.setOpacity(.3),o.fire("spiderfied")},_animationUnspiderfy:function(){this._noanimationUnspiderfy()}}),L.MarkerClusterGroup.include({_spiderfied:null,_spiderfierOnAdd:function(){this._map.on("click",this._unspiderfyWrapper,this),this._map.options.zoomAnimation&&this._map.on("zoomstart",this._unspiderfyZoomStart,this),this._map.on("zoomend",this._noanimationUnspiderfy,this),L.Path.SVG&&!L.Browser.touch&&this._map._initPathRoot()},_spiderfierOnRemove:function(){this._map.off("click",this._unspiderfyWrapper,this),this._map.off("zoomstart",this._unspiderfyZoomStart,this),this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._unspiderfy()},_unspiderfyZoomStart:function(){this._map&&this._map.on("zoomanim",this._unspiderfyZoomAnim,this)},_unspiderfyZoomAnim:function(t){L.DomUtil.hasClass(this._map._mapPane,"leaflet-touching")||(this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._unspiderfy(t))},_unspiderfyWrapper:function(){this._unspiderfy()},_unspiderfy:function(t){this._spiderfied&&this._spiderfied.unspiderfy(t)},_noanimationUnspiderfy:function(){this._spiderfied&&this._spiderfied._noanimationUnspiderfy()},_unspiderfyLayer:function(t){t._spiderLeg&&(this._featureGroup.removeLayer(t),t.setOpacity(1),t.setZIndexOffset(0),this._map.removeLayer(t._spiderLeg),delete t._spiderLeg)}})}(window,document);
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	/*
@@ -22002,7 +21986,7 @@
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	L.Control.Permalink = L.Control.extend({
@@ -22171,7 +22155,7 @@
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
@@ -22442,7 +22426,7 @@
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	/*
@@ -22457,10 +22441,11 @@
 	},_hideActionsToolbar:function(){this._actionsContainer.style.display="none",L.DomUtil.removeClass(this._toolbarContainer,"leaflet-draw-toolbar-notop"),L.DomUtil.removeClass(this._toolbarContainer,"leaflet-draw-toolbar-nobottom"),L.DomUtil.removeClass(this._actionsContainer,"leaflet-draw-actions-top"),L.DomUtil.removeClass(this._actionsContainer,"leaflet-draw-actions-bottom")}}),L.Tooltip=L.Class.extend({initialize:function(t){this._map=t,this._popupPane=t._panes.popupPane,this._container=t.options.drawControlTooltips?L.DomUtil.create("div","leaflet-draw-tooltip",this._popupPane):null,this._singleLineLabel=!1},dispose:function(){this._container&&(this._popupPane.removeChild(this._container),this._container=null)},updateContent:function(t){return this._container?(t.subtext=t.subtext||"",0!==t.subtext.length||this._singleLineLabel?t.subtext.length>0&&this._singleLineLabel&&(L.DomUtil.removeClass(this._container,"leaflet-draw-tooltip-single"),this._singleLineLabel=!1):(L.DomUtil.addClass(this._container,"leaflet-draw-tooltip-single"),this._singleLineLabel=!0),this._container.innerHTML=(t.subtext.length>0?'<span class="leaflet-draw-tooltip-subtext">'+t.subtext+"</span><br />":"")+"<span>"+t.text+"</span>",this):this},updatePosition:function(t){var e=this._map.latLngToLayerPoint(t),i=this._container;return this._container&&(i.style.visibility="inherit",L.DomUtil.setPosition(i,e)),this},showAsError:function(){return this._container&&L.DomUtil.addClass(this._container,"leaflet-error-draw-tooltip"),this},removeError:function(){return this._container&&L.DomUtil.removeClass(this._container,"leaflet-error-draw-tooltip"),this}}),L.DrawToolbar=L.Toolbar.extend({options:{polyline:{},polygon:{},rectangle:{},circle:{},marker:{}},initialize:function(t){for(var e in this.options)this.options.hasOwnProperty(e)&&t[e]&&(t[e]=L.extend({},this.options[e],t[e]));this._toolbarClass="leaflet-draw-draw",L.Toolbar.prototype.initialize.call(this,t)},getModeHandlers:function(t){return[{enabled:this.options.polyline,handler:new L.Draw.Polyline(t,this.options.polyline),title:L.drawLocal.draw.toolbar.buttons.polyline},{enabled:this.options.polygon,handler:new L.Draw.Polygon(t,this.options.polygon),title:L.drawLocal.draw.toolbar.buttons.polygon},{enabled:this.options.rectangle,handler:new L.Draw.Rectangle(t,this.options.rectangle),title:L.drawLocal.draw.toolbar.buttons.rectangle},{enabled:this.options.circle,handler:new L.Draw.Circle(t,this.options.circle),title:L.drawLocal.draw.toolbar.buttons.circle},{enabled:this.options.marker,handler:new L.Draw.Marker(t,this.options.marker),title:L.drawLocal.draw.toolbar.buttons.marker}]},getActions:function(t){return[{enabled:t.deleteLastVertex,title:L.drawLocal.draw.toolbar.undo.title,text:L.drawLocal.draw.toolbar.undo.text,callback:t.deleteLastVertex,context:t},{title:L.drawLocal.draw.toolbar.actions.title,text:L.drawLocal.draw.toolbar.actions.text,callback:this.disable,context:this}]},setOptions:function(t){L.setOptions(this,t);for(var e in this._modes)this._modes.hasOwnProperty(e)&&t.hasOwnProperty(e)&&this._modes[e].handler.setOptions(t[e])}}),L.EditToolbar=L.Toolbar.extend({options:{edit:{selectedPathOptions:{color:"#fe57a1",opacity:.6,dashArray:"10, 10",fill:!0,fillColor:"#fe57a1",fillOpacity:.1}},remove:{},featureGroup:null},initialize:function(t){t.edit&&("undefined"==typeof t.edit.selectedPathOptions&&(t.edit.selectedPathOptions=this.options.edit.selectedPathOptions),t.edit=L.extend({},this.options.edit,t.edit)),t.remove&&(t.remove=L.extend({},this.options.remove,t.remove)),this._toolbarClass="leaflet-draw-edit",L.Toolbar.prototype.initialize.call(this,t),this._selectedFeatureCount=0},getModeHandlers:function(t){var e=this.options.featureGroup;return[{enabled:this.options.edit,handler:new L.EditToolbar.Edit(t,{featureGroup:e,selectedPathOptions:this.options.edit.selectedPathOptions}),title:L.drawLocal.edit.toolbar.buttons.edit},{enabled:this.options.remove,handler:new L.EditToolbar.Delete(t,{featureGroup:e}),title:L.drawLocal.edit.toolbar.buttons.remove}]},getActions:function(){return[{title:L.drawLocal.edit.toolbar.actions.save.title,text:L.drawLocal.edit.toolbar.actions.save.text,callback:this._save,context:this},{title:L.drawLocal.edit.toolbar.actions.cancel.title,text:L.drawLocal.edit.toolbar.actions.cancel.text,callback:this.disable,context:this}]},addToolbar:function(t){var e=L.Toolbar.prototype.addToolbar.call(this,t);return this._checkDisabled(),this.options.featureGroup.on("layeradd layerremove",this._checkDisabled,this),e},removeToolbar:function(){this.options.featureGroup.off("layeradd layerremove",this._checkDisabled,this),L.Toolbar.prototype.removeToolbar.call(this)},disable:function(){this.enabled()&&(this._activeMode.handler.revertLayers(),L.Toolbar.prototype.disable.call(this))},_save:function(){this._activeMode.handler.save(),this._activeMode.handler.disable()},_checkDisabled:function(){var t,e=this.options.featureGroup,i=0!==e.getLayers().length;this.options.edit&&(t=this._modes[L.EditToolbar.Edit.TYPE].button,i?L.DomUtil.removeClass(t,"leaflet-disabled"):L.DomUtil.addClass(t,"leaflet-disabled"),t.setAttribute("title",i?L.drawLocal.edit.toolbar.buttons.edit:L.drawLocal.edit.toolbar.buttons.editDisabled)),this.options.remove&&(t=this._modes[L.EditToolbar.Delete.TYPE].button,i?L.DomUtil.removeClass(t,"leaflet-disabled"):L.DomUtil.addClass(t,"leaflet-disabled"),t.setAttribute("title",i?L.drawLocal.edit.toolbar.buttons.remove:L.drawLocal.edit.toolbar.buttons.removeDisabled))}}),L.EditToolbar.Edit=L.Handler.extend({statics:{TYPE:"edit"},includes:L.Mixin.Events,initialize:function(t,e){if(L.Handler.prototype.initialize.call(this,t),this._selectedPathOptions=e.selectedPathOptions,this._featureGroup=e.featureGroup,!(this._featureGroup instanceof L.FeatureGroup))throw new Error("options.featureGroup must be a L.FeatureGroup");this._uneditedLayerProps={},this.type=L.EditToolbar.Edit.TYPE},enable:function(){!this._enabled&&this._hasAvailableLayers()&&(this.fire("enabled",{handler:this.type}),this._map.fire("draw:editstart",{handler:this.type}),L.Handler.prototype.enable.call(this),this._featureGroup.on("layeradd",this._enableLayerEdit,this).on("layerremove",this._disableLayerEdit,this))},disable:function(){this._enabled&&(this._featureGroup.off("layeradd",this._enableLayerEdit,this).off("layerremove",this._disableLayerEdit,this),L.Handler.prototype.disable.call(this),this._map.fire("draw:editstop",{handler:this.type}),this.fire("disabled",{handler:this.type}))},addHooks:function(){var t=this._map;t&&(t.getContainer().focus(),this._featureGroup.eachLayer(this._enableLayerEdit,this),this._tooltip=new L.Tooltip(this._map),this._tooltip.updateContent({text:L.drawLocal.edit.handlers.edit.tooltip.text,subtext:L.drawLocal.edit.handlers.edit.tooltip.subtext}),this._map.on("mousemove",this._onMouseMove,this))},removeHooks:function(){this._map&&(this._featureGroup.eachLayer(this._disableLayerEdit,this),this._uneditedLayerProps={},this._tooltip.dispose(),this._tooltip=null,this._map.off("mousemove",this._onMouseMove,this))},revertLayers:function(){this._featureGroup.eachLayer(function(t){this._revertLayer(t)},this)},save:function(){var t=new L.LayerGroup;this._featureGroup.eachLayer(function(e){e.edited&&(t.addLayer(e),e.edited=!1)}),this._map.fire("draw:edited",{layers:t})},_backupLayer:function(t){var e=L.Util.stamp(t);this._uneditedLayerProps[e]||(t instanceof L.Polyline||t instanceof L.Polygon||t instanceof L.Rectangle?this._uneditedLayerProps[e]={latlngs:L.LatLngUtil.cloneLatLngs(t.getLatLngs())}:t instanceof L.Circle?this._uneditedLayerProps[e]={latlng:L.LatLngUtil.cloneLatLng(t.getLatLng()),radius:t.getRadius()}:t instanceof L.Marker&&(this._uneditedLayerProps[e]={latlng:L.LatLngUtil.cloneLatLng(t.getLatLng())}))},_revertLayer:function(t){var e=L.Util.stamp(t);t.edited=!1,this._uneditedLayerProps.hasOwnProperty(e)&&(t instanceof L.Polyline||t instanceof L.Polygon||t instanceof L.Rectangle?t.setLatLngs(this._uneditedLayerProps[e].latlngs):t instanceof L.Circle?(t.setLatLng(this._uneditedLayerProps[e].latlng),t.setRadius(this._uneditedLayerProps[e].radius)):t instanceof L.Marker&&t.setLatLng(this._uneditedLayerProps[e].latlng))},_toggleMarkerHighlight:function(t){if(t._icon){var e=t._icon;e.style.display="none",L.DomUtil.hasClass(e,"leaflet-edit-marker-selected")?(L.DomUtil.removeClass(e,"leaflet-edit-marker-selected"),this._offsetMarker(e,-4)):(L.DomUtil.addClass(e,"leaflet-edit-marker-selected"),this._offsetMarker(e,4)),e.style.display=""}},_offsetMarker:function(t,e){var i=parseInt(t.style.marginTop,10)-e,o=parseInt(t.style.marginLeft,10)-e;t.style.marginTop=i+"px",t.style.marginLeft=o+"px"},_enableLayerEdit:function(t){var e,i=t.layer||t.target||t,o=i instanceof L.Marker;(!o||i._icon)&&(this._backupLayer(i),this._selectedPathOptions&&(e=L.Util.extend({},this._selectedPathOptions),o?this._toggleMarkerHighlight(i):(i.options.previousOptions=L.Util.extend({dashArray:null},i.options),i instanceof L.Circle||i instanceof L.Polygon||i instanceof L.Rectangle||(e.fill=!1),i.setStyle(e))),o?(i.dragging.enable(),i.on("dragend",this._onMarkerDragEnd)):i.editing.enable())},_disableLayerEdit:function(t){var e=t.layer||t.target||t;e.edited=!1,this._selectedPathOptions&&(e instanceof L.Marker?this._toggleMarkerHighlight(e):(e.setStyle(e.options.previousOptions),delete e.options.previousOptions)),e instanceof L.Marker?(e.dragging.disable(),e.off("dragend",this._onMarkerDragEnd,this)):e.editing.disable()},_onMarkerDragEnd:function(t){var e=t.target;e.edited=!0},_onMouseMove:function(t){this._tooltip.updatePosition(t.latlng)},_hasAvailableLayers:function(){return 0!==this._featureGroup.getLayers().length}}),L.EditToolbar.Delete=L.Handler.extend({statics:{TYPE:"remove"},includes:L.Mixin.Events,initialize:function(t,e){if(L.Handler.prototype.initialize.call(this,t),L.Util.setOptions(this,e),this._deletableLayers=this.options.featureGroup,!(this._deletableLayers instanceof L.FeatureGroup))throw new Error("options.featureGroup must be a L.FeatureGroup");this.type=L.EditToolbar.Delete.TYPE},enable:function(){!this._enabled&&this._hasAvailableLayers()&&(this.fire("enabled",{handler:this.type}),this._map.fire("draw:deletestart",{handler:this.type}),L.Handler.prototype.enable.call(this),this._deletableLayers.on("layeradd",this._enableLayerDelete,this).on("layerremove",this._disableLayerDelete,this))},disable:function(){this._enabled&&(this._deletableLayers.off("layeradd",this._enableLayerDelete,this).off("layerremove",this._disableLayerDelete,this),L.Handler.prototype.disable.call(this),this._map.fire("draw:deletestop",{handler:this.type}),this.fire("disabled",{handler:this.type}))},addHooks:function(){var t=this._map;t&&(t.getContainer().focus(),this._deletableLayers.eachLayer(this._enableLayerDelete,this),this._deletedLayers=new L.layerGroup,this._tooltip=new L.Tooltip(this._map),this._tooltip.updateContent({text:L.drawLocal.edit.handlers.remove.tooltip.text}),this._map.on("mousemove",this._onMouseMove,this))},removeHooks:function(){this._map&&(this._deletableLayers.eachLayer(this._disableLayerDelete,this),this._deletedLayers=null,this._tooltip.dispose(),this._tooltip=null,this._map.off("mousemove",this._onMouseMove,this))},revertLayers:function(){this._deletedLayers.eachLayer(function(t){this._deletableLayers.addLayer(t)},this)},save:function(){this._map.fire("draw:deleted",{layers:this._deletedLayers})},_enableLayerDelete:function(t){var e=t.layer||t.target||t;e.on("click",this._removeLayer,this)},_disableLayerDelete:function(t){var e=t.layer||t.target||t;e.off("click",this._removeLayer,this),this._deletedLayers.removeLayer(e)},_removeLayer:function(t){var e=t.layer||t.target||t;this._deletableLayers.removeLayer(e),this._deletedLayers.addLayer(e)},_onMouseMove:function(t){this._tooltip.updatePosition(t.latlng)},_hasAvailableLayers:function(){return 0!==this._deletableLayers.getLayers().length}})}(window,document);
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
+	__webpack_require__(17)
 	__webpack_require__(18)
 	__webpack_require__(19)
 	__webpack_require__(20)
@@ -22472,10 +22457,9 @@
 	__webpack_require__(26)
 	__webpack_require__(27)
 	__webpack_require__(28)
-	__webpack_require__(29)
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -22540,7 +22524,7 @@
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -22640,7 +22624,7 @@
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -22766,7 +22750,7 @@
 
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -23009,7 +22993,7 @@
 
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -23226,7 +23210,7 @@
 
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -23397,7 +23381,7 @@
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -23740,7 +23724,7 @@
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -24260,7 +24244,7 @@
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -24374,7 +24358,7 @@
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -24552,7 +24536,7 @@
 
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -24713,7 +24697,7 @@
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports) {
 
 	/* ========================================================================
@@ -24881,7 +24865,7 @@
 
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports) {
 
 	/*
@@ -25214,12 +25198,12 @@
 
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* global define, $ */
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define */
 
-	!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function ($) {
 	    'use strict';
 	    var getDistance = function () {
 	        return $('input[name="searchRadius"]:checked').val();
@@ -25288,16 +25272,16 @@
 	        CollisionEnum: CollisionEnum,
 	        getDistance: getDistance
 	    };
-	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define */
 	'use strict';
 
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(33), __webpack_require__(34), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, map, s, $) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30), __webpack_require__(32), __webpack_require__(33), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, map, s, $) {
 	  var summary;
 
 	  /*
@@ -25462,13 +25446,13 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define, L */
 	'use strict';
 
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, $) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, $) {
 	    var lat;
 	    var lng;
 	    var map;
@@ -25753,8 +25737,6 @@
 	    init();
 
 	    return {
-	        bikeIcon: bikeIcon,
-	        pedestrianIcon: pedestrianIcon,
 	        getAPIUrl: getAPIUrl,
 	        getAPIUrlForPoly: getAPIUrlForPoly,
 	        clearAreas: clearAreas,
@@ -25764,19 +25746,18 @@
 	        finalizeMarkerGroup: finalizeMarkerGroup,
 	        addFeatureToMap: addFeatureToMap,
 	        getMetaData: getMetaData,
-	        setCoordinates: setCoordinates,
-	        isDrawing: isDrawing
+	        setCoordinates: setCoordinates
 	    };
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define */
 	'use strict';
 
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, $) {
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(30), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility, $) {
 	  /**
 	  *   Issue #28: Since some crashes may not have any injuries, we need a helper function
 	  *   that catches this condition and returns 0 instead.

@@ -1,5 +1,5 @@
 /* jshint undef: true, unused: false */
-/* global L,Q,$$,console,Rhaboo,document,require,define */
+/* global Rhaboo,require,define */
 'use strict';
 
 require('rhaboo');
@@ -19,9 +19,6 @@ require('purl');
 require('leaflet.draw');
 require('bootstrap');
 require('highcharts/highcharts');
-
-
-
 
 define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crashes, map, summary, $) {
     var store = Rhaboo.persistent('crashBrowser');
@@ -127,13 +124,6 @@ define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crash
         if (store.addresses) {
             setAddresses(store.addresses);
         }
-    };
-
-    /*
-    *  Assign module methods to various events.
-    */
-    $(document).ready(function() {
-        init();
 
         $('body').on('search', function (event, opts) {
             if (!opts) {
@@ -202,12 +192,7 @@ define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crash
         }
 
         $('.btn').button();
-    });
-
-    return {
-        fetchCoordsForAddress: fetchCoordsForAddress,
-        saveAddressAndShowCrashes: saveAddressAndShowCrashes,
-        setAddresses: setAddresses,
-        getAddresses: getAddresses
     };
+
+    $(document).ready(init);
 });

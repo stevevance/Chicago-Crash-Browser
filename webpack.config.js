@@ -9,7 +9,7 @@ module.exports = {
     filename: 'bundle.js'
   },
   resolve: {
-      root: [path.join(__dirname, 'bower_components'), path.join(__dirname, 'js')]
+      root: [path.join(__dirname, 'bower_components'), path.join(__dirname, 'js'), path.join(__dirname, 'js', 'lib')]
   },
   plugins: [
       new webpack.ResolverPlugin(
