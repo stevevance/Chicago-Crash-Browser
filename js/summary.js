@@ -233,7 +233,7 @@ define(['util'], function (Utility) {
   };
 
   var populateMetaData = function(metaDataObj) {
-      $('#radius').html(metaDataObj.dist);
+      $('#radius').html(Utility.getDistance());
       $('#coords').html(metaDataObj.lat+', '+metaDataObj.lng);
       $('#latitude').html(metaDataObj.lat);
       $('#longitude').html(metaDataObj.lng);

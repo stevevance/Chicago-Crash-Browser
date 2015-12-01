@@ -276,7 +276,7 @@ define(['util'], function (Utility) {
         return {
             lat: lat,
             lng: lng,
-            dist: dist
+            dist: Utility.getDistance()
         };
     };
 

@@ -21,12 +21,7 @@ define(['util', 'map', 'summary'], function (Utility, map, s) {
       } else {
           fn = fetchCrashDataByPoly;
       }
-      return fn().done(function (data) {
-          generateSummaries(data.crashes);
-      }).fail(function () {
-          $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
-          map.closePopup();
-      });
+      return fn();
   }
 
   /*
@@ -46,8 +41,8 @@ define(['util', 'map', 'summary'], function (Utility, map, s) {
 
   var fetchCrashes = function fetchCrashes(options) {
     return fetchRawCrashData(options)
-      .done(function (crashes) {
-        summary = generateSummaries(crashes);
+      .done(function (data) {
+        generateSummaries(data.crashes);
       });
   };
 
@@ -159,7 +154,7 @@ define(['util', 'map', 'summary'], function (Utility, map, s) {
       s.populateMetaData(metaDataObj);
 
     } else {
-        $('#status').html('No crashes found within ' + map.getMetaData().dist + ' feet of this location');
+        $('#status').html('No crashes found within ' + Utility.getDistance() + ' feet of this location');
     }
     return summary;
   };

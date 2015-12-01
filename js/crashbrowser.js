@@ -69,7 +69,7 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
                 store.write('addresses', addresses);
             }
             map.setCoordinates(data[0].lat, data[0].lon);
-            crashes.getCrashes();
+            $('body').trigger('search');
         }, function() {
             var badIdx = addresses.indexOf(searchAddress);
             if (badIdx !== -1) {
@@ -128,16 +128,23 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
         init();
 
         $('body').on('search', function (event, opts) {
+            if (!opts) {
+                opts = { areaType: 'circle' };
+            }
             map.clearAreas();
             crashes
                 .getCrashes(opts)
                 .done(function () {
-                    if (opts.areaType === 'circle') {
-                        map.addCircle();
-                    } else {
+                    if (opts.areaType === 'poly') {
                         map.addPoly();
+                    } else {
+                        map.addCircle();
                     }
                     map.finalizeMarkerGroup();
+                })
+                .fail(function () {
+                    $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
+                    map.closePopup();
                 });
         });
 
@@ -145,7 +152,7 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
             var searchRadiusValue = $('input[name="searchRadius"]:checked').val();
             $('#searchRadiusButtons label input').removeClass('active');
             $.cookie('searchRadius', searchRadiusValue);
-            crashes.getCrashes();
+            $('body').trigger('search');
         });
 
         $('input[name="outputType"]:radio').change(function() {
@@ -185,7 +192,7 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
 
         var get = $.url().fparam('get');
         if(get == 'yes') {
-            crashes.getCrashes();
+            $('body').trigger('search');
         }
 
         $('.btn').button();

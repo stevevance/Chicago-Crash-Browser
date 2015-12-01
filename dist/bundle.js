@@ -115,7 +115,7 @@
 	                store.write('addresses', addresses);
 	            }
 	            map.setCoordinates(data[0].lat, data[0].lon);
-	            crashes.getCrashes();
+	            $('body').trigger('search');
 	        }, function() {
 	            var badIdx = addresses.indexOf(searchAddress);
 	            if (badIdx !== -1) {
@@ -174,16 +174,23 @@
 	        init();
 
 	        $('body').on('search', function (event, opts) {
+	            if (!opts) {
+	                opts = { areaType: 'circle' };
+	            }
 	            map.clearAreas();
 	            crashes
 	                .getCrashes(opts)
 	                .done(function () {
-	                    if (opts.areaType === 'circle') {
-	                        map.addCircle();
-	                    } else {
+	                    if (opts.areaType === 'poly') {
 	                        map.addPoly();
+	                    } else {
+	                        map.addCircle();
 	                    }
 	                    map.finalizeMarkerGroup();
+	                })
+	                .fail(function () {
+	                    $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
+	                    map.closePopup();
 	                });
 	        });
 
@@ -191,7 +198,7 @@
 	            var searchRadiusValue = $('input[name="searchRadius"]:checked').val();
 	            $('#searchRadiusButtons label input').removeClass('active');
 	            $.cookie('searchRadius', searchRadiusValue);
-	            crashes.getCrashes();
+	            $('body').trigger('search');
 	        });
 
 	        $('input[name="outputType"]:radio').change(function() {
@@ -231,7 +238,7 @@
 
 	        var get = $.url().fparam('get');
 	        if(get == 'yes') {
-	            crashes.getCrashes();
+	            $('body').trigger('search');
 	        }
 
 	        $('.btn').button();
@@ -36134,12 +36141,7 @@
 	      } else {
 	          fn = fetchCrashDataByPoly;
 	      }
-	      return fn().done(function (data) {
-	          generateSummaries(data.crashes);
-	      }).fail(function () {
-	          $('#status').html('Something went wrong while retrieving data. Please try again later and alert Steven.');
-	          map.closePopup();
-	      });
+	      return fn();
 	  }
 
 	  /*
@@ -36159,8 +36161,8 @@
 
 	  var fetchCrashes = function fetchCrashes(options) {
 	    return fetchRawCrashData(options)
-	      .done(function (crashes) {
-	        summary = generateSummaries(crashes);
+	      .done(function (data) {
+	        generateSummaries(data.crashes);
 	      });
 	  };
 
@@ -36272,7 +36274,7 @@
 	      s.populateMetaData(metaDataObj);
 
 	    } else {
-	        $('#status').html('No crashes found within ' + map.getMetaData().dist + ' feet of this location');
+	        $('#status').html('No crashes found within ' + Utility.getDistance() + ' feet of this location');
 	    }
 	    return summary;
 	  };
@@ -36565,7 +36567,7 @@
 	        return {
 	            lat: lat,
 	            lng: lng,
-	            dist: dist
+	            dist: Utility.getDistance()
 	        };
 	    };
 
@@ -36827,7 +36829,7 @@
 	  };
 
 	  var populateMetaData = function(metaDataObj) {
-	      $('#radius').html(metaDataObj.dist);
+	      $('#radius').html(Utility.getDistance());
 	      $('#coords').html(metaDataObj.lat+', '+metaDataObj.lng);
 	      $('#latitude').html(metaDataObj.lat);
 	      $('#longitude').html(metaDataObj.lng);
