@@ -1,8 +1,12 @@
+/* global define, $ */
+'use strict';
+
 define(['util'], function (Utility) {
   /**
   *   Issue #28: Since some crashes may not have any injuries, we need a helper function
   *   that catches this condition and returns 0 instead.
   */
+
   var injuryFigure = function(injuries) {
       if (injuries === undefined) {
           return 0;

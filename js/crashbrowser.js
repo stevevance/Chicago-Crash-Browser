@@ -36,7 +36,12 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
         var dfd = $.Deferred();
 
         if ($('#address').val()) {
-            $.getJSON('http://nominatim.openstreetmap.org/search?street=' + $('#address').val() + '&city=Chicago&state=IL&format=json', function(data) {
+            $.getJSON('http://nominatim.openstreetmap.org/search', {
+                street: $('#address').val(),
+                city: 'Chicago',
+                state: 'IL',
+                format: 'json'
+            }, function(data) {
                 if (data.length > 0 && !!data[0].lat && !!data[0].lon) {
                     dfd.resolve(data);
                 } else {
@@ -54,7 +59,11 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
     };
 
     var getAddresses = function getAddresses() {
-        return addresses;
+        if (addresses.length > 0) {
+            return addresses;
+        } else {
+            return ['121 N. LaSalle Blvd'];
+        }
     };
 
     var saveAddressAndShowCrashes = function() {
@@ -135,7 +144,7 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
             crashes
                 .getCrashes(opts)
                 .done(function () {
-                    if (opts.areaType === 'poly') {
+                    if (opts.areaType === 'polygon') {
                         map.addPoly();
                     } else {
                         map.addCircle();
@@ -179,12 +188,10 @@ define(['util', 'crashes', 'map', 'summary'], function (Utility, crashes, map, s
             saveAddressAndShowCrashes();
         });
 
-        if (getAddresses().length > 0) {
-            $('#address').autocomplete({
-                source: getAddresses(),
-                minLength: 0
-            });
-        }
+        $('#address').autocomplete({
+            source: getAddresses(),
+            minLength: 0
+        });
 
         $('#address').focus(function () {
             $('#address').autocomplete('search', '');

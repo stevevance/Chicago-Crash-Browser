@@ -148,6 +148,8 @@ define(['util'], function (Utility) {
         map.addLayer(circle);
         if (markerGroup.getLayers().length > 0) {
             map.fitBounds(markerGroup.getBounds());
+        } else {
+            map.fitBounds(circle);
         }
     };
 
@@ -158,6 +160,8 @@ define(['util'], function (Utility) {
         map.addLayer(poly);
         if (markerGroup.getLayers().length > 0) {
             map.fitBounds(markerGroup.getBounds());
+        } else {
+            map.fitBounds(poly);
         }
     };
 

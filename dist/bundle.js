@@ -82,7 +82,12 @@
 	        var dfd = $.Deferred();
 
 	        if ($('#address').val()) {
-	            $.getJSON('http://nominatim.openstreetmap.org/search?street=' + $('#address').val() + '&city=Chicago&state=IL&format=json', function(data) {
+	            $.getJSON('http://nominatim.openstreetmap.org/search', {
+	                street: $('#address').val(),
+	                city: 'Chicago',
+	                state: 'IL',
+	                format: 'json'
+	            }, function(data) {
 	                if (data.length > 0 && !!data[0].lat && !!data[0].lon) {
 	                    dfd.resolve(data);
 	                } else {
@@ -100,7 +105,11 @@
 	    };
 
 	    var getAddresses = function getAddresses() {
-	        return addresses;
+	        if (addresses.length > 0) {
+	            return addresses;
+	        } else {
+	            return ['121 N. LaSalle Blvd'];
+	        }
 	    };
 
 	    var saveAddressAndShowCrashes = function() {
@@ -181,7 +190,7 @@
 	            crashes
 	                .getCrashes(opts)
 	                .done(function () {
-	                    if (opts.areaType === 'poly') {
+	                    if (opts.areaType === 'polygon') {
 	                        map.addPoly();
 	                    } else {
 	                        map.addCircle();
@@ -225,12 +234,10 @@
 	            saveAddressAndShowCrashes();
 	        });
 
-	        if (getAddresses().length > 0) {
-	            $('#address').autocomplete({
-	                source: getAddresses(),
-	                minLength: 0
-	            });
-	        }
+	        $('#address').autocomplete({
+	            source: getAddresses(),
+	            minLength: 0
+	        });
 
 	        $('#address').focus(function () {
 	            $('#address').autocomplete('search', '');
@@ -36439,6 +36446,8 @@
 	        map.addLayer(circle);
 	        if (markerGroup.getLayers().length > 0) {
 	            map.fitBounds(markerGroup.getBounds());
+	        } else {
+	            map.fitBounds(circle);
 	        }
 	    };
 
@@ -36449,6 +36458,8 @@
 	        map.addLayer(poly);
 	        if (markerGroup.getLayers().length > 0) {
 	            map.fitBounds(markerGroup.getBounds());
+	        } else {
+	            map.fitBounds(poly);
 	        }
 	    };
 
@@ -36594,11 +36605,15 @@
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* global define, $ */
+	'use strict';
+
+	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(31)], __WEBPACK_AMD_DEFINE_RESULT__ = function (Utility) {
 	  /**
 	  *   Issue #28: Since some crashes may not have any injuries, we need a helper function
 	  *   that catches this condition and returns 0 instead.
 	  */
+
 	  var injuryFigure = function(injuries) {
 	      if (injuries === undefined) {
 	          return 0;
