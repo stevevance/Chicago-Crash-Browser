@@ -207,8 +207,7 @@ define(['util', 'jquery'], function (Utility, $) {
         north = northeast.lat;
         east = northeast.lng;
 
-        // return 'http://chicagocrashes.org/api.php?lat='+lat+'&lng='+lng+'&north='+north+'&south='+south+'&east='+east+'&west='+west+'&distance='+Utility.getDistance();
-        return 'http://chicagocrashes.org/api2.php?lat='+lat+'&lng='+lng+'&distance='+Utility.getDistance();
+        return '/api2.php?lat='+lat+'&lng='+lng+'&distance='+Utility.getDistance();
 
     };
 
@@ -226,7 +225,7 @@ define(['util', 'jquery'], function (Utility, $) {
         var lastPoint = poly.getLatLngs()[0];
         coords += lastPoint.lng + ' ' + lastPoint.lat;
 
-        return 'http://chicagocrashes.org/api2.php?coords=' + coords;
+        return '/api2.php?coords=' + coords;
     };
 
     /**
