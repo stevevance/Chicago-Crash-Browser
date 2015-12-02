@@ -15,7 +15,6 @@ require('leaflet-dist/leaflet-src');
 require('leaflet.markerclusterer');
 require('leaflet-locatecontrol/src/L.Control.Locate');
 require('leaflet-plugins/control/Permalink');
-require('purl');
 require('leaflet.draw');
 require('bootstrap');
 require('highcharts/highcharts');
@@ -186,7 +185,7 @@ define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crash
             $('#address').autocomplete('search', '');
         });
 
-        var get = $.url().fparam('get');
+        var get = Utility.getParam('get');
         if(get == 'yes') {
             $('body').trigger('search');
         }

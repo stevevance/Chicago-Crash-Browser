@@ -20,8 +20,8 @@ define(['util', 'jquery'], function (Utility, $) {
     };
 
     var init = function() {
-        var initLat = $.url().fparam('lat') || 41.895924;
-        var initLng = $.url().fparam('lon') || -87.654921;
+        var initLat = Utility.getParam('lat') || 41.895924;
+        var initLng = Utility.getParam('lon') || -87.654921;
         setCoordinates(initLat, initLng);
         center = [lat, lng];
 
