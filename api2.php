@@ -1,5 +1,5 @@
 <?php
-require_once("pg.php");
+require_once("../api/pg.php");
 
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');

@@ -3,6 +3,8 @@ var del = require('del');
 var sourcemaps = require('gulp-sourcemaps');
 var concatCss = require('gulp-concat-css');
 var webpack = require('gulp-webpack');
+var rsync = require('rsync-slim');
+var secrets = require('./secrets.json');
 
 const outputFolder = 'dist';
 
@@ -24,7 +26,9 @@ gulp.task('default', ['clean'], function () {
     'bower_components/**/leaflet.draw/dist/images/spritesheet-2x.png'])
     .pipe(gulp.dest(outputFolder))
 
-  gulp.src('index.html')
+  gulp.src(['index.html',
+    'api2.php',
+    'staticmap.php'])
     .pipe(gulp.dest(outputFolder));
 
   return gulp.src('js/crashbrowser.js')
@@ -34,4 +38,14 @@ gulp.task('default', ['clean'], function () {
 
 gulp.task('clean', function () {
   return del([outputFolder]);
-})
+});
+
+gulp.task('deploy', ['default'], function () {
+  rsync({
+    src: outputFolder + '/',
+    dest: secrets.username + '@' + secrets.hostname + ':/var/www/chicagocrashes/htdocs',
+    options: '-rvhcz --delete --progress'
+  }), function (err) {
+    console.error(err);
+  }
+});
