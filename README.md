@@ -3,7 +3,15 @@ Chicago Crash Browser
 
 [Demo the Chicago Crash Browser](http://chicagocrashes.org/index.php#lat=41.857719&lon=-87.661216&get=yes&zoom=18) - will load the intersection of 18th Street and Blue Island Avenue. 
 
-The Chicago Crash Browser is an interface for the automobile crash data from the Illinois Department of Transportation (IDOT). Crash data for Chicago in 2005-2011 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by IDOT.
+The Chicago Crash Browser is an interface for the automobile crash data from the Illinois Department of Transportation (IDOT). Crash data for Chicago in 2005-2013 where a bicyclist or pedestrian was the first point of impact by a driver's automobile, as collected by responding law enforcement and maintained by IDOT.
+
+2014 crash data was obtained December 24, 2015. Use of crash data must now be accompanied by this disclaimer:
+
+````
+The Division of Traffic Safety requires the following statement be placed on any work product that incorporates or references our data. 
+ 
+DISCLAIMER: The motor vehicle crash data referenced herein was provided by the Illinois Department of Transportation. The author is responsible for any data analyses and conclusions drawn.
+````
 
 ##Purpose
 The purpose of the Crash Browser is two fold:
@@ -11,18 +19,6 @@ The purpose of the Crash Browser is two fold:
 1. Give planners, politicians, and policy makers the tools and information they need to make good decisions and prioritization about where to make investments about transportation safety. 
 
 2. Give activists and advocates the information they need to demand change in the transportation system in the most effective way. 
-
-##Enhancements
-Desired enhancements include:
-* Speeding up the PostGIS tables
-* Joining the "CrashExtract" table with the "PersonExtract" table so the full number of bicyclists and pedestrians are counted in the figures returned to the user for their point search. Alternative: After the crash "casenumbers" (unique ID) are returned, send a query to the "PersonExtract" table once per casenumber to get the person information (this might be faster than joining)
-* Usability enhancements that tell the user the database is running their search; show how much time a search has taken; reverse geocodes the searched coordinates
-* Style changes
-* Update the API to return details like the number of rows returned and the time it took for the PostgreSQL server to run the query
-* Close the popup when the search results are returned (for some reason I cannot figure this out, and I thought it was pretty simple)
-* Make it responsive
-* Count the number of crashes per year and give the bike/pedestrian numbers in a year by year breakdown
-* "Bookmark" the locations so a person can create a text list of locations and their resulting crash figures. This is so a user can create a report of several intersections for their neighborhood. 
 
 ##Data
 The Chicago Crash Browser uses only one of the three tables the state provides, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided, all cities except Chicago ("City Code" != 1051) were stripped and uploaded to a PostgreSQL PostGIS-enabled database. 
