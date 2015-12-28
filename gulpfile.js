@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var del = require('del');
 var sourcemaps = require('gulp-sourcemaps');
 var concatCss = require('gulp-concat-css');
-var webpack = require('gulp-webpack');
+var webpack = require('webpack-stream');
 var rsync = require('rsync-slim');
 var secrets = require('./secrets.json');
 
