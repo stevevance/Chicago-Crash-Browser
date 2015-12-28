@@ -1,7 +1,19 @@
 /* global define */
 
-define(['jquery'], function ($) {
+define(['jquery', 'urijs', 'lodash'], function ($, URI, _) {
     'use strict';
+    var params = {};
+
+    var uri = new URI(window.location.href);
+    _.each(uri.fragment().split('&'), function (pair) {
+        var param = pair.split('=');
+        params[param[0]] = param[1];
+    });
+
+    var getParam = function getParam(param) {
+        return uri[param];
+    };
+
     var getDistance = function () {
         return $('input[name="searchRadius"]:checked').val();
     };
@@ -67,6 +79,7 @@ define(['jquery'], function ($) {
         personOrPeople: personOrPeople,
         crashOrCrashes: crashOrCrashes,
         CollisionEnum: CollisionEnum,
-        getDistance: getDistance
+        getDistance: getDistance,
+        getParam: getParam
     };
 });

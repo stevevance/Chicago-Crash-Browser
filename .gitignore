@@ -3,10 +3,13 @@ old/
 pg.php
 *dontcopy*
 *.sql
-
+secrets.json
 *.qgs
 cache/
 
 github_token
 
 DATA.md
+
+dist/
+node_modules/
