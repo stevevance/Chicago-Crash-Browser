@@ -19,6 +19,7 @@
   "devDependencies": {
     "del": "^2.2.0",
     "gulp": "^3.9.0",
+    "gulp-concat-css": "^2.2.0",
     "gulp-sourcemaps": "^1.6.0",
     "webpack": "^1.11.0",
     "webpack-dev-server": "^1.10.1",
