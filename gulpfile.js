@@ -45,7 +45,7 @@ gulp.task('deploy', ['default'], function () {
     src: outputFolder + '/',
     dest: secrets.username + '@' + secrets.hostname + ':/var/www/chicagocrashes/htdocs',
     options: '-rvhcz --delete --progress'
-  }), function (err) {
+  }, function (err) {
     console.error(err);
-  }
+  });
 });
