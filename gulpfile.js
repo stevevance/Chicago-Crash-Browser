@@ -8,19 +8,28 @@ var secrets = require('./secrets.json');
 
 const outputFolder = 'dist';
 
-gulp.task('default', ['clean'], function () {
-  gulp.src([
+gulp.task('css', function () {
+   return gulp.src([
       'bower_components/leaflet-dist/leaflet.css',
       'bower_components/leaflet.markerclusterer/dist/*.css',
       'bower_components/leaflet-locatecontrol/src/*.css',
       'bower_components/leaflet.draw/dist/*.css',
+      'node_modules/select2/dist/css/select2.min.css',
       'stylesheets/index.css']
     )
     .pipe(concatCss('bundle.css'))
     .pipe(gulp.dest(outputFolder));
+});
 
-  gulp.src('images/**/*')
+gulp.task('images', ['clean'], function () {
+  return gulp.src('images/**/*')
     .pipe(gulp.dest(outputFolder + '/images'));
+});
+
+gulp.task('default', ['clean', 'css', 'images'], function () {
+
+  gulp.src('api/**/*')
+    .pipe(gulp.dest(outputFolder + '/api'));
 
   gulp.src(['bower_components/**/leaflet-locatecontrol/src/images/locate.png',
     'bower_components/**/leaflet.draw/dist/images/spritesheet-2x.png'])
