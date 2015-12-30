@@ -14,6 +14,7 @@ gulp.task('default', ['clean'], function () {
       'bower_components/leaflet.markerclusterer/dist/*.css',
       'bower_components/leaflet-locatecontrol/src/*.css',
       'bower_components/leaflet.draw/dist/*.css',
+      'node_modules/select2/dist/css/select2.min.css',
       'stylesheets/index.css']
     )
     .pipe(concatCss('bundle.css'))
@@ -21,6 +22,9 @@ gulp.task('default', ['clean'], function () {
 
   gulp.src('images/**/*')
     .pipe(gulp.dest(outputFolder + '/images'));
+
+  gulp.src('api/**/*')
+    .pipe(gulp.dest(outputFolder + '/api'));
 
   gulp.src(['bower_components/**/leaflet-locatecontrol/src/images/locate.png',
     'bower_components/**/leaflet.draw/dist/images/spritesheet-2x.png'])

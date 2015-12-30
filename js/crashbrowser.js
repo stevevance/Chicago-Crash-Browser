@@ -11,6 +11,8 @@ require('jquery-ui/ui/menu');
 require('jquery-ui/ui/autocomplete');
 require('jquery-cookie/jquery.cookie');
 
+require('select2');
+
 require('leaflet-dist/leaflet-src');
 require('leaflet.markerclusterer');
 require('leaflet-locatecontrol/src/L.Control.Locate');
@@ -19,7 +21,7 @@ require('leaflet.draw');
 require('bootstrap');
 require('highcharts/highcharts');
 
-define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crashes, map, summary, $) {
+define(['util', 'crashes', 'map', 'summary', 'areas', 'jquery'], function (Utility, crashes, map, summary, areas, $) {
     var store = Rhaboo.persistent('crashBrowser');
     var addresses = [];
 
@@ -186,11 +188,14 @@ define(['util', 'crashes', 'map', 'summary', 'jquery'], function (Utility, crash
         });
 
         var get = Utility.getParam('get');
-        if(get == 'yes') {
+        if(get === 'yes') {
             $('body').trigger('search');
         }
 
         $('.btn').button();
+
+        areas.initDropdown();
+
     };
 
     $(document).ready(init);

@@ -1,0 +1,2132 @@
+[
+    {
+        "name": "West Humboldt Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-humboldt-park",
+        "metadata": null
+    },
+    {
+        "name": "London Town",
+        "type": "neighborhood",
+        "slug": "neighborhood-london-town",
+        "metadata": null
+    },
+    {
+        "name": "Chrysler Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-chrysler-village",
+        "metadata": null
+    },
+    {
+        "name": "Margate Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-margate-park",
+        "metadata": null
+    },
+    {
+        "name": "Lincoln Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-lincoln-park",
+        "metadata": null
+    },
+    {
+        "name": "Lincoln Square",
+        "type": "neighborhood",
+        "slug": "neighborhood-lincoln-square",
+        "metadata": null
+    },
+    {
+        "name": "The Gap",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-gap",
+        "metadata": null
+    },
+    {
+        "name": "Golden Gate",
+        "type": "neighborhood",
+        "slug": "neighborhood-golden-gate",
+        "metadata": null
+    },
+    {
+        "name": "Beverly",
+        "type": "neighborhood",
+        "slug": "neighborhood-beverly",
+        "metadata": null
+    },
+    {
+        "name": "Leclaire Courts",
+        "type": "neighborhood",
+        "slug": "neighborhood-leclaire-courts",
+        "metadata": null
+    },
+    {
+        "name": "Longwood Manor",
+        "type": "neighborhood",
+        "slug": "neighborhood-longwood-manor",
+        "metadata": null
+    },
+    {
+        "name": "South Old Irving Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-old-irving-park",
+        "metadata": null
+    },
+    {
+        "name": "Palmer Square",
+        "type": "neighborhood",
+        "slug": "neighborhood-palmer-square",
+        "metadata": null
+    },
+    {
+        "name": "Mckinley Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-mckinley-park",
+        "metadata": null
+    },
+    {
+        "name": "The Loop",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-loop",
+        "metadata": null
+    },
+    {
+        "name": "Lawndale",
+        "type": "neighborhood",
+        "slug": "neighborhood-lawndale",
+        "metadata": null
+    },
+    {
+        "name": "Marquette Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-marquette-park",
+        "metadata": null
+    },
+    {
+        "name": "Marynook",
+        "type": "neighborhood",
+        "slug": "neighborhood-marynook",
+        "metadata": null
+    },
+    {
+        "name": "Mayfair",
+        "type": "neighborhood",
+        "slug": "neighborhood-mayfair",
+        "metadata": null
+    },
+    {
+        "name": "South Shore",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-shore",
+        "metadata": null
+    },
+    {
+        "name": "Altgeld Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-altgeld-gardens",
+        "metadata": null
+    },
+    {
+        "name": "Ida B. Wells / Darrow Homes",
+        "type": "neighborhood",
+        "slug": "neighborhood-ida-b-wells-darrow-homes",
+        "metadata": null
+    },
+    {
+        "name": "West De Paul",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-de-paul",
+        "metadata": null
+    },
+    {
+        "name": "The Bush",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-bush",
+        "metadata": null
+    },
+    {
+        "name": "The Island",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-island",
+        "metadata": null
+    },
+    {
+        "name": "Garfield Ridge",
+        "type": "neighborhood",
+        "slug": "neighborhood-garfield-ridge",
+        "metadata": null
+    },
+    {
+        "name": "Magnificent Mile",
+        "type": "neighborhood",
+        "slug": "neighborhood-magnificent-mile",
+        "metadata": null
+    },
+    {
+        "name": "Hanson Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-hanson-park",
+        "metadata": null
+    },
+    {
+        "name": "Cabrini Green",
+        "type": "neighborhood",
+        "slug": "neighborhood-cabrini-green",
+        "metadata": null
+    },
+    {
+        "name": "Princeton Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-princeton-park",
+        "metadata": null
+    },
+    {
+        "name": "Montclare",
+        "type": "neighborhood",
+        "slug": "neighborhood-montclare",
+        "metadata": null
+    },
+    {
+        "name": "North Austin",
+        "type": "neighborhood",
+        "slug": "neighborhood-north-austin",
+        "metadata": null
+    },
+    {
+        "name": "Morgan Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-morgan-park",
+        "metadata": null
+    },
+    {
+        "name": "North Kenwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-north-kenwood",
+        "metadata": null
+    },
+    {
+        "name": "Near North",
+        "type": "neighborhood",
+        "slug": "neighborhood-near-north",
+        "metadata": null
+    },
+    {
+        "name": "Near East Side",
+        "type": "neighborhood",
+        "slug": "neighborhood-near-east-side",
+        "metadata": null
+    },
+    {
+        "name": "Near West Side",
+        "type": "neighborhood",
+        "slug": "neighborhood-near-west-side",
+        "metadata": null
+    },
+    {
+        "name": "Noble Square",
+        "type": "neighborhood",
+        "slug": "neighborhood-noble-square",
+        "metadata": null
+    },
+    {
+        "name": "North Mayfair",
+        "type": "neighborhood",
+        "slug": "neighborhood-north-mayfair",
+        "metadata": null
+    },
+    {
+        "name": "Belmont Central",
+        "type": "neighborhood",
+        "slug": "neighborhood-belmont-central",
+        "metadata": null
+    },
+    {
+        "name": "Andersonville",
+        "type": "neighborhood",
+        "slug": "neighborhood-andersonville",
+        "metadata": null
+    },
+    {
+        "name": "Archer Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-archer-heights",
+        "metadata": null
+    },
+    {
+        "name": "Park Manor",
+        "type": "neighborhood",
+        "slug": "neighborhood-park-manor",
+        "metadata": null
+    },
+    {
+        "name": "Dearborn Homes",
+        "type": "neighborhood",
+        "slug": "neighborhood-dearborn-homes",
+        "metadata": null
+    },
+    {
+        "name": "Calumet Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-calumet-heights",
+        "metadata": null
+    },
+    {
+        "name": "Albany Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-albany-park",
+        "metadata": null
+    },
+    {
+        "name": "Arcadia Terrace",
+        "type": "neighborhood",
+        "slug": "neighborhood-arcadia-terrace",
+        "metadata": null
+    },
+    {
+        "name": "Tri-Taylor",
+        "type": "neighborhood",
+        "slug": "neighborhood-tri-taylor",
+        "metadata": null
+    },
+    {
+        "name": "Belmont Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-belmont-gardens",
+        "metadata": null
+    },
+    {
+        "name": "Park West",
+        "type": "neighborhood",
+        "slug": "neighborhood-park-west",
+        "metadata": null
+    },
+    {
+        "name": "Kennedy Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-kennedy-park",
+        "metadata": null
+    },
+    {
+        "name": "Parkview",
+        "type": "neighborhood",
+        "slug": "neighborhood-parkview",
+        "metadata": null
+    },
+    {
+        "name": "The Villa",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-villa",
+        "metadata": null
+    },
+    {
+        "name": "Greektown",
+        "type": "neighborhood",
+        "slug": "neighborhood-greektown",
+        "metadata": null
+    },
+    {
+        "name": "Little Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-little-village",
+        "metadata": null
+    },
+    {
+        "name": "Kelvin Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-kelvin-park",
+        "metadata": null
+    },
+    {
+        "name": "Kilbourn Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-kilbourn-park",
+        "metadata": null
+    },
+    {
+        "name": "Wrigleyville",
+        "type": "neighborhood",
+        "slug": "neighborhood-wrigleyville",
+        "metadata": null
+    },
+    {
+        "name": "Streeterville",
+        "type": "neighborhood",
+        "slug": "neighborhood-streeterville",
+        "metadata": null
+    },
+    {
+        "name": "Lake View East",
+        "type": "neighborhood",
+        "slug": "neighborhood-lake-view-east",
+        "metadata": null
+    },
+    {
+        "name": "Belmont Terrace",
+        "type": "neighborhood",
+        "slug": "neighborhood-belmont-terrace",
+        "metadata": null
+    },
+    {
+        "name": "Brynford Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-brynford-park",
+        "metadata": null
+    },
+    {
+        "name": "Douglas Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-douglas-park",
+        "metadata": null
+    },
+    {
+        "name": "Lithuanian Plaza",
+        "type": "neighborhood",
+        "slug": "neighborhood-lithuanian-plaza",
+        "metadata": null
+    },
+    {
+        "name": "Marycrest",
+        "type": "neighborhood",
+        "slug": "neighborhood-marycrest",
+        "metadata": null
+    },
+    {
+        "name": "Harbour Point Estates",
+        "type": "neighborhood",
+        "slug": "neighborhood-harbour-point-estates",
+        "metadata": null
+    },
+    {
+        "name": "Fulton River District",
+        "type": "neighborhood",
+        "slug": "neighborhood-fulton-river-district",
+        "metadata": null
+    },
+    {
+        "name": "Heart Of Italy",
+        "type": "neighborhood",
+        "slug": "neighborhood-heart-of-italy",
+        "metadata": null
+    },
+    {
+        "name": "East Chatham",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-chatham",
+        "metadata": null
+    },
+    {
+        "name": "Beverly View",
+        "type": "neighborhood",
+        "slug": "neighborhood-beverly-view",
+        "metadata": null
+    },
+    {
+        "name": "Dearborn Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-dearborn-park",
+        "metadata": null
+    },
+    {
+        "name": "Pill Hill",
+        "type": "neighborhood",
+        "slug": "neighborhood-pill-hill",
+        "metadata": null
+    },
+    {
+        "name": "East Beverly",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-beverly",
+        "metadata": null
+    },
+    {
+        "name": "Dunning",
+        "type": "neighborhood",
+        "slug": "neighborhood-dunning",
+        "metadata": null
+    },
+    {
+        "name": "East Pilsen",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-pilsen",
+        "metadata": null
+    },
+    {
+        "name": "East Garfield Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-garfield-park",
+        "metadata": null
+    },
+    {
+        "name": "Edgewater Beach",
+        "type": "neighborhood",
+        "slug": "neighborhood-edgewater-beach",
+        "metadata": null
+    },
+    {
+        "name": "Ukrainian Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-ukrainian-village",
+        "metadata": null
+    },
+    {
+        "name": "Galewood",
+        "type": "neighborhood",
+        "slug": "neighborhood-galewood",
+        "metadata": null
+    },
+    {
+        "name": "Gladstone Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-gladstone-park",
+        "metadata": null
+    },
+    {
+        "name": "Eden Green",
+        "type": "neighborhood",
+        "slug": "neighborhood-eden-green",
+        "metadata": null
+    },
+    {
+        "name": "Gold Coast",
+        "type": "neighborhood",
+        "slug": "neighborhood-gold-coast",
+        "metadata": null
+    },
+    {
+        "name": "Pilsen",
+        "type": "neighborhood",
+        "slug": "neighborhood-pilsen",
+        "metadata": null
+    },
+    {
+        "name": "Grand Crossing",
+        "type": "neighborhood",
+        "slug": "neighborhood-grand-crossing",
+        "metadata": null
+    },
+    {
+        "name": "Goose Island",
+        "type": "neighborhood",
+        "slug": "neighborhood-goose-island",
+        "metadata": null
+    },
+    {
+        "name": "Graceland West",
+        "type": "neighborhood",
+        "slug": "neighborhood-graceland-west",
+        "metadata": null
+    },
+    {
+        "name": "Ravenswood Manor",
+        "type": "neighborhood",
+        "slug": "neighborhood-ravenswood-manor",
+        "metadata": null
+    },
+    {
+        "name": "Belmont Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-belmont-heights",
+        "metadata": null
+    },
+    {
+        "name": "Beverly Woods",
+        "type": "neighborhood",
+        "slug": "neighborhood-beverly-woods",
+        "metadata": null
+    },
+    {
+        "name": "Buena Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-buena-park",
+        "metadata": null
+    },
+    {
+        "name": "Chatham",
+        "type": "neighborhood",
+        "slug": "neighborhood-chatham",
+        "metadata": null
+    },
+    {
+        "name": "Big Oaks",
+        "type": "neighborhood",
+        "slug": "neighborhood-big-oaks",
+        "metadata": null
+    },
+    {
+        "name": "Bowmanville",
+        "type": "neighborhood",
+        "slug": "neighborhood-bowmanville",
+        "metadata": null
+    },
+    {
+        "name": "Clearing (W)",
+        "type": "neighborhood",
+        "slug": "neighborhood-clearing-w-",
+        "metadata": null
+    },
+    {
+        "name": "Printers Row",
+        "type": "neighborhood",
+        "slug": "neighborhood-printers-row",
+        "metadata": null
+    },
+    {
+        "name": "Prairie District",
+        "type": "neighborhood",
+        "slug": "neighborhood-prairie-district",
+        "metadata": null
+    },
+    {
+        "name": "Ravenswood",
+        "type": "neighborhood",
+        "slug": "neighborhood-ravenswood",
+        "metadata": null
+    },
+    {
+        "name": "West Pullman",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-pullman",
+        "metadata": null
+    },
+    {
+        "name": "Logan Square",
+        "type": "neighborhood",
+        "slug": "neighborhood-logan-square",
+        "metadata": null
+    },
+    {
+        "name": "Avondale",
+        "type": "neighborhood",
+        "slug": "neighborhood-avondale",
+        "metadata": null
+    },
+    {
+        "name": "Brainerd",
+        "type": "neighborhood",
+        "slug": "neighborhood-brainerd",
+        "metadata": null
+    },
+    {
+        "name": "East Hyde Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-hyde-park",
+        "metadata": null
+    },
+    {
+        "name": "Brighton Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-brighton-park",
+        "metadata": null
+    },
+    {
+        "name": "Budlong Woods",
+        "type": "neighborhood",
+        "slug": "neighborhood-budlong-woods",
+        "metadata": null
+    },
+    {
+        "name": "Chicago Lawn",
+        "type": "neighborhood",
+        "slug": "neighborhood-chicago-lawn",
+        "metadata": null
+    },
+    {
+        "name": "Clearing (E)",
+        "type": "neighborhood",
+        "slug": "neighborhood-clearing-e-",
+        "metadata": null
+    },
+    {
+        "name": "River's Edge",
+        "type": "neighborhood",
+        "slug": "neighborhood-river-s-edge",
+        "metadata": null
+    },
+    {
+        "name": "Rogers Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-rogers-park",
+        "metadata": null
+    },
+    {
+        "name": "West Englewood",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-englewood",
+        "metadata": null
+    },
+    {
+        "name": "West Lawn",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-lawn",
+        "metadata": null
+    },
+    {
+        "name": "Cragin",
+        "type": "neighborhood",
+        "slug": "neighborhood-cragin",
+        "metadata": null
+    },
+    {
+        "name": "Pulaski Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-pulaski-park",
+        "metadata": null
+    },
+    {
+        "name": "Gresham",
+        "type": "neighborhood",
+        "slug": "neighborhood-gresham",
+        "metadata": null
+    },
+    {
+        "name": "Ranch Triangle",
+        "type": "neighborhood",
+        "slug": "neighborhood-ranch-triangle",
+        "metadata": null
+    },
+    {
+        "name": "Ravenswood Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-ravenswood-gardens",
+        "metadata": null
+    },
+    {
+        "name": "South East Ravenswood",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-east-ravenswood",
+        "metadata": null
+    },
+    {
+        "name": "Gage Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-gage-park",
+        "metadata": null
+    },
+    {
+        "name": "West Morgan Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-morgan-park",
+        "metadata": null
+    },
+    {
+        "name": "Lake View",
+        "type": "neighborhood",
+        "slug": "neighborhood-lake-view",
+        "metadata": null
+    },
+    {
+        "name": "Roseland",
+        "type": "neighborhood",
+        "slug": "neighborhood-roseland",
+        "metadata": null
+    },
+    {
+        "name": "Bridgeport",
+        "type": "neighborhood",
+        "slug": "neighborhood-bridgeport",
+        "metadata": null
+    },
+    {
+        "name": "Woodlawn",
+        "type": "neighborhood",
+        "slug": "neighborhood-woodlawn",
+        "metadata": null
+    },
+    {
+        "name": "Hyde Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-hyde-park",
+        "metadata": null
+    },
+    {
+        "name": "Sheridan Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-sheridan-park",
+        "metadata": null
+    },
+    {
+        "name": "Washington Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-washington-park",
+        "metadata": null
+    },
+    {
+        "name": "Jackson Park Highlands",
+        "type": "neighborhood",
+        "slug": "neighborhood-jackson-park-highlands",
+        "metadata": null
+    },
+    {
+        "name": "Parkway Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-parkway-gardens",
+        "metadata": null
+    },
+    {
+        "name": "Bucktown",
+        "type": "neighborhood",
+        "slug": "neighborhood-bucktown",
+        "metadata": null
+    },
+    {
+        "name": "Cottage Grove Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-cottage-grove-heights",
+        "metadata": null
+    },
+    {
+        "name": "Irving Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-irving-park",
+        "metadata": null
+    },
+    {
+        "name": "River West",
+        "type": "neighborhood",
+        "slug": "neighborhood-river-west",
+        "metadata": null
+    },
+    {
+        "name": "East Side",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-side",
+        "metadata": null
+    },
+    {
+        "name": "River North",
+        "type": "neighborhood",
+        "slug": "neighborhood-river-north",
+        "metadata": null
+    },
+    {
+        "name": "Schorsch Forest View",
+        "type": "neighborhood",
+        "slug": "neighborhood-schorsch-forest-view",
+        "metadata": null
+    },
+    {
+        "name": "Old Town Triangle",
+        "type": "neighborhood",
+        "slug": "neighborhood-old-town-triangle",
+        "metadata": null
+    },
+    {
+        "name": "Illinois Medical District",
+        "type": "neighborhood",
+        "slug": "neighborhood-illinois-medical-district",
+        "metadata": null
+    },
+    {
+        "name": "Schorsch Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-schorsch-village",
+        "metadata": null
+    },
+    {
+        "name": "Winneconna Parkway",
+        "type": "neighborhood",
+        "slug": "neighborhood-winneconna-parkway",
+        "metadata": null
+    },
+    {
+        "name": "Old Edgebrook",
+        "type": "neighborhood",
+        "slug": "neighborhood-old-edgebrook",
+        "metadata": null
+    },
+    {
+        "name": "Sauganash",
+        "type": "neighborhood",
+        "slug": "neighborhood-sauganash",
+        "metadata": null
+    },
+    {
+        "name": "Hermosa",
+        "type": "neighborhood",
+        "slug": "neighborhood-hermosa",
+        "metadata": null
+    },
+    {
+        "name": "Heart Of Chicago",
+        "type": "neighborhood",
+        "slug": "neighborhood-heart-of-chicago",
+        "metadata": null
+    },
+    {
+        "name": "Riverdale",
+        "type": "neighborhood",
+        "slug": "neighborhood-riverdale",
+        "metadata": null
+    },
+    {
+        "name": "Hollywood Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-hollywood-park",
+        "metadata": null
+    },
+    {
+        "name": "Old Norwood Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-old-norwood-park",
+        "metadata": null
+    },
+    {
+        "name": "Sauganash Woods",
+        "type": "neighborhood",
+        "slug": "neighborhood-sauganash-woods",
+        "metadata": null
+    },
+    {
+        "name": "Prairie Shores",
+        "type": "neighborhood",
+        "slug": "neighborhood-prairie-shores",
+        "metadata": null
+    },
+    {
+        "name": "Old Town",
+        "type": "neighborhood",
+        "slug": "neighborhood-old-town",
+        "metadata": null
+    },
+    {
+        "name": "Peterson Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-peterson-park",
+        "metadata": null
+    },
+    {
+        "name": "South Commons",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-commons",
+        "metadata": null
+    },
+    {
+        "name": "Sleepy Hollow",
+        "type": "neighborhood",
+        "slug": "neighborhood-sleepy-hollow",
+        "metadata": null
+    },
+    {
+        "name": "Portage Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-portage-park",
+        "metadata": null
+    },
+    {
+        "name": "Lathrop Homes",
+        "type": "neighborhood",
+        "slug": "neighborhood-lathrop-homes",
+        "metadata": null
+    },
+    {
+        "name": "West Loop Gate",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-loop-gate",
+        "metadata": null
+    },
+    {
+        "name": "Lake Meadows",
+        "type": "neighborhood",
+        "slug": "neighborhood-lake-meadows",
+        "metadata": null
+    },
+    {
+        "name": "Edgewater Glen",
+        "type": "neighborhood",
+        "slug": "neighborhood-edgewater-glen",
+        "metadata": null
+    },
+    {
+        "name": "Lakewood - Balmoral",
+        "type": "neighborhood",
+        "slug": "neighborhood-lakewood-balmoral",
+        "metadata": null
+    },
+    {
+        "name": "Groveland Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-groveland-park",
+        "metadata": null
+    },
+    {
+        "name": "South Edgebrook",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-edgebrook",
+        "metadata": null
+    },
+    {
+        "name": "Stony Island Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-stony-island-park",
+        "metadata": null
+    },
+    {
+        "name": "Union Ridge",
+        "type": "neighborhood",
+        "slug": "neighborhood-union-ridge",
+        "metadata": null
+    },
+    {
+        "name": "University Village / Little Italy",
+        "type": "neighborhood",
+        "slug": "neighborhood-university-village-little-italy",
+        "metadata": null
+    },
+    {
+        "name": "Avalon Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-avalon-park",
+        "metadata": null
+    },
+    {
+        "name": "Uptown",
+        "type": "neighborhood",
+        "slug": "neighborhood-uptown",
+        "metadata": null
+    },
+    {
+        "name": "Vittum Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-vittum-park",
+        "metadata": null
+    },
+    {
+        "name": "Washington Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-washington-heights",
+        "metadata": null
+    },
+    {
+        "name": "West Beverly",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-beverly",
+        "metadata": null
+    },
+    {
+        "name": "West Chatham",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-chatham",
+        "metadata": null
+    },
+    {
+        "name": "West Elsdon",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-elsdon",
+        "metadata": null
+    },
+    {
+        "name": "West Garfield Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-garfield-park",
+        "metadata": null
+    },
+    {
+        "name": "Scottsdale",
+        "type": "neighborhood",
+        "slug": "neighborhood-scottsdale",
+        "metadata": null
+    },
+    {
+        "name": "Trumbull Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-trumbull-park",
+        "metadata": null
+    },
+    {
+        "name": "West Rogers Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-rogers-park",
+        "metadata": null
+    },
+    {
+        "name": "South Austin",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-austin",
+        "metadata": null
+    },
+    {
+        "name": "Bronzeville",
+        "type": "neighborhood",
+        "slug": "neighborhood-bronzeville",
+        "metadata": null
+    },
+    {
+        "name": "Homan Square",
+        "type": "neighborhood",
+        "slug": "neighborhood-homan-square",
+        "metadata": null
+    },
+    {
+        "name": "Oriole Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-oriole-park",
+        "metadata": null
+    },
+    {
+        "name": "Pullman",
+        "type": "neighborhood",
+        "slug": "neighborhood-pullman",
+        "metadata": null
+    },
+    {
+        "name": "Irving Woods",
+        "type": "neighborhood",
+        "slug": "neighborhood-irving-woods",
+        "metadata": null
+    },
+    {
+        "name": "Humboldt Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-humboldt-park",
+        "metadata": null
+    },
+    {
+        "name": "Oakland",
+        "type": "neighborhood",
+        "slug": "neighborhood-oakland",
+        "metadata": null
+    },
+    {
+        "name": "Norwood Park East",
+        "type": "neighborhood",
+        "slug": "neighborhood-norwood-park-east",
+        "metadata": null
+    },
+    {
+        "name": "Norwood Park West",
+        "type": "neighborhood",
+        "slug": "neighborhood-norwood-park-west",
+        "metadata": null
+    },
+    {
+        "name": "O'hare",
+        "type": "neighborhood",
+        "slug": "neighborhood-o-hare",
+        "metadata": null
+    },
+    {
+        "name": "North Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-north-park",
+        "metadata": null
+    },
+    {
+        "name": "East Ukrainian Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-east-ukrainian-village",
+        "metadata": null
+    },
+    {
+        "name": "Fifth City",
+        "type": "neighborhood",
+        "slug": "neighborhood-fifth-city",
+        "metadata": null
+    },
+    {
+        "name": "Edison Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-edison-park",
+        "metadata": null
+    },
+    {
+        "name": "Fernwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-fernwood",
+        "metadata": null
+    },
+    {
+        "name": "Roscoe Village",
+        "type": "neighborhood",
+        "slug": "neighborhood-roscoe-village",
+        "metadata": null
+    },
+    {
+        "name": "Ford City",
+        "type": "neighborhood",
+        "slug": "neighborhood-ford-city",
+        "metadata": null
+    },
+    {
+        "name": "Forest Glen",
+        "type": "neighborhood",
+        "slug": "neighborhood-forest-glen",
+        "metadata": null
+    },
+    {
+        "name": "Jeffery Manor",
+        "type": "neighborhood",
+        "slug": "neighborhood-jeffery-manor",
+        "metadata": null
+    },
+    {
+        "name": "South Loop",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-loop",
+        "metadata": null
+    },
+    {
+        "name": "Englewood",
+        "type": "neighborhood",
+        "slug": "neighborhood-englewood",
+        "metadata": null
+    },
+    {
+        "name": "Back Of The Yards",
+        "type": "neighborhood",
+        "slug": "neighborhood-back-of-the-yards",
+        "metadata": null
+    },
+    {
+        "name": "Canaryville",
+        "type": "neighborhood",
+        "slug": "neighborhood-canaryville",
+        "metadata": null
+    },
+    {
+        "name": "North Center",
+        "type": "neighborhood",
+        "slug": "neighborhood-north-center",
+        "metadata": null
+    },
+    {
+        "name": "Stateway Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-stateway-gardens",
+        "metadata": null
+    },
+    {
+        "name": "Wentworth Gardens",
+        "type": "neighborhood",
+        "slug": "neighborhood-wentworth-gardens",
+        "metadata": null
+    },
+    {
+        "name": "Horner Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-horner-park",
+        "metadata": null
+    },
+    {
+        "name": "West Woodlawn",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-woodlawn",
+        "metadata": null
+    },
+    {
+        "name": "South Deering",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-deering",
+        "metadata": null
+    },
+    {
+        "name": "West Town",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-town",
+        "metadata": null
+    },
+    {
+        "name": "Wicker Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-wicker-park",
+        "metadata": null
+    },
+    {
+        "name": "Wildwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-wildwood",
+        "metadata": null
+    },
+    {
+        "name": "Edgebrook",
+        "type": "neighborhood",
+        "slug": "neighborhood-edgebrook",
+        "metadata": null
+    },
+    {
+        "name": "Fuller Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-fuller-park",
+        "metadata": null
+    },
+    {
+        "name": "Kenwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-kenwood",
+        "metadata": null
+    },
+    {
+        "name": "Wrightwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-wrightwood",
+        "metadata": null
+    },
+    {
+        "name": "Wrightwood Neighbors",
+        "type": "neighborhood",
+        "slug": "neighborhood-wrightwood-neighbors",
+        "metadata": null
+    },
+    {
+        "name": "Sheffield Neighbors",
+        "type": "neighborhood",
+        "slug": "neighborhood-sheffield-neighbors",
+        "metadata": null
+    },
+    {
+        "name": "Magnolia Glen",
+        "type": "neighborhood",
+        "slug": "neighborhood-magnolia-glen",
+        "metadata": null
+    },
+    {
+        "name": "Ickes Praire Homes",
+        "type": "neighborhood",
+        "slug": "neighborhood-ickes-praire-homes",
+        "metadata": null
+    },
+    {
+        "name": "Mount Greenwood Heights",
+        "type": "neighborhood",
+        "slug": "neighborhood-mount-greenwood-heights",
+        "metadata": null
+    },
+    {
+        "name": "Edgewater",
+        "type": "neighborhood",
+        "slug": "neighborhood-edgewater",
+        "metadata": null
+    },
+    {
+        "name": "Old Irving Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-old-irving-park",
+        "metadata": null
+    },
+    {
+        "name": "West Chesterfield",
+        "type": "neighborhood",
+        "slug": "neighborhood-west-chesterfield",
+        "metadata": null
+    },
+    {
+        "name": "Mount Greenwood",
+        "type": "neighborhood",
+        "slug": "neighborhood-mount-greenwood",
+        "metadata": null
+    },
+    {
+        "name": "Burnside",
+        "type": "neighborhood",
+        "slug": "neighborhood-burnside",
+        "metadata": null
+    },
+    {
+        "name": "Rosemoor",
+        "type": "neighborhood",
+        "slug": "neighborhood-rosemoor",
+        "metadata": null
+    },
+    {
+        "name": "Tally's Corner",
+        "type": "neighborhood",
+        "slug": "neighborhood-tally-s-corner",
+        "metadata": null
+    },
+    {
+        "name": "Hegewisch",
+        "type": "neighborhood",
+        "slug": "neighborhood-hegewisch",
+        "metadata": null
+    },
+    {
+        "name": "Ashburn",
+        "type": "neighborhood",
+        "slug": "neighborhood-ashburn",
+        "metadata": null
+    },
+    {
+        "name": "South Chicago",
+        "type": "neighborhood",
+        "slug": "neighborhood-south-chicago",
+        "metadata": null
+    },
+    {
+        "name": "Jefferson Park",
+        "type": "neighborhood",
+        "slug": "neighborhood-jefferson-park",
+        "metadata": null
+    },
+    {
+        "name": "The Robert Taylor Homes",
+        "type": "neighborhood",
+        "slug": "neighborhood-the-robert-taylor-homes",
+        "metadata": null
+    },
+    {
+        "name": "Chinatown",
+        "type": "neighborhood",
+        "slug": "neighborhood-chinatown",
+        "metadata": null
+    },
+    {
+        "name": "Douglas",
+        "type": "communityarea",
+        "slug": "communityarea-douglas",
+        "metadata": null
+    },
+    {
+        "name": "Lincoln Square",
+        "type": "communityarea",
+        "slug": "communityarea-lincoln-square",
+        "metadata": null
+    },
+    {
+        "name": "Hyde Park",
+        "type": "communityarea",
+        "slug": "communityarea-hyde-park",
+        "metadata": null
+    },
+    {
+        "name": "Woodlawn",
+        "type": "communityarea",
+        "slug": "communityarea-woodlawn",
+        "metadata": null
+    },
+    {
+        "name": "Rogers Park",
+        "type": "communityarea",
+        "slug": "communityarea-rogers-park",
+        "metadata": null
+    },
+    {
+        "name": "Jefferson Park",
+        "type": "communityarea",
+        "slug": "communityarea-jefferson-park",
+        "metadata": null
+    },
+    {
+        "name": "Forest Glen",
+        "type": "communityarea",
+        "slug": "communityarea-forest-glen",
+        "metadata": null
+    },
+    {
+        "name": "North Park",
+        "type": "communityarea",
+        "slug": "communityarea-north-park",
+        "metadata": null
+    },
+    {
+        "name": "Albany Park",
+        "type": "communityarea",
+        "slug": "communityarea-albany-park",
+        "metadata": null
+    },
+    {
+        "name": "Near North Side",
+        "type": "communityarea",
+        "slug": "communityarea-near-north-side",
+        "metadata": null
+    },
+    {
+        "name": "Oakland",
+        "type": "communityarea",
+        "slug": "communityarea-oakland",
+        "metadata": null
+    },
+    {
+        "name": "West Town",
+        "type": "communityarea",
+        "slug": "communityarea-west-town",
+        "metadata": null
+    },
+    {
+        "name": "Austin",
+        "type": "communityarea",
+        "slug": "communityarea-austin",
+        "metadata": null
+    },
+    {
+        "name": "Fuller Park",
+        "type": "communityarea",
+        "slug": "communityarea-fuller-park",
+        "metadata": null
+    },
+    {
+        "name": "Grand Boulevard",
+        "type": "communityarea",
+        "slug": "communityarea-grand-boulevard",
+        "metadata": null
+    },
+    {
+        "name": "Loop",
+        "type": "communityarea",
+        "slug": "communityarea-loop",
+        "metadata": null
+    },
+    {
+        "name": "South Shore",
+        "type": "communityarea",
+        "slug": "communityarea-south-shore",
+        "metadata": null
+    },
+    {
+        "name": "Kenwood",
+        "type": "communityarea",
+        "slug": "communityarea-kenwood",
+        "metadata": null
+    },
+    {
+        "name": "Washington Park",
+        "type": "communityarea",
+        "slug": "communityarea-washington-park",
+        "metadata": null
+    },
+    {
+        "name": "Burnside",
+        "type": "communityarea",
+        "slug": "communityarea-burnside",
+        "metadata": null
+    },
+    {
+        "name": "Portage Park",
+        "type": "communityarea",
+        "slug": "communityarea-portage-park",
+        "metadata": null
+    },
+    {
+        "name": "Dunning",
+        "type": "communityarea",
+        "slug": "communityarea-dunning",
+        "metadata": null
+    },
+    {
+        "name": "Riverdale",
+        "type": "communityarea",
+        "slug": "communityarea-riverdale",
+        "metadata": null
+    },
+    {
+        "name": "Hegewisch",
+        "type": "communityarea",
+        "slug": "communityarea-hegewisch",
+        "metadata": null
+    },
+    {
+        "name": "Garfield Ridge",
+        "type": "communityarea",
+        "slug": "communityarea-garfield-ridge",
+        "metadata": null
+    },
+    {
+        "name": "Irving Park",
+        "type": "communityarea",
+        "slug": "communityarea-irving-park",
+        "metadata": null
+    },
+    {
+        "name": "Montclare",
+        "type": "communityarea",
+        "slug": "communityarea-montclare",
+        "metadata": null
+    },
+    {
+        "name": "West Ridge",
+        "type": "communityarea",
+        "slug": "communityarea-west-ridge",
+        "metadata": null
+    },
+    {
+        "name": "Archer Heights",
+        "type": "communityarea",
+        "slug": "communityarea-archer-heights",
+        "metadata": null
+    },
+    {
+        "name": "Belmont Cragin",
+        "type": "communityarea",
+        "slug": "communityarea-belmont-cragin",
+        "metadata": null
+    },
+    {
+        "name": "Logan Square",
+        "type": "communityarea",
+        "slug": "communityarea-logan-square",
+        "metadata": null
+    },
+    {
+        "name": "Hermosa",
+        "type": "communityarea",
+        "slug": "communityarea-hermosa",
+        "metadata": null
+    },
+    {
+        "name": "Avondale",
+        "type": "communityarea",
+        "slug": "communityarea-avondale",
+        "metadata": null
+    },
+    {
+        "name": "Humboldt Park",
+        "type": "communityarea",
+        "slug": "communityarea-humboldt-park",
+        "metadata": null
+    },
+    {
+        "name": "Near West Side",
+        "type": "communityarea",
+        "slug": "communityarea-near-west-side",
+        "metadata": null
+    },
+    {
+        "name": "West Garfield Park",
+        "type": "communityarea",
+        "slug": "communityarea-west-garfield-park",
+        "metadata": null
+    },
+    {
+        "name": "Uptown",
+        "type": "communityarea",
+        "slug": "communityarea-uptown",
+        "metadata": null
+    },
+    {
+        "name": "East Garfield Park",
+        "type": "communityarea",
+        "slug": "communityarea-east-garfield-park",
+        "metadata": null
+    },
+    {
+        "name": "North Lawndale",
+        "type": "communityarea",
+        "slug": "communityarea-north-lawndale",
+        "metadata": null
+    },
+    {
+        "name": "Near South Side",
+        "type": "communityarea",
+        "slug": "communityarea-near-south-side",
+        "metadata": null
+    },
+    {
+        "name": "South Lawndale",
+        "type": "communityarea",
+        "slug": "communityarea-south-lawndale",
+        "metadata": null
+    },
+    {
+        "name": "Norwood Park",
+        "type": "communityarea",
+        "slug": "communityarea-norwood-park",
+        "metadata": null
+    },
+    {
+        "name": "Lower West Side",
+        "type": "communityarea",
+        "slug": "communityarea-lower-west-side",
+        "metadata": null
+    },
+    {
+        "name": "Armour Square",
+        "type": "communityarea",
+        "slug": "communityarea-armour-square",
+        "metadata": null
+    },
+    {
+        "name": "South Chicago",
+        "type": "communityarea",
+        "slug": "communityarea-south-chicago",
+        "metadata": null
+    },
+    {
+        "name": "Chatham",
+        "type": "communityarea",
+        "slug": "communityarea-chatham",
+        "metadata": null
+    },
+    {
+        "name": "Avalon Park",
+        "type": "communityarea",
+        "slug": "communityarea-avalon-park",
+        "metadata": null
+    },
+    {
+        "name": "Calumet Heights",
+        "type": "communityarea",
+        "slug": "communityarea-calumet-heights",
+        "metadata": null
+    },
+    {
+        "name": "Roseland",
+        "type": "communityarea",
+        "slug": "communityarea-roseland",
+        "metadata": null
+    },
+    {
+        "name": "South Deering",
+        "type": "communityarea",
+        "slug": "communityarea-south-deering",
+        "metadata": null
+    },
+    {
+        "name": "East Side",
+        "type": "communityarea",
+        "slug": "communityarea-east-side",
+        "metadata": null
+    },
+    {
+        "name": "West Pullman",
+        "type": "communityarea",
+        "slug": "communityarea-west-pullman",
+        "metadata": null
+    },
+    {
+        "name": "Edison Park",
+        "type": "communityarea",
+        "slug": "communityarea-edison-park",
+        "metadata": null
+    },
+    {
+        "name": "North Center",
+        "type": "communityarea",
+        "slug": "communityarea-north-center",
+        "metadata": null
+    },
+    {
+        "name": "Lake View",
+        "type": "communityarea",
+        "slug": "communityarea-lake-view",
+        "metadata": null
+    },
+    {
+        "name": "Pullman",
+        "type": "communityarea",
+        "slug": "communityarea-pullman",
+        "metadata": null
+    },
+    {
+        "name": "Brighton Park",
+        "type": "communityarea",
+        "slug": "communityarea-brighton-park",
+        "metadata": null
+    },
+    {
+        "name": "Mckinley Park",
+        "type": "communityarea",
+        "slug": "communityarea-mckinley-park",
+        "metadata": null
+    },
+    {
+        "name": "Bridgeport",
+        "type": "communityarea",
+        "slug": "communityarea-bridgeport",
+        "metadata": null
+    },
+    {
+        "name": "Clearing",
+        "type": "communityarea",
+        "slug": "communityarea-clearing",
+        "metadata": null
+    },
+    {
+        "name": "New City",
+        "type": "communityarea",
+        "slug": "communityarea-new-city",
+        "metadata": null
+    },
+    {
+        "name": "West Elsdon",
+        "type": "communityarea",
+        "slug": "communityarea-west-elsdon",
+        "metadata": null
+    },
+    {
+        "name": "Gage Park",
+        "type": "communityarea",
+        "slug": "communityarea-gage-park",
+        "metadata": null
+    },
+    {
+        "name": "West Lawn",
+        "type": "communityarea",
+        "slug": "communityarea-west-lawn",
+        "metadata": null
+    },
+    {
+        "name": "Greater Grand Crossing",
+        "type": "communityarea",
+        "slug": "communityarea-greater-grand-crossing",
+        "metadata": null
+    },
+    {
+        "name": "Lincoln Park",
+        "type": "communityarea",
+        "slug": "communityarea-lincoln-park",
+        "metadata": null
+    },
+    {
+        "name": "Ashburn",
+        "type": "communityarea",
+        "slug": "communityarea-ashburn",
+        "metadata": null
+    },
+    {
+        "name": "Chicago Lawn",
+        "type": "communityarea",
+        "slug": "communityarea-chicago-lawn",
+        "metadata": null
+    },
+    {
+        "name": "West Englewood",
+        "type": "communityarea",
+        "slug": "communityarea-west-englewood",
+        "metadata": null
+    },
+    {
+        "name": "Englewood",
+        "type": "communityarea",
+        "slug": "communityarea-englewood",
+        "metadata": null
+    },
+    {
+        "name": "Mount Greenwood",
+        "type": "communityarea",
+        "slug": "communityarea-mount-greenwood",
+        "metadata": null
+    },
+    {
+        "name": "Auburn Gresham",
+        "type": "communityarea",
+        "slug": "communityarea-auburn-gresham",
+        "metadata": null
+    },
+    {
+        "name": "Edgewater",
+        "type": "communityarea",
+        "slug": "communityarea-edgewater",
+        "metadata": null
+    },
+    {
+        "name": "O'hare",
+        "type": "communityarea",
+        "slug": "communityarea-ohare",
+        "metadata": null
+    },
+    {
+        "name": "Washington Heights",
+        "type": "communityarea",
+        "slug": "communityarea-washington-heights",
+        "metadata": null
+    },
+    {
+        "name": "Morgan Park",
+        "type": "communityarea",
+        "slug": "communityarea-morgan-park",
+        "metadata": null
+    },
+    {
+        "name": "Beverly",
+        "type": "communityarea",
+        "slug": "communityarea-beverly",
+        "metadata": null
+    },
+    {
+        "name": "Ward 42, Alder Brendan Reilly",
+        "type": "ward",
+        "slug": "ward-42",
+        "metadata": "42nd"
+    },
+    {
+        "name": "Ward 12, Alder George A. Cardenas",
+        "type": "ward",
+        "slug": "ward-12",
+        "metadata": "12th"
+    },
+    {
+        "name": "Ward 16, Alder Toni Foulkes",
+        "type": "ward",
+        "slug": "ward-16",
+        "metadata": "16th"
+    },
+    {
+        "name": "Ward 15, Alder Raymond Lopez",
+        "type": "ward",
+        "slug": "ward-15",
+        "metadata": "15th"
+    },
+    {
+        "name": "Ward 20, Alder Willie Cochran",
+        "type": "ward",
+        "slug": "ward-20",
+        "metadata": "20th"
+    },
+    {
+        "name": "Ward 49, Alder Joe A. Moore",
+        "type": "ward",
+        "slug": "ward-49",
+        "metadata": "49th"
+    },
+    {
+        "name": "Ward 23, Alder Michael R. Zalewski",
+        "type": "ward",
+        "slug": "ward-23",
+        "metadata": "23rd"
+    },
+    {
+        "name": "Ward 29, Alder Chris Taliaferro",
+        "type": "ward",
+        "slug": "ward-29",
+        "metadata": "29th"
+    },
+    {
+        "name": "Ward 14, Alder Edward M. Burke",
+        "type": "ward",
+        "slug": "ward-14",
+        "metadata": "14th"
+    },
+    {
+        "name": "Ward 3, Alder Pat Dowell",
+        "type": "ward",
+        "slug": "ward-3",
+        "metadata": "3rd"
+    },
+    {
+        "name": "Ward 4, Alder William Burns",
+        "type": "ward",
+        "slug": "ward-4",
+        "metadata": "4th"
+    },
+    {
+        "name": "Ward 2, Alder Brian Hopkins",
+        "type": "ward",
+        "slug": "ward-2",
+        "metadata": "2nd"
+    },
+    {
+        "name": "Ward 35, Alder Carlos Ramirez-Rosa",
+        "type": "ward",
+        "slug": "ward-35",
+        "metadata": "35th"
+    },
+    {
+        "name": "Ward 21, Alder Howard B Brookins, Jr.",
+        "type": "ward",
+        "slug": "ward-21",
+        "metadata": "21st"
+    },
+    {
+        "name": "Ward 24, Alder Michael Scott, Jr.",
+        "type": "ward",
+        "slug": "ward-24",
+        "metadata": "24th"
+    },
+    {
+        "name": "Ward 13, Alder Marty Quinn",
+        "type": "ward",
+        "slug": "ward-13",
+        "metadata": "13th"
+    },
+    {
+        "name": "Ward 48, Alder Harry Osterman",
+        "type": "ward",
+        "slug": "ward-48",
+        "metadata": "48th"
+    },
+    {
+        "name": "Ward 31, Alder Milagros \"Milly\" Santiago",
+        "type": "ward",
+        "slug": "ward-31",
+        "metadata": "31st"
+    },
+    {
+        "name": "Ward 47, Alder Ameya Pawar",
+        "type": "ward",
+        "slug": "ward-47",
+        "metadata": "47th"
+    },
+    {
+        "name": "Ward 38, Alder Nicholas Sposato",
+        "type": "ward",
+        "slug": "ward-38",
+        "metadata": "38th"
+    },
+    {
+        "name": "Ward 33, Alder Deb Mell",
+        "type": "ward",
+        "slug": "ward-33",
+        "metadata": "33rd"
+    },
+    {
+        "name": "Ward 30, Alder Ariel E. Reboyras",
+        "type": "ward",
+        "slug": "ward-30",
+        "metadata": "30th"
+    },
+    {
+        "name": "Ward 34, Alder Carrie M Austin",
+        "type": "ward",
+        "slug": "ward-34",
+        "metadata": "34th"
+    },
+    {
+        "name": "Ward 28, Alder Jason Ervin",
+        "type": "ward",
+        "slug": "ward-28",
+        "metadata": "28th"
+    },
+    {
+        "name": "Ward 40, Alder Patrick J. O'connor",
+        "type": "ward",
+        "slug": "ward-40",
+        "metadata": "40th"
+    },
+    {
+        "name": "Ward 44, Alder Tom M. Tunney",
+        "type": "ward",
+        "slug": "ward-44",
+        "metadata": "44th"
+    },
+    {
+        "name": "Ward 25, Alder Daniel S. Solis",
+        "type": "ward",
+        "slug": "ward-25",
+        "metadata": "25th"
+    },
+    {
+        "name": "Ward 50, Alder Debra Silverstein",
+        "type": "ward",
+        "slug": "ward-50",
+        "metadata": "50th"
+    },
+    {
+        "name": "Ward 22, Alder Ricardo Munoz",
+        "type": "ward",
+        "slug": "ward-22",
+        "metadata": "22nd"
+    },
+    {
+        "name": "Ward 41, Alder Anthony Napolitano",
+        "type": "ward",
+        "slug": "ward-41",
+        "metadata": "41st"
+    },
+    {
+        "name": "Ward 18, Alder Derrick Curtis",
+        "type": "ward",
+        "slug": "ward-18",
+        "metadata": "18th"
+    },
+    {
+        "name": "Ward 17, Alder David Moore",
+        "type": "ward",
+        "slug": "ward-17",
+        "metadata": "17th"
+    },
+    {
+        "name": "Ward 6, Alder Roderick Sawyer",
+        "type": "ward",
+        "slug": "ward-6",
+        "metadata": "6th"
+    },
+    {
+        "name": "Ward 5, Alder Leslie Hairston",
+        "type": "ward",
+        "slug": "ward-5",
+        "metadata": "5th"
+    },
+    {
+        "name": "Ward 43, Alder Michele Smith",
+        "type": "ward",
+        "slug": "ward-43",
+        "metadata": "43rd"
+    },
+    {
+        "name": "Ward 8, Alder Michelle Harris",
+        "type": "ward",
+        "slug": "ward-8",
+        "metadata": "8th"
+    },
+    {
+        "name": "Ward 7, Alder Gregory Mitchell",
+        "type": "ward",
+        "slug": "ward-7",
+        "metadata": "7th"
+    },
+    {
+        "name": "Ward 39, Alder Margaret Laurino",
+        "type": "ward",
+        "slug": "ward-39",
+        "metadata": "39th"
+    },
+    {
+        "name": "Ward 46, Alder James Cappleman",
+        "type": "ward",
+        "slug": "ward-46",
+        "metadata": "46th"
+    },
+    {
+        "name": "Ward 32, Alder Scott Waguespack",
+        "type": "ward",
+        "slug": "ward-32",
+        "metadata": "32nd"
+    },
+    {
+        "name": "Ward 1, Alder Proco Joe Moreno",
+        "type": "ward",
+        "slug": "ward-1",
+        "metadata": "1st"
+    },
+    {
+        "name": "Ward 19, Alder Matthew O'shea",
+        "type": "ward",
+        "slug": "ward-19",
+        "metadata": "19th"
+    },
+    {
+        "name": "Ward 9, Alder Anthony Beale",
+        "type": "ward",
+        "slug": "ward-9",
+        "metadata": "9th"
+    },
+    {
+        "name": "Ward 36, Alder Gilbert Villegas",
+        "type": "ward",
+        "slug": "ward-36",
+        "metadata": "36th"
+    },
+    {
+        "name": "Ward 37, Alder Emma Mitts",
+        "type": "ward",
+        "slug": "ward-37",
+        "metadata": "37th"
+    },
+    {
+        "name": "Ward 27, Alder Walter Burnett, Jr.",
+        "type": "ward",
+        "slug": "ward-27",
+        "metadata": "27th"
+    },
+    {
+        "name": "Ward 10, Alder Susan Sadlowski-Garza",
+        "type": "ward",
+        "slug": "ward-10",
+        "metadata": "10th"
+    },
+    {
+        "name": "Ward 11, Alder Patrick Daley Thompson",
+        "type": "ward",
+        "slug": "ward-11",
+        "metadata": "11th"
+    },
+    {
+        "name": "Ward 26, Alder Roberto Maldonado",
+        "type": "ward",
+        "slug": "ward-26",
+        "metadata": "26th"
+    },
+    {
+        "name": "Ward 45, Alder John Arena",
+        "type": "ward",
+        "slug": "ward-45",
+        "metadata": "45th"
+    }
+]
