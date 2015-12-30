@@ -220,11 +220,15 @@ define(['util', 'jquery'], function (Utility, $) {
         $('#status').html('Looking through the database...');
 
         var coords = '';
-        poly.getLatLngs().forEach(function (coord) {
+        var latLngs = poly.getLatLngs();
+        if (_.isArray(latLngs[0])) {
+            latLngs = latLngs[0];
+        }
+        latLngs.forEach(function (coord) {
             coords += coord.lng + ' ' + coord.lat + ',';
         });
         // Append last point
-        var lastPoint = poly.getLatLngs()[0];
+        var lastPoint = latLngs[0];
         coords += lastPoint.lng + ' ' + lastPoint.lat;
 
         return prefix + '/api2.php?coords=' + coords;

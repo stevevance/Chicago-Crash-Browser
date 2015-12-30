@@ -1,7 +1,7 @@
 /* global define, L */
 'use strict';
 
-define(['jquery', 'lodash'], function ($, _) {
+define(['jquery', 'lodash', 'map'], function ($, _, map) {
   var areas;
 
   function initDropdown() {
@@ -32,8 +32,9 @@ define(['jquery', 'lodash'], function ($, _) {
                 method: 'boundary',
                 place: e.params.data.id
               }
-            }).then(function (geoJson) {
-              map.setPoly(L.geoJson(geoJson));
+            }).then(function (geoJsonRaw) {
+              map.clearAreas();
+              map.setPoly(L.GeoJSON.geometryToLayer(geoJsonRaw.features[0]));
               $('body').trigger('search', {
                 areaType: 'polygon'
               });
