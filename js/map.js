@@ -10,8 +10,8 @@ define(['util', 'jquery'], function (Utility, $) {
     var poly;
     var markerGroup;
     var isDrawing = false;
-    // var prefix = 'http://www.chicagocrashes.org';
-    var prefix = '';
+    var prefix = 'http://www.chicagocrashes.org';
+    // var prefix = '';
 
     var shapeOptions = {
         color: 'red',
@@ -316,6 +316,10 @@ define(['util', 'jquery'], function (Utility, $) {
         };
     };
 
+    var setPoly = function setPoly(newPoly) {
+        poly = newPoly;
+    }
+
     init();
 
     return {
@@ -328,6 +332,7 @@ define(['util', 'jquery'], function (Utility, $) {
         finalizeMarkerGroup: finalizeMarkerGroup,
         addFeatureToMap: addFeatureToMap,
         getMetaData: getMetaData,
-        setCoordinates: setCoordinates
+        setCoordinates: setCoordinates,
+        setPoly: setPoly
     };
 });
