@@ -10,8 +10,7 @@ define(['util', 'jquery'], function (Utility, $) {
     var poly;
     var markerGroup;
     var isDrawing = false;
-    var prefix = 'http://www.chicagocrashes.org';
-    // var prefix = '';
+    var API_HOST = '@@API_HOST';
 
     var shapeOptions = {
         color: 'red',
@@ -209,7 +208,7 @@ define(['util', 'jquery'], function (Utility, $) {
         north = northeast.lat;
         east = northeast.lng;
 
-        return prefix + '/api2.php?lat='+lat+'&lng='+lng+'&distance='+Utility.getDistance();
+        return API_HOST + '/api2.php?lat='+lat+'&lng='+lng+'&distance='+Utility.getDistance();
 
     };
 
@@ -231,7 +230,7 @@ define(['util', 'jquery'], function (Utility, $) {
         var lastPoint = latLngs[0];
         coords += lastPoint.lng + ' ' + lastPoint.lat;
 
-        return prefix + '/api2.php?coords=' + coords;
+        return API_HOST + '/api2.php?coords=' + coords;
     };
 
     /**

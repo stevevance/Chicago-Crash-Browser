@@ -5,6 +5,8 @@ var concatCss = require('gulp-concat-css');
 var webpack = require('webpack-stream');
 var rsync = require('rsync-slim');
 var secrets = require('./secrets.json');
+var connect = require('gulp-connect');
+var replace = require('gulp-replace');
 
 const outputFolder = 'dist';
 
@@ -49,7 +51,21 @@ gulp.task('clean', function () {
   return del([outputFolder]);
 });
 
-gulp.task('deploy', ['default'], function () {
+gulp.task('serve', ['clean', 'default'], function () {
+  gulp.src([outputFolder + '/bundle.js'])
+    .pipe(replace('@@API_HOST', 'http://www.chicagocrashes.org'))
+    .pipe(gulp.dest(outputFolder, {overwrite: true}));
+
+  connect.server({root: 'dist'})
+});
+
+gulp.task('replaceProd', ['default'], function () {
+  return gulp.src([outputFolder + '/bundle.js'])
+    .pipe(replace('@@API_HOST', ''))
+    .pipe(gulp.dest(outputFolder, {overwrite: true}));
+})
+
+gulp.task('deploy', ['default', 'replaceProd'], function () {
   rsync({
     src: outputFolder + '/',
     dest: secrets.username + '@' + secrets.hostname + ':/var/www/chicagocrashes/htdocs',
