@@ -59,11 +59,13 @@ gulp.task('serve', ['clean', 'default'], function () {
   connect.server({root: 'dist'})
 });
 
-gulp.task('deploy', ['default'], function () {
-  gulp.src([outputFolder + '/bundle.js'])
+gulp.task('replaceProd', ['default'], function () {
+  return gulp.src([outputFolder + '/bundle.js'])
     .pipe(replace('@@API_HOST', ''))
     .pipe(gulp.dest(outputFolder, {overwrite: true}));
+})
 
+gulp.task('deploy', ['default', 'replaceProd'], function () {
   rsync({
     src: outputFolder + '/',
     dest: secrets.username + '@' + secrets.hostname + ':/var/www/chicagocrashes/htdocs',
