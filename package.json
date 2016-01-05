@@ -20,6 +20,8 @@
     "del": "^2.2.0",
     "gulp": "^3.9.0",
     "gulp-concat-css": "^2.2.0",
+    "gulp-connect": "^2.3.1",
+    "gulp-replace": "^0.5.4",
     "gulp-sourcemaps": "^1.6.0",
     "rsync-slim": "^1.1.0",
     "webpack": "^1.11.0",
