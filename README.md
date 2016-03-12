@@ -7,11 +7,8 @@ The Chicago Crash Browser is an interface for the automobile crash data from the
 
 2014 crash data was obtained December 24, 2015. Use of crash data must now be accompanied by this disclaimer:
 
-````
-The Division of Traffic Safety requires the following statement be placed on any work product that incorporates or references our data. 
- 
+> The Division of Traffic Safety requires the following statement be placed on any work product that incorporates or references our data. 
 DISCLAIMER: The motor vehicle crash data referenced herein was provided by the Illinois Department of Transportation. The author is responsible for any data analyses and conclusions drawn.
-````
 
 ##Purpose
 The purpose of the Crash Browser is two fold:
