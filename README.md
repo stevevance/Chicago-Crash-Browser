@@ -48,7 +48,11 @@ The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois 
 * Attempted to create a public browser later in 2011, to get more details about the crashes, especially after I obtained additional years of data
 * IDOT asks me to remove the links to the data dumps in March 2015. I did. I put the links back up in March 2016 because [IDOT changed their boneheaded policy](http://chi.streetsblog.org/2015/11/03/idot-finally-sees-the-light-stops-withholding-crash-data-from-the-public/) on who can have access to this vital public health and safety data. 
 
-##Credits##
+## Stay updated
+* Follow [@stevevance](http://twitter.com/stevevance) on Twitter
+* Sign up for the rarely-issued [e-blasts on TinyLetter](https://tinyletter.com/chicagocrashes)
+
+##Credits
 * Smart Chicago Collaborative for hosting the site
 * Michael Carney and Sebastian Lew (who got me interested in automobile crash data in the first place after they asked if I had it)
 * Lori M. at IDOT (for providing the data)
