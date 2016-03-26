@@ -38,8 +38,9 @@ gulp.task('default', ['clean', 'css', 'images'], function () {
     .pipe(gulp.dest(outputFolder))
 
   gulp.src(['index.html',
-    'api2.php',
-    'staticmap.php'])
+    'api.php',
+    'config.php'
+    ])
     .pipe(gulp.dest(outputFolder));
 
   return gulp.src('js/crashbrowser.js')
