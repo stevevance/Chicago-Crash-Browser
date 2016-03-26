@@ -25,6 +25,15 @@ The data was removed on March 4, 2015, upon the request of the Illinois Departme
 * [Data dictionary, 2004-2012](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
 * [Data dictionary, 2013-present](datadictionary/Illinois%20Traffic%20Crash%20Data%20Extract%20Metadata%20112014-Crash.docx)
 
+## Installation
+
+Since this is an open source project, you can clone/fork it and build or adapt your own version, for Chicago or anywhere else. After you clone it to your computer, run these commands in the Terminal:
+````
+npm install && bower install && gulp replaceProd
+````
+Then point your web browser to the `/dist` folder. 
+
+
 ##API
 The API returns JSON and has the following GET parameters:
 * distance (in feet). This is capped at 1,000 feet. 
@@ -53,19 +62,19 @@ The records' WGS84 (EPSG:4326) coordinates are converted to EPSG:3436 (Illinois 
 * Sign up for the rarely-issued [e-blasts on TinyLetter](https://tinyletter.com/chicagocrashes)
 
 ##Credits
-* Smart Chicago Collaborative for hosting the site
 * Michael Carney and Sebastian Lew (who got me interested in automobile crash data in the first place after they asked if I had it)
-* Lori M. at IDOT (for providing the data)
+* Richard Lee who made the first social edits via GitHub
+* Robert Guico who installed Bower (for dependencies) and cleaned up a lot of the JavaScript
+* Lori and Charles at IDOT (for providing the data)
 * Jerad Weiner
 * Amanda Woodall at Active Transportation Alliance (for helping me understand the data)
-* Derek Eder and Nick Rougeux (for continued tech support and brainstorming)
+* Derek Eder and Nick Rougeux
 * Cory Mollett (for PostgreSQL and Amazon Web Services help)
-* Ryan Lakes (for motivating me to resurrect this)
-* Nabil Nazha (for assistance in developing a method relating intersections to bike crashes in GIS and determining the ideal distance)
+* Ryan Lakes
+* Nabil Nazha
 * Bill Vassilakis
 * Trina Chiasson
-* Richard Lee who made the first edits via GitHub. 
-* Robert Guico who installed Bower (for dependencies) and cleaned up a lot of the JavaScript
+* Smart Chicago Collaborative for hosting the site
 * Everyone who appreciates this work.
 
 ##Cities outside Chicago##

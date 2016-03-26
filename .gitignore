@@ -13,3 +13,4 @@ DATA.md
 
 dist/
 node_modules/
+*.pem
