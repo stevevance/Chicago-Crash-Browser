@@ -39,6 +39,8 @@ gulp.task('default', ['clean', 'css', 'images'], function () {
 
   gulp.src(['index.html',
     'api.php',
+    'staticmap.php',
+    'favicon.ico',
     'config.php'
     ])
     .pipe(gulp.dest(outputFolder));
