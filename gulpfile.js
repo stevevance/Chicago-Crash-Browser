@@ -40,7 +40,7 @@ gulp.task('default', ['clean', 'css', 'images'], function () {
   gulp.src(['index.html',
     'api.php',
     'staticmap.php',
-    'favicon.ico'
+    'favicon.ico',
     'api.php',
     'config.php'
     ])
