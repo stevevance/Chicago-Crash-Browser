@@ -1,70 +1,77 @@
 <?php
+require_once("config.php");
+require_once("pg.php");
+require_once("functions.php");
+
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
-require_once("pg.php");
-error_reporting(0);
+$distance = intval($_GET['distance']);
+$lat = floatval($_GET['lat']);
+$lng = floatval($_GET['lng']);
 
-if(!empty($_GET)) {
-	$lat = trim($_GET['lat']);
-	$lng = trim($_GET['lng']);
-	$distance = intval($_GET['distance']);
+$coords = "";
+if(!empty($_GET) & isset($_GET['coords'])):
+	$coords = trim(urldecode($_GET["coords"]));
+    $coords = pg_escape_string($coords);
+endif;
 
-	$north = trim($_GET["north"]);
-	$south = trim($_GET["south"]);
-	$east = trim($_GET["east"]);
-	$west = trim($_GET["west"]);
-}
-
-if(!is_numeric($lat)) { // protect against SQL injection
-	$lat = 41.895924;
-}
-if(!is_numeric($lng)) { // protect
-	$lng = -87.654921;
-}
-if(!is_numeric($north)) { // protect
-	$west = -87.93;
-	$east = -87.515;
-	$north  = 42.0820;
-	$south = 41.6300;
-}
-if($distance > 500) { // in feet
-	$distance = 150;
-}
-
-// constant for ST_Transform
-$NAD83_ILLINOIS_EAST = 3435;
-$WGS_84 = 4326;
-
-$sql = <<< HEREDOC
-SELECT array_to_json(array_agg(row_to_json(t))) AS result FROM (
-SELECT "collType",
-	casenumber,
-	"totalInjuries",
-	"Total killed" as "totalKilled",
-	"No injuries" as "noInjuries",
-	"Crash severity" as "crashSeverity",
-	month,
-	day,
-	year,
-	latitude,
-	longitude FROM "$table" c
-WHERE
-ST_DWithin((SELECT ST_Transform(ST_GeomFromText('POINT( $lng $lat )',$WGS_84),$NAD83_ILLINOIS_EAST)), ST_Transform(c.wgs84, $NAD83_ILLINOIS_EAST), $distance)
-AND latitude < $north AND latitude > $south
-AND longitude > $west AND longitude < $east
-ORDER BY year ASC, month ASC, day ASC
-) as t
+$table = TABLE_CRASHES;
+if($distance):
+	$q = <<<HEREDOC
+	SELECT * FROM (
+	SELECT
+		"collType",
+		casenumber,
+		"totalInjuries",
+		"totalKilled",
+		"noInjuries",
+		"Crash severity" as "crashSeverity",
+		month,
+		day,
+		year,
+		trunc("Crash latitude"::numeric, 6) AS latitude,
+		trunc("Crash longitude"::numeric, 6) AS longitude
+	FROM {$table} c
+	WHERE ST_DWithin(c.geom_3435, ST_Transform(ST_GeometryFromText('POINT({$lng} {$lat})',4326), 3435), {$distance})
+	) as t
 HEREDOC;
+else:
+	$q = <<<HEREDOC
+	SELECT * FROM (
+	SELECT
+		"collType",
+		casenumber,
+		"totalInjuries",
+		"totalKilled",
+		"noInjuries",
+		"Crash severity" as "crashSeverity",
+		month,
+		day,
+		year,
+		trunc("Crash latitude"::numeric, 6) AS latitude,
+		trunc("Crash longitude"::numeric, 6) AS longitude
+	FROM {$table} c
+	WHERE ST_Within(c.geom_4326, ST_GeomFromText('POLYGON(($coords))', 4326))
+	) as t
+HEREDOC;
+endif;
 
-if(!empty($lat) && !empty($lng)) {
-	$result = pg_query($pg, $sql);
-	$total = pg_num_rows($result);
+$result = pg_query($pg, $q);
+$total = pg_num_rows($result);
+
+if (!$result) {
+    echo "An error occurred.\n";
+    echo $q;
+    echo pg_result_error($result);
 }
 
-echo pg_last_error($pg);
+$crashes = json_encode(pg_fetch_all($result));
+$query = json_encode($q);
+//, "sql": {$query}
+$response = <<<EOF
+{"response":{"coords": "{$coords}", "results": "$total"},"crashes": {$crashes} }
+EOF;
 
-$r = pg_fetch_assoc($result);
-$result = $r['result'] ? $r['result'] : '[]';
-echo '{"response":{"sql":' . json_encode($sql) . '},"crashes":' . $result . '}';
+echo $response;
 ?>
