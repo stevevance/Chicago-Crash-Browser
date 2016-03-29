@@ -42,7 +42,8 @@ gulp.task('default', ['clean', 'css', 'images'], function () {
     'staticmap.php',
     'favicon.ico',
     'config.php',
-    'functions.php'
+    'functions.php',
+    'map.php'
     ])
     .pipe(gulp.dest(outputFolder));
 
