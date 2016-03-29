@@ -14,11 +14,6 @@ require_once("functions.php");
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
-foreach($argv as $i){
-    list($k, $v) = explode('=', $i, 2);
-    $_GET[$k] = $v;
-}
-
 $distance = intval($_GET['distance']);
 $lat = floatval($_GET['lat']);
 $lng = floatval($_GET['lng']);
