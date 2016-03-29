@@ -1,11 +1,11 @@
 <?php
 
 // DEFINE constants
-$config = [
-	"srid_wgs84"=>4326, 
-	"srid_illinois_east"=>3435, 
+$config = array (
+	"srid_wgs84"=>4326,
+	"srid_illinois_east"=>3435,
 	"table_crashes"=>"crashes_chicago_2009_2014"
-];
+);
 
 foreach($config as $key=>$val):
 	define(strtoupper($key),$val);

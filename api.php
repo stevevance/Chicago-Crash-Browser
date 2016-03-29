@@ -1,10 +1,23 @@
 <?php
 require_once("config.php");
-require_once("pg.php");
+require_once("../api/pg.php");
 require_once("functions.php");
+
+// foreach ($argv as $arg) {
+//     $e=explode("=",$arg);
+//     if(count($e)==2)
+//         $_GET[$e[0]]=$e[1];
+//     else
+//         $_GET[$e[0]]=0;
+// }
 
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
+
+foreach($argv as $i){
+    list($k, $v) = explode('=', $i, 2);
+    $_GET[$k] = $v;
+}
 
 $distance = intval($_GET['distance']);
 $lat = floatval($_GET['lat']);
