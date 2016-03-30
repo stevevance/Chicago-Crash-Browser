@@ -20,8 +20,10 @@ The purpose of the Crash Browser is two fold:
 ##Data
 The Chicago Crash Browser uses only one of the three tables the state provides, called "CrashExtract". It's called this because the crash data is an extract from the entire database, extracted by year and city. Whenever the whole state was provided, all cities except Chicago ("City Code" != 1051) were stripped and uploaded to a PostgreSQL PostGIS-enabled database. 
 
-The data was removed on March 4, 2015, upon the request of the Illinois Department of Transportation, which cited  sections of the Illinois Vehicle Code.
+### Get the data
+All of the data links are in the [Data](DATA.md) page.
 
+### Metadata
 * [Data dictionary, 2004-2012](datadictionary/2004-present_crash_datadictionary_10-13-09.docx)
 * [Data dictionary, 2013-present](datadictionary/Illinois%20Traffic%20Crash%20Data%20Extract%20Metadata%20112014-Crash.docx)
 
