@@ -27,7 +27,7 @@ define(['jquery', 'lodash', 'map'], function ($, _, map) {
         });
 
         $('#areaSelector').on('select2:select', function (e) {
-          $.ajax('http://www.chicagocityscape.com/php/api.map.php', {
+          $.ajax('map.php', {
               data: {
                 method: 'boundary',
                 place: e.params.data.id
