@@ -8,6 +8,10 @@ Some datasets have data for crashes within the City of Chicago and others have c
 > The Division of Traffic Safety requires the following statement be placed on any work product that incorporates or references our data. 
 DISCLAIMER: The motor vehicle crash data referenced herein was provided by the Illinois Department of Transportation. The author is responsible for any data analyses and conclusions drawn.
 
+IDOT will not provide access to its [Safety Portal](https://webapps.dot.illinois.gov/SafetyPortal/) unless you work for a government agency. When I requested access to it in December 2015, [Ken Martin](mailto:Ken.Martin@illinois.gov) from IDOT responded: "The IDOT Safety Portal was designed under the provisions of the Illinois Vehicle Code to provide access to crash data and our SR1050 crash reports for federal, state, and local governmental agencies involved in highway safety research and studies. We will not be able to grant your request."
+
+The Safety Portal replaced the Safety Data Mart in 2016, which had maps and crash data open to anyone. 
+
 ## Notes / Getting Help
 * Be careful comparing data 2005-2008 and 2009 to present because the reporting threshold changed. In the former period, the data will contain crashes that had no injuries and property damage of at least $500. In the latter period, the data will contain crashes that had no injuries but property damage of at least $1,500. If there was an injury, the data will contain that crash regardless of the property damage estimate. 
 * Beware that fields were added and removed for the 2013 & 2014 datasets (and likely future datasets). Until I write about the differences please compare the data dictionaries. 
