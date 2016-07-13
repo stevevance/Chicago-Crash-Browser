@@ -58,11 +58,9 @@ The data is zipped CSV files. Most of these don't have the field names. You can 
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2008/2008_VehicleExtract.txt.zip)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2008/2008_PersonExtract.txt.zip)
 
-### 2009 - City of Chicago
+### 2009 - State of Illinois
 
-*   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2009/2009_CrashExtract.txt.zip)
-*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2009/2009_VehicleExtract.txt.zip)
-*   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2009/2009_PersonExtract.txt.zip)
+*   [Crash, Vehicle, Person](http://chicagocrashes.s3.amazonaws.com/crashdata/illinois_2009/StatewideExtract2009.zip)
 
 ### 2010 - State of Illinois
 
@@ -76,11 +74,9 @@ The data is zipped CSV files. Most of these don't have the field names. You can 
 *   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2011/2011_VehicleExtract.txt.zip)
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2011/2011_PersonExtract.txt.zip)
 
-### 2012 - City of Chicago
+### 2012 - State of Illinois
 
-*   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_CrashExtract.txt.zip)
-*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_VehicleExtract.txt.zip)
-*   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2012/2012_PersonExtract.txt.zip) 
+*   [Crash, Vehicle, Person](http://chicagocrashes.s3.amazonaws.com/crashdata/illinois_2012/StatewideExtract2012.zip) 
 
 ### 2013 - State of Illinois (note changes in Data Dictionary above)
 *   [All three tables](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2013/StatewideExtract2013.zip) (80 MB)
