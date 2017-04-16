@@ -91,7 +91,7 @@ The data is zipped CSV files. Most of these don't have the field names. You can 
 *   [Person](http://s3.amazonaws.com/chicagocrashes/crashdata/illinois_2014/2014_IllinoisPersonExtract.txt.zip) (15 MB)
 
 ### 2015 - City of Chicago
-April 16, 2017: I thought I asked for the whole state, but maybe I didn't. I'll try to get those later. 
+Data was posted on April 16, 2017. I thought I asked for the whole state, but maybe I didn't. I'll try to get those later. 
 * [All three tables](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoAllThreeTables.zip) (20 MB)
 * [Crash](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoCrashExtract.txt.zip) (9 MB)
 * [Vehicle](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoVehicleExtract.txt.zip) (7 MB)
