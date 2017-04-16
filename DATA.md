@@ -96,6 +96,8 @@ Data was posted on April 16, 2017. I thought I asked for the whole state, but ma
 * [Crash](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoCrashExtract.txt.zip) (9 MB)
 * [Vehicle](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoVehicleExtract.txt.zip) (7 MB)
 * [Person](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/2015_ChicagoPersonExtract.txt.zip) (4 MB)
+* [Summary report](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/Chicago%202015%20City%20Summary.pdf)
+* [Dooring report](http://chicagocrashes.s3.amazonaws.com/crashdata/chicago_2015/Chicago%20Dooring%20Report%202015.pdf) - dooring crashes aren't included in the crash table
 
 ### Field Names for 2006-2012
 Append these to the top of the CSV data. 
