@@ -101,9 +101,9 @@ Data was posted on April 16, 2017. I thought I asked for the whole state, but ma
 
 ### Field Names for 2006-2012
 Append these to the top of the CSV data. 
-*   [Crash](http://s3.amazonaws.com/chicagocrashes/field_names/crash field names.csv)
-*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/field_names/person field names.csv)
-*   [Person](http://s3.amazonaws.com/chicagocrashes/field_names/vehicle field names.csv)
+*   [Crash](http://s3.amazonaws.com/chicagocrashes/field_names/crash%20field%20names.csv)
+*   [Vehicle](http://s3.amazonaws.com/chicagocrashes/field_names/person%20field%20names.csv)
+*   [Person](http://s3.amazonaws.com/chicagocrashes/field_names/vehicle%20field%20names.csv)
 
 ### Field Names for 2013-2014 (currently not prepared)
 You can find these in the data dictionary, though. 
