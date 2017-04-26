@@ -4,7 +4,7 @@
 $config = array (
 	"srid_wgs84"=>4326,
 	"srid_illinois_east"=>3435,
-	"table_crashes"=>"crashes_chicago_2009_2014"
+	"table_crashes"=>"crashes_chicago_2009_2015"
 );
 
 foreach($config as $key=>$val):
