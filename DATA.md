@@ -34,6 +34,9 @@ The Safety Portal replaced the Safety Data Mart in 2016, which had maps and cras
 
 The data is zipped CSV files. Most of these don't have the field names. You can add those using the field name files at the bottom. 
 
+* [Summaries of each Illinois municipality on IDOT's website](https://apps.dot.illinois.gov/eplan/desenv/crash/City%20Summaries/)
+* [Other crash data from IDOT](http://www.idot.illinois.gov/transportation-system/safety/Illinois-Roadway-Crash-Data)
+
 ### 2005 - City of Chicago
 
 *   [Crash](http://s3.amazonaws.com/chicagocrashes/crashdata/chicago_2005/2005_CrashExtract.txt.zip)
