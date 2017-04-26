@@ -1,6 +1,6 @@
 <?php
 require_once("config.php");
-require_once("../api/pg.php");
+require_once("pg.php");
 require_once("functions.php");
 
 // foreach ($argv as $arg) {
@@ -38,8 +38,8 @@ if($distance):
 		month,
 		day,
 		year,
-		trunc("Crash latitude"::numeric, 6) AS latitude,
-		trunc("Crash longitude"::numeric, 6) AS longitude
+		st_y(geom_4326) AS latitude,
+		st_x(geom_4326) AS longitude
 	FROM {$table} c
 	WHERE ST_DWithin(c.geom_3435, ST_Transform(ST_GeometryFromText('POINT({$lng} {$lat})',4326), 3435), {$distance})
 	) as t
@@ -57,8 +57,8 @@ else:
 		month,
 		day,
 		year,
-		trunc("Crash latitude"::numeric, 6) AS latitude,
-		trunc("Crash longitude"::numeric, 6) AS longitude
+		st_y(geom_4326) AS latitude,
+		st_x(geom_4326) AS longitude
 	FROM {$table} c
 	WHERE ST_Within(c.geom_4326, ST_GeomFromText('POLYGON(($coords))', 4326))
 	) as t
