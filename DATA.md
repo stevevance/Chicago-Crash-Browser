@@ -117,6 +117,10 @@ Append these to the top of the CSV data.
 
 ### Extracting data from the ArcGIS MapServer
 Use [pyesridump](https://github.com/openaddresses/pyesridump) to extract the data into GeoJSON (you should have a fast reliable internet connection before starting this). 
+
+This command will tell the ArcGIS server to filter the "CrashReportCity" for "Chicago", and will only return the selected rows (this decreases the time to download all of the data). 
+
+While this database is real-time in that some of the latest crashes are in here, not all of the latest crashes are in here. If you are looking for complete data, do not use this database – wait for the annual crash reports, which contain complete and cleaned data. 
 ````
 esri2geojson -f ICN,TotalInjured,OInjuries,AInjuries,BInjuries,CInjuries,CrashInjurySeverity,IsHitAndRun,ContribCausePrim,ContribCauseSec,CrashReportCity,CrashDateTimeText,TotalFatals,FunctionalClassCIS,TypeOfFirstCrash,IsAnyCitation,CrashVehicleCount,AgencyCrashReportNo,IsAlcoholRelated,CISCrashID,AddressNo,HighwayOrStreetName,IntersectionStreets,InvestigatingAgencyName -p "where=CrashReportCity%3D%27Chicago%27" http://ags10s1.dot.illinois.gov/ArcGIS/rest/services/SafetyPortal/SafetyPortal/MapServer/12 idotcrashes_2017_Chicago.geojson
 ````
